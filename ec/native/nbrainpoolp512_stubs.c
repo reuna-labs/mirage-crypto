@@ -4,12 +4,12 @@
  * 32-bit for MSVC.
  */
 #if defined(ARCH_64BIT) && !defined(_MSC_VER)
-#include "nbrainpoolp512_64.h"
+#include "nbrainpoolp512_fiat_64.h"
 #define LIMBS 8
 #define WORD uint64_t
 #define WORDSIZE 64
 #else
-#include "nbrainpoolp512_32.h"
+#include "nbrainpoolp512_fiat_32.h"
 #define LIMBS 16
 #define WORD uint32_t
 #define WORDSIZE 32

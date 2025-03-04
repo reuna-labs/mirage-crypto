@@ -92,62 +92,6 @@ CAMLprim value mc_secp256k1_select(value out, value bit, value t, value f)
 	CAMLreturn(Val_unit);
 }
 
-CAMLprim value mc_nsecp256k1_inv(value out, value in)
-{
-	CAMLparam2(out, in);
-	fiat_nsecp256k1_inv((limb_t*)Bytes_val(out), (const limb_t*)String_val(in));
-	CAMLreturn(Val_unit);
-}
-
-CAMLprim value mc_nsecp256k1_mul(value out, value a, value b)
-{
-	CAMLparam3(out, a, b);
-	fiat_nsecp256k1_mul((limb_t*)Bytes_val(out), (const limb_t*)String_val(a), (const limb_t*)String_val(b));
-	CAMLreturn(Val_unit);
-}
-
-CAMLprim value mc_nsecp256k1_add(value out, value a, value b)
-{
-	CAMLparam3(out, a, b);
-	fiat_nsecp256k1_add((limb_t*)Bytes_val(out), (const limb_t*)String_val(a), (const limb_t*)String_val(b));
-	CAMLreturn(Val_unit);
-}
-
-CAMLprim value mc_nsecp256k1_one(value out)
-{
-	CAMLparam1(out);
-	fiat_nsecp256k1_set_one((limb_t*)Bytes_val(out));
-	CAMLreturn(Val_unit);
-}
-
-CAMLprim value mc_nsecp256k1_from_bytes(value out, value in)
-{
-	CAMLparam2(out, in);
-	fiat_nsecp256k1_from_bytes((limb_t*)Bytes_val(out), _st_uint8(in));
-	CAMLreturn(Val_unit);
-}
-
-CAMLprim value mc_nsecp256k1_to_bytes(value out, value in)
-{
-	CAMLparam2(out, in);
-	fiat_nsecp256k1_to_bytes(Bytes_val(out), (const limb_t*)String_val(in));
-	CAMLreturn(Val_unit);
-}
-
-CAMLprim value mc_nsecp256k1_from_montgomery(value out, value in)
-{
-	CAMLparam2(out, in);
-	fiat_nsecp256k1_from_montgomery((limb_t*)Bytes_val(out), (const limb_t*)String_val(in));
-	CAMLreturn(Val_unit);
-}
-
-CAMLprim value mc_nsecp256k1_to_montgomery(value out, value in)
-{
-	CAMLparam2(out, in);
-	fiat_nsecp256k1_to_montgomery((limb_t*)Bytes_val(out), (const limb_t*)String_val(in));
-	CAMLreturn(Val_unit);
-}
-
 #define PT(v) ((const pt_aff_t*) (String_val(v)))
 #define PT_OUT(v) ((pt_aff_t*) (Bytes_val(v)))
 
