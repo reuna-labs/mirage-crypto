@@ -242,6 +242,13 @@ let ed25519 =
 
 let ed25519_sig () = Mirage_crypto_ec.Ed25519.sign ~key:ed25519 msg_str
 
+let bip340 =
+  Result.get_ok
+    (Mirage_crypto_ec.P256k1.Dsa_bip340.priv_of_octets
+       "\x05\x9f\x4f\xfc\xcc\xf9\xba\x13\xfe\xdd\x09\x42\xef\x08\xcf\x2d\x90\x9f\x32\xe2\x93\x4a\xb5\xc9\x3b\x6c\x99\xbe\x5a\x9f\xf5\x27")
+
+let bip340_sig () = Mirage_crypto_ec.P256k1.Dsa_bip340.sign_bip340 ~key:bip340 ~aux_rand:(String.make 32 '\000') msg_str_32
+
 let ecdsas = [
   ("P256", `P256 (ecdsa_p256, ecdsa_p256_sig ()));
   ("P256k1", `P256k1 (ecdsa_p256k1, ecdsa_p256k1_sig ()));
@@ -251,6 +258,7 @@ let ecdsas = [
   ("BrainpoolP384", `BrainpoolP384 (ecdsa_brainpoolp384, ecdsa_brainpoolp384_sig ()));
   ("BrainpoolP512", `BrainpoolP512 (ecdsa_brainpoolp512, ecdsa_brainpoolp512_sig ()));
   ("Ed25519", `Ed25519 (ed25519, ed25519_sig ()));
+  ("Bip340", `P256k1_bip340 (bip340, bip340_sig ()));
 ]
 
 let ecdh_shares =
@@ -351,6 +359,7 @@ let benchmarks = [
            | `BrainpoolP384 _ -> BrainpoolP384.Dsa.generate () |> ignore
            | `BrainpoolP512 _ -> BrainpoolP512.Dsa.generate () |> ignore
            | `Ed25519 _ -> Ed25519.generate () |> ignore
+           | `P256k1_bip340 _ -> P256k1.Dsa_bip340.generate () |> ignore
         )
         fst ecdsas);
 
@@ -365,6 +374,7 @@ let benchmarks = [
           | `BrainpoolP384 (key, _) -> BrainpoolP384.Dsa.sign ~key msg_str_48
           | `BrainpoolP512 (key, _) -> BrainpoolP512.Dsa.sign ~key msg_str_64
           | `Ed25519 (key, _) -> Ed25519.sign ~key msg_str, ""
+          | `P256k1_bip340 (key, _) -> P256k1.Dsa_bip340.sign_bip340 ~key ~aux_rand:(String.make 32 '\000') msg_str_32
         )
         fst ecdsas);
 
@@ -379,6 +389,7 @@ let benchmarks = [
           | `BrainpoolP384 (key, signature) -> BrainpoolP384.Dsa.(verify ~key:(pub_of_priv key) signature msg_str_48)
           | `BrainpoolP512 (key, signature) -> BrainpoolP512.Dsa.(verify ~key:(pub_of_priv key) signature msg_str_64)
           | `Ed25519 (key, signature) -> Ed25519.(verify ~key:(pub_of_priv key) signature ~msg:msg_str)
+          | `P256k1_bip340 (key, signature) -> P256k1.Dsa_bip340.(verify_bip340 ~key:(pub_of_priv key) signature msg_str_32)
         ) fst ecdsas);
 
   bm "dh-secret" (fun name ->

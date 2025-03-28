@@ -145,6 +145,45 @@ module type Dsa = sig
 
 end
 
+(** BIP-340 Schnorr signature algorithm on curve secp256k1. *)
+module type Dsa_bip340 = sig
+  include Dsa
+
+  (** {2 Serialisation} *)
+
+  val get_x : pub -> string
+  (** [get_x p] returns the X coordinate of public key [p]. *)
+
+  (** {2 Cryptographic operations} *)
+
+  val sign_bip340 : key:priv -> ?aux_rand:string -> string -> string * string
+  (** [sign ~key ~aux_rand msg] signs the message [msg] using the private [key].
+      If [aux_rand] is provided, it is used as auxiliary randomness in the
+      deterministic nonce generation process. Otherwise, fresh randomness is
+      generated.
+
+      The BIP-340 signing algorithm implements key prefixing to prevent key
+      recovery in multi-user settings. The result is a pair of [r] and [s] where
+      [r] is the X coordinate of the nonce point R, and [s] is the signature
+      scalar.
+
+      Note that unlike ECDSA, BIP-340 signatures do not require pre-hashing of
+      the message, though pre-hashing is recommended for large messages.
+
+      @raise Invalid_argument if the signature cannot be generated. *)
+
+  val verify_bip340 : key:pub -> string * string -> string -> bool
+  (** [verify ~x (r, s) msg] verifies the BIP-340 Schnorr signature [r, s]
+      on the message [msg] with the public [x] coordinate. The return value is
+      [true] if verification was successful, [false] otherwise.
+
+      The verification checks that s⋅G = R + hash(R || P || m)⋅P, where
+      R is the point with x-coordinate r and even y-coordinate,
+      P is the point with x-coordinate from the public key and even y-coordinate,
+      and m is the message. *)
+
+end
+
 (** Elliptic curve with Diffie-Hellman and DSA. *)
 module type Dh_dsa = sig
 
@@ -154,6 +193,16 @@ module type Dh_dsa = sig
   (** Digital signature algorithm. *)
   module Dsa : Dsa
 end
+
+(** secp256k1 with Diffie-Hellman, DSA and BIP-340. *)
+module type P256k1 = sig
+  include Dh_dsa
+
+  (** Digital signature algorithm. *)
+  module Dsa_bip340 : Dsa_bip340 with type priv = Dsa.priv and type pub = Dsa.pub
+
+end
+
 
 (** The NIST P-256 curve, also known as SECP256R1. *)
 module P256 : Dh_dsa
@@ -165,7 +214,7 @@ module P384 : Dh_dsa
 module P521 : Dh_dsa
 
 (** The SECP256K1 curve. *)
-module P256k1 : Dh_dsa
+module P256k1 : P256k1
 
 (** The BrainpoolP256r1 curve. *)
 module BrainpoolP256 : Dh_dsa

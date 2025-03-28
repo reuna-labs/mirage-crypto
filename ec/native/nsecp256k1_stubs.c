@@ -43,6 +43,13 @@ CAMLprim value mc_nsecp256k1_add(value out, value a, value b)
 	CAMLreturn(Val_unit);
 }
 
+CAMLprim value mc_nsecp256k1_opp(value out, value in)
+{
+	CAMLparam2(out, in);
+	fiat_nsecp256k1_opp((WORD*)Bytes_val(out), (const WORD*)String_val(in));
+	CAMLreturn(Val_unit);
+}
+
 CAMLprim value mc_nsecp256k1_one(value out)
 {
 	CAMLparam1(out);
