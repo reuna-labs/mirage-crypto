@@ -360,7 +360,7 @@ module Make_point_base (P : Parameters) (F : Foreign_point) (Fe : Field_element)
     if compress then
       let out = Bytes.create (P.byte_length + 1) in
       let ident =
-        2 + (String.get_uint8 buf ((P.byte_length * 2) - 1)) land 1
+        2 + (String.get_uint8 buf (P.byte_length * 2)) land 1
       in
       Bytes.unsafe_blit_string buf 1 out 1 P.byte_length;
       Bytes.set_uint8 out 0 ident;
@@ -411,7 +411,7 @@ module Make_point_base (P : Parameters) (F : Foreign_point) (Fe : Field_element)
       let y_str = T.out_y y |> Fe.from_montgomery |> Fe.to_octets in (* number must not be in montgomery domain*)
       let ident = String.get_uint8 pk 0 in
       let signY =
-        2 + (String.get_uint8 y_str 1) land 1
+        2 + (String.get_uint8 y_str 0) land 1
       in
       let y = if Int.equal signY ident then y else y' in
       validate_finite_point_fe x y

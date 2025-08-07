@@ -719,6 +719,22 @@ let secp256k1_bip340_sign =
   let l = List.mapi (fun i (c, n) -> (if n = ""  then "BIP-340 case " ^ string_of_int i else n), `Quick, c) cases in
   ("BIP-340 gen/sign/verify", `Quick, secp256k1_bip340_gen) :: l
 
+let pub_key_compression (module Dsa:Mirage_crypto_ec.Dsa) () =
+  for _ = 1 to 20 do
+    let _, pub = Dsa.generate () in
+    let compressed = Dsa.pub_to_octets ~compress:true pub in
+    let decompressed = Dsa.pub_of_octets compressed in
+    match decompressed with
+      | Ok decompressed ->
+        let p1 = Dsa.pub_to_octets pub in
+        let p2 = Dsa.pub_to_octets decompressed in
+        Alcotest.(check string __LOC__ p1 p2);
+        let prefix = String.get_uint8 compressed 0 in
+        let expected = 2 + String.(get_uint8 p1 (length p1 - 1)) land 1 in
+        Alcotest.(check int __LOC__ expected prefix);
+      | Error e -> Alcotest.failf "%a" pp_error e
+  done
+
 let ecdsa_rfc6979_p256 =
   (* A.2.5 - P 256 *)
   let priv, pub =
@@ -739,18 +755,6 @@ let ecdsa_rfc6979_p256 =
       in
       Alcotest.(check bool __LOC__ true pub_eq)
     | Error _ -> Alcotest.fail "bad public key"
-  in
-  let pub_key_compression () =
-    let _, pub = P256.Dsa.generate () in
-    let compressed = P256.Dsa.pub_to_octets ~compress:true pub in
-    let decompressed = P256.Dsa.pub_of_octets compressed in
-    let comparison = match decompressed with
-      | Ok decompressed ->
-        let p1 = P256.Dsa.pub_to_octets pub in
-        let p2 = P256.Dsa.pub_to_octets decompressed in
-        String.equal p1 p2
-      | Error _ -> false in
-    Alcotest.(check bool __LOC__ true comparison)
   in
   let case (type a) (hash : a Digestif.hash) ~message ~k ~r ~s () =
     let msg =
@@ -813,7 +817,7 @@ let ecdsa_rfc6979_p256 =
       ~s:"39AF9F15DE0DB8D97E72719C74820D304CE5226E32DEDAE67519E840D1194E55" ;
   ] in
   ("public key matches", `Quick, pub_rfc) ::
-  ("public key compression and decompression", `Quick, pub_key_compression) ::
+  ("public key compression and decompression", `Quick, (pub_key_compression (module P256.Dsa))) ::
   List.mapi (fun i c -> "RFC 6979 A.2.5 " ^ string_of_int i, `Quick, c) cases
 
 let ecdsa_rfc6979_p384 =
@@ -836,19 +840,6 @@ let ecdsa_rfc6979_p384 =
       in
       Alcotest.(check bool __LOC__ true pub_eq)
     | Error _ -> Alcotest.fail "bad public key"
-  in
-  let pub_key_compression () =
-    let _, pub = P384.Dsa.generate () in
-    let compressed = P384.Dsa.pub_to_octets ~compress:true pub in
-    let decompressed = P384.Dsa.pub_of_octets compressed in
-    let comparison = match decompressed with
-      | Ok decompressed ->
-        let p1 = P384.Dsa.pub_to_octets pub in
-        let p2 = P384.Dsa.pub_to_octets decompressed in
-        String.equal p1 p2
-      | Error _ -> false
-    in
-    Alcotest.(check bool __LOC__ true comparison)
   in
   let case (type a) (hash : a Digestif.hash) ~message ~k ~r ~s () =
     let msg =
@@ -950,7 +941,7 @@ let ecdsa_rfc6979_p384 =
        4A2092CD3792E0159AD9CEE37659C736"
   ] in
   ("public key matches", `Quick, pub_rfc) ::
-  ("public key compression and decompression", `Quick, pub_key_compression) ::
+  ("public key compression and decompression", `Quick, pub_key_compression (module P384.Dsa)) ::
   List.mapi (fun i c -> "RFC 6979 A.2.6 " ^ string_of_int i, `Quick, c) cases
 
 let ecdsa_rfc6979_p521 =
@@ -984,19 +975,6 @@ let ecdsa_rfc6979_p521 =
       in
       Alcotest.(check bool __LOC__ true pub_eq)
     | Error _ -> Alcotest.fail "bad public key"
-  in
-  let pub_key_compression () =
-    let _, pub = P521.Dsa.generate () in
-    let compressed = P521.Dsa.pub_to_octets ~compress:true pub in
-    let decompressed = P521.Dsa.pub_of_octets compressed in
-    let comparison = match decompressed with
-      | Ok decompressed ->
-        let p1 = P521.Dsa.pub_to_octets pub in
-        let p2 = P521.Dsa.pub_to_octets decompressed in
-        String.equal p1 p2
-      | Error _ -> false
-    in
-    Alcotest.(check bool __LOC__ true comparison)
   in
   let case (type a) (hash : a Digestif.hash) ~message ~k ~r ~s () =
     let msg = Digestif.(digest_string hash message |> to_raw_string hash)
@@ -1128,7 +1106,7 @@ let ecdsa_rfc6979_p521 =
 
   ] in
   ("public key matches", `Quick, pub_rfc) ::
-  ("public key compression and decompression", `Quick, pub_key_compression) ::
+  ("public key compression and decompression", `Quick, pub_key_compression (module P521.Dsa)) ::
   List.mapi (fun i c -> "RFC 6979 A.2.7 " ^ string_of_int i, `Quick, c) cases
 
 let x25519 () =
