@@ -345,28 +345,21 @@ module Make_point_base (P : Parameters) (F : Foreign_point) (Fe : Field_element)
       (to_affine_raw p)
 
   let to_octets ~compress p =
-    let buf =
-      match to_affine p with
-      | None -> String.make 1 '\000'
-      | Some (x, y) ->
-        let len_x = String.length x and len_y = String.length y in
-        let res = Bytes.create (1 + len_x + len_y) in
-        Bytes.set res 0 '\004' ;
-        let rev_x = rev_string x and rev_y = rev_string y in
-        Bytes.unsafe_blit_string rev_x 0 res 1 len_x ;
-        Bytes.unsafe_blit_string rev_y 0 res (1 + len_x) len_y ;
-        Bytes.unsafe_to_string res
-    in
-    if compress then
-      let out = Bytes.create (P.byte_length + 1) in
-      let ident =
-        2 + (String.get_uint8 buf (P.byte_length * 2)) land 1
+    match to_affine p with
+    | None -> String.make 1 '\000'
+    | Some (x, y) ->
+      let len_x = String.length x and len_y = String.length y in
+      let buf_len, ident = if compress then
+        1 + len_x, 2 + String.(get_uint8 y 0) land 1
+      else
+        1 + len_x + len_y, 4
       in
-      Bytes.unsafe_blit_string buf 1 out 1 P.byte_length;
-      Bytes.set_uint8 out 0 ident;
-      Bytes.unsafe_to_string out
-    else
-      buf
+      let buf = Bytes.create (buf_len) in
+      Bytes.set_uint8 buf 0 ident;
+      Bytes.unsafe_blit_string (rev_string x) 0 buf 1 len_x ;
+      if not compress then
+        Bytes.unsafe_blit_string (rev_string y) 0 buf (1 + len_x) len_y;
+      Bytes.unsafe_to_string buf
 
   let x_of_finite_point p =
     match to_affine p with None -> assert false | Some (x, _) -> rev_string x
