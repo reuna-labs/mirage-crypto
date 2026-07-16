@@ -1,0 +1,4 @@
+(library
+ (name mirage_crypto_kerberos_legacy)
+ (public_name mirage-crypto-kerberos-legacy)
+ (libraries mirage-crypto mirage-crypto-rng mirage-crypto-kerberos digestif eqaf))

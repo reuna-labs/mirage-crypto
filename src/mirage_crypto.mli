@@ -494,6 +494,67 @@ end
     (**/**)
   end
 
+  (** {e Ciphertext Stealing} mode (CBC-CS3 variant).
+
+      Encrypts arbitrary-length messages (at least one block) without padding.
+      Output is the same length as input. The last two cipher blocks are swapped
+      relative to standard CBC, following RFC 3962 / Kerberos convention. *)
+  module type CTS = sig
+
+    type key
+
+    val of_secret : string -> key
+    (** Construct the encryption key corresponding to [secret].
+
+        @raise Invalid_argument if the length of [secret] is not in
+        {{!key_sizes}[key_sizes]}. *)
+
+    val key_sizes  : int array
+    (** Key sizes allowed with this cipher. *)
+
+    val block_size : int
+    (** The size of a single block. *)
+
+    val encrypt : key:key -> iv:string -> string -> string
+    (** [encrypt ~key ~iv msg] encrypts [msg] using ciphertext stealing.
+
+        @raise Invalid_argument if [iv] is not [block_size] bytes.
+        @raise Invalid_argument if [String.length msg < block_size]. *)
+
+    val decrypt : key:key -> iv:string -> string -> string
+    (** [decrypt ~key ~iv msg] decrypts a ciphertext produced by [encrypt].
+
+        @raise Invalid_argument if [iv] is not [block_size] bytes.
+        @raise Invalid_argument if [String.length msg < block_size]. *)
+
+    val encrypt_into : key:key -> iv:string -> string -> src_off:int ->
+      bytes -> dst_off:int -> int -> unit
+    (** [encrypt_into ~key ~iv src ~src_off dst dst_off len] encrypts [len]
+        octets from [src] starting at [src_off] into [dst] starting at [dst_off].
+
+        @raise Invalid_argument if [iv] is not [block_size] bytes.
+        @raise Invalid_argument if [len < block_size].
+        @raise Invalid_argument if [src_off < 0 || String.length src - src_off < len].
+        @raise Invalid_argument if [dst_off < 0 || Bytes.length dst - dst_off < len]. *)
+
+    val decrypt_into : key:key -> iv:string -> string -> src_off:int ->
+      bytes -> dst_off:int -> int -> unit
+    (** [decrypt_into ~key ~iv src ~src_off dst dst_off len] decrypts [len]
+        octets from [src] starting at [src_off] into [dst] starting at [dst_off].
+
+        @raise Invalid_argument if [iv] is not [block_size] bytes.
+        @raise Invalid_argument if [len < block_size].
+        @raise Invalid_argument if [src_off < 0 || String.length src - src_off < len].
+        @raise Invalid_argument if [dst_off < 0 || Bytes.length dst - dst_off < len]. *)
+
+    (**/**)
+    val unsafe_encrypt_into : key:key -> iv:string -> string -> src_off:int ->
+      bytes -> dst_off:int -> int -> unit
+    val unsafe_decrypt_into : key:key -> iv:string -> string -> src_off:int ->
+      bytes -> dst_off:int -> int -> unit
+    (**/**)
+  end
+
   (** {e Galois/Counter Mode}. *)
   module type GCM = sig
 
@@ -525,6 +586,7 @@ module AES : sig
   module CTR : Block.CTR with type ctr = int64 * int64
   module GCM : Block.GCM
   module CCM16 : Block.CCM16
+  module CTS : Block.CTS
 end
 
 module DES : sig

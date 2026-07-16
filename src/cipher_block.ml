@@ -102,6 +102,23 @@ module Block = struct
     val key_sizes  : int array
     val block_size : int
   end
+
+  module type CTS = sig
+    type key
+    val of_secret : string -> key
+    val key_sizes  : int array
+    val block_size : int
+    val encrypt : key:key -> iv:string -> string -> string
+    val decrypt : key:key -> iv:string -> string -> string
+    val encrypt_into : key:key -> iv:string -> string -> src_off:int ->
+      bytes -> dst_off:int -> int -> unit
+    val decrypt_into : key:key -> iv:string -> string -> src_off:int ->
+      bytes -> dst_off:int -> int -> unit
+    val unsafe_encrypt_into : key:key -> iv:string -> string -> src_off:int ->
+      bytes -> dst_off:int -> int -> unit
+    val unsafe_decrypt_into : key:key -> iv:string -> string -> src_off:int ->
+      bytes -> dst_off:int -> int -> unit
+  end
 end
 
 module Counters = struct
@@ -453,6 +470,114 @@ module Modes = struct
       authenticate_decrypt ~key ~nonce ?adata cdata
   end
 
+  (* CTS (Ciphertext Stealing), CBC-CS3 variant as used by Kerberos (RFC 3962).
+     Output length equals input length; requires len >= block_size. *)
+  module CTS_of (Core : Block.Core) : Block.CTS = struct
+
+    type key = Core.ekey * Core.dkey
+
+    let (key_sizes, block_size) = Core.(key, block)
+    let block = block_size
+    let of_secret = Core.of_secret
+
+    let check_inputs ~iv len =
+      if String.length iv <> block then
+        invalid_arg "CTS: IV length %u" (String.length iv);
+      if len < block then
+        invalid_arg "CTS: message length %u < block size" len
+    [@@inline]
+
+    let unsafe_encrypt_into ~key:(ekey, _) ~iv src ~src_off dst ~dst_off len =
+      let r = len mod block in
+      let n = len / block + (if r > 0 then 1 else 0) in
+      if n = 1 then begin
+        (* Single full block: CBC-encrypt, no stealing *)
+        Bytes.unsafe_blit_string src src_off dst dst_off block;
+        Native.xor_into_bytes iv 0 dst dst_off block;
+        Core.encrypt ~key:ekey ~blocks:1 (Bytes.unsafe_to_string dst) dst_off dst dst_off
+      end else begin
+        (* Allocate padded buffer of n full blocks; zero-initialized so partial last block is padded with zeros *)
+        let padded = Bytes.make (n * block) '\x00' in
+        Bytes.unsafe_blit_string src src_off padded 0 len;
+        (* In-place CBC on all n padded blocks *)
+        Native.xor_into_bytes iv 0 padded 0 block;
+        Core.encrypt ~key:ekey ~blocks:1 (Bytes.unsafe_to_string padded) 0 padded 0;
+        for i = 1 to n - 1 do
+          Native.xor_into_bytes (Bytes.unsafe_to_string padded) ((i-1)*block) padded (i*block) block;
+          Core.encrypt ~key:ekey ~blocks:1 (Bytes.unsafe_to_string padded) (i*block) padded (i*block)
+        done;
+        (* CBS-CS3: emit C_1..C_{n-2}, then swap C_{n-1} and C_n (truncating C_{n-1}) *)
+        let last_len = if r > 0 then r else block in
+        let prefix_len = (n - 2) * block in
+        Bytes.unsafe_blit padded 0 dst dst_off prefix_len;
+        Bytes.unsafe_blit padded ((n-1)*block) dst (dst_off + prefix_len) block;
+        Bytes.unsafe_blit padded ((n-2)*block) dst (dst_off + prefix_len + block) last_len
+      end
+
+    let encrypt_into ~key ~iv src ~src_off dst ~dst_off len =
+      check_inputs ~iv len;
+      check_offset ~tag:"CTS" ~buf:"src" ~off:src_off ~len (String.length src);
+      check_offset ~tag:"CTS" ~buf:"dst" ~off:dst_off ~len (Bytes.length dst);
+      unsafe_encrypt_into ~key ~iv src ~src_off dst ~dst_off len
+
+    let encrypt ~key ~iv src =
+      let len = String.length src in
+      let dst = Bytes.create len in
+      encrypt_into ~key ~iv src ~src_off:0 dst ~dst_off:0 len;
+      Bytes.unsafe_to_string dst
+
+    let unsafe_decrypt_into ~key:(_, dkey) ~iv src ~src_off dst ~dst_off len =
+      let r = len mod block in
+      let n = len / block + (if r > 0 then 1 else 0) in
+      if n = 1 then begin
+        Core.decrypt ~key:dkey ~blocks:1 src src_off dst dst_off;
+        Native.xor_into_bytes iv 0 dst dst_off block
+      end else begin
+        let last_len = if r > 0 then r else block in
+        let prefix_len = (n - 2) * block in
+        let x_off = src_off + prefix_len in
+        let y_off = src_off + prefix_len + block in
+        (* tmp = D_K(X), where X = C_n in encryption order *)
+        let tmp = Bytes.create block in
+        Core.decrypt ~key:dkey ~blocks:1 src x_off tmp 0;
+        (* Reconstruct C_{n-1} = Y || tmp[last_len..] *)
+        let c_nm1 = Bytes.create block in
+        Bytes.unsafe_blit_string src y_off c_nm1 0 last_len;
+        if r > 0 then Bytes.unsafe_blit tmp r c_nm1 r (block - r);
+        (* P_n = tmp[0..last_len-1] XOR c_nm1[0..last_len-1] *)
+        let p_n_off = dst_off + prefix_len + block in
+        Bytes.unsafe_blit tmp 0 dst p_n_off last_len;
+        Native.xor_into_bytes (Bytes.unsafe_to_string c_nm1) 0 dst p_n_off last_len;
+        (* P_{n-1} = D_K(c_nm1) XOR C_{n-2} *)
+        let p_nm1_off = dst_off + prefix_len in
+        Core.decrypt ~key:dkey ~blocks:1 (Bytes.unsafe_to_string c_nm1) 0 dst p_nm1_off;
+        if prefix_len = 0 then
+          Native.xor_into_bytes iv 0 dst p_nm1_off block
+        else
+          Native.xor_into_bytes src (src_off + prefix_len - block) dst p_nm1_off block;
+        (* Decrypt C_1..C_{n-2} with standard CBC *)
+        if prefix_len > 0 then begin
+          let pblocks = n - 2 in
+          Core.decrypt ~key:dkey ~blocks:pblocks src src_off dst dst_off;
+          Native.xor_into_bytes iv 0 dst dst_off block;
+          if pblocks > 1 then
+            Native.xor_into_bytes src src_off dst (dst_off + block) ((pblocks - 1) * block)
+        end
+      end
+
+    let decrypt_into ~key ~iv src ~src_off dst ~dst_off len =
+      check_inputs ~iv len;
+      check_offset ~tag:"CTS" ~buf:"src" ~off:src_off ~len (String.length src);
+      check_offset ~tag:"CTS" ~buf:"dst" ~off:dst_off ~len (Bytes.length dst);
+      unsafe_decrypt_into ~key ~iv src ~src_off dst ~dst_off len
+
+    let decrypt ~key ~iv src =
+      let len = String.length src in
+      let dst = Bytes.create len in
+      decrypt_into ~key ~iv src ~src_off:0 dst ~dst_off:0 len;
+      Bytes.unsafe_to_string dst
+  end
+
   module CCM16_of (C : Block.Core) : Block.CCM16 = struct
 
     assert (C.block = 16)
@@ -566,6 +691,7 @@ module AES = struct
   module CTR = Modes.CTR_of (Core) (Counters.C128be)
   module GCM = Modes.GCM_of (Core)
   module CCM16 = Modes.CCM16_of (Core)
+  module CTS = Modes.CTS_of (Core)
 
 end
 

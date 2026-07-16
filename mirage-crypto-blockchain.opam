@@ -1,0 +1,54 @@
+opam-version: "2.0"
+homepage:     "https://github.com/mirage/mirage-crypto"
+dev-repo:     "git+https://github.com/mirage/mirage-crypto.git"
+bug-reports:  "https://github.com/mirage/mirage-crypto/issues"
+doc:          "https://mirage.github.io/mirage-crypto/doc"
+authors:      ["David Kaloper <dk505@cam.ac.uk>" "Hannes Mehnert <hannes@mehnert.org>" ]
+maintainer:   "Hannes Mehnert <hannes@mehnert.org>"
+license:      "ISC"
+synopsis:     "Blockchain-oriented cryptographic primitives for mirage-crypto"
+
+build: [ ["dune" "subst"] {dev}
+         ["dune" "build" "-p" name "-j" jobs ]
+         ["dune" "runtest" "-p" name "-j" jobs] {with-test} ]
+
+depends: [
+  "ocaml" {>= "4.13.0"}
+  "dune" {>= "2.7"}
+  "mirage-crypto" {=version}
+  "mirage-crypto-rng" {=version}
+  "digestif" {>= "1.2.0"}
+  "zarith" {>= "1.13"}
+  "eqaf" {>= "0.8"}
+  "ounit2" {with-test}
+  "ohex" {with-test & >= "0.2.0"}
+]
+description: """
+Mirage-crypto-blockchain provides cryptographic primitives commonly used in
+blockchain protocols.
+
+Fully implemented: Blake2b and RIPEMD-160 (thin wrappers over digestif),
+Keccak-256 (Ethereum's pre-standardization Keccak, distinct from SHA3-256),
+BLAKE3, secp256k1 ECDSA / BIP340 Schnorr signatures, the StarkNet/StarkEx
+Stark Curve signature scheme, the Poseidon hash over the STARK field,
+BLS12-381 (G1/G2 group arithmetic, the optimal ate pairing, RFC 9380
+hash-to-curve for G2, and BLS signatures in the minimal-pubkey-size
+configuration), and sr25519 (Ristretto255 over Curve25519, Schnorrkel
+Schnorr signatures, and a Merlin/STROBE128 transcript for Fiat-Shamir
+challenges and randomized nonces, as used by Substrate/Polkadot).
+
+IMPORTANT: the Secp256k1, Bip340, Stark_curve, Bls12_381, and Sr25519
+modules use plain (non-constant-time) double-and-add scalar
+multiplication -- and, for Sr25519, branch-on-value Ristretto255 field
+operations -- and are NOT hardened against timing side-channels. They
+are quick reference implementations pending a future constant-time
+revamp; see the "NOT CONSTANT TIME" banners in
+mirage_crypto_blockchain.mli. Do not use them to handle secret keys in
+adversarial or timing-observable environments.
+
+Ed25519-BIP32 is exposed only as a documented interface stub in this
+release; calling it raises Failure "not yet implemented: ...". See the
+module doc comments for the intended API and implementation notes for a
+future phase.
+"""
+x-maintenance-intent: [ "(latest)" ]

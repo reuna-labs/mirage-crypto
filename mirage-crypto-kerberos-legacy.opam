@@ -1,0 +1,35 @@
+opam-version: "2.0"
+homepage:     "https://github.com/mirage/mirage-crypto"
+dev-repo:     "git+https://github.com/mirage/mirage-crypto.git"
+bug-reports:  "https://github.com/mirage/mirage-crypto/issues"
+doc:          "https://mirage.github.io/mirage-crypto/doc"
+authors:      ["David Kaloper <dk505@cam.ac.uk>" "Hannes Mehnert <hannes@mehnert.org>" ]
+maintainer:   "Hannes Mehnert <hannes@mehnert.org>"
+license:      "ISC"
+synopsis:     "Legacy Kerberos cipher suites (3DES, RC4) for mirage-crypto"
+
+build: [ ["dune" "subst"] {dev}
+         ["dune" "build" "-p" name "-j" jobs ]
+         ["dune" "runtest" "-p" name "-j" jobs] {with-test} ]
+
+depends: [
+  "ocaml" {>= "4.13.0"}
+  "dune" {>= "2.7"}
+  "mirage-crypto" {=version}
+  "mirage-crypto-rng" {=version}
+  "mirage-crypto-kerberos" {=version}
+  "digestif" {>= "1.1.4"}
+  "eqaf" {>= "0.8"}
+  "ounit2" {with-test}
+  "ohex" {with-test & >= "0.2.0"}
+]
+description: """
+Mirage-crypto-kerberos-legacy adds 3DES-CBC/SHA1 (etype 16, RFC 3961) and
+RC4-HMAC-MD5 (etypes 23 and 24, MS-KILE / RFC 4757) to mirage-crypto-kerberos.
+
+These cipher suites are provided for interoperability with legacy Kerberos
+deployments only.  3DES is vulnerable to Sweet32 (CVE-2016-2183) and RC4 is
+cryptographically broken.  Prefer the AES etypes in mirage-crypto-kerberos
+for new deployments.
+"""
+x-maintenance-intent: [ "(latest)" ]

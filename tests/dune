@@ -60,6 +60,20 @@
  (libraries alcotest mirage-crypto-ec wycheproof digestif asn1-combinators)
  (package mirage-crypto-ec))
 
+(test
+ (name test_kerberos_runner)
+ (libraries test_common mirage-crypto mirage-crypto-kerberos-legacy
+   mirage-crypto-rng mirage-crypto-rng.unix ounit2)
+ (package mirage-crypto-kerberos-legacy)
+ (modules test_kerberos test_kerberos_runner))
+
+(test
+ (name test_blockchain_runner)
+ (libraries test_common mirage-crypto mirage-crypto-blockchain
+   mirage-crypto-rng mirage-crypto-rng.unix ounit2)
+ (package mirage-crypto-blockchain)
+ (modules test_blockchain test_blockchain_runner))
+
 (tests
  (names     test_miou_rng test_miou_entropy_collection)
  (modules   test_miou_rng test_miou_entropy_collection)
