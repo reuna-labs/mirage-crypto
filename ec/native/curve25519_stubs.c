@@ -4,11 +4,11 @@
  * 32-bit for MSVC.
  */
 #if defined(ARCH_64BIT) && !defined(_MSC_VER)
-#include "curve25519_64.h"
+#include "curve25519_fiat_64.h"
 #define WORD uint64_t
 #define LIMBS 5
 #else
-#include "curve25519_32.h"
+#include "curve25519_fiat_32.h"
 #define WORD uint32_t
 #define LIMBS 10
 #endif

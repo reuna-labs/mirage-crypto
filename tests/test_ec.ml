@@ -216,6 +216,509 @@ let ecdsa = [
   "ECDSA verify", `Quick, ecdsa_verify ;
 ]
 
+let brainpoolp256_ecdsa_gen () =
+  let d = of_hex "6f836168c0ba509e3a1a9ab9e512ffd4bb70a062e8be6b791c30037edd49f337" in
+  let p = match
+      BrainpoolP256.Dsa.pub_of_octets
+        (of_hex {|04
+                  5046988febf1cbe9f0d1b60e9a34f706a0ee9ba7ad58643e13c17c968af97fe3
+                  99e111ea496bff192a417899a9f3e8422f6f46e7a7dab3bc675bebbf94eed9a4|})
+    with
+    | Ok a -> a
+    | Error _ -> assert false
+  in
+  let pub = match BrainpoolP256.Dsa.priv_of_octets d with
+    | Ok p -> BrainpoolP256.Dsa.pub_of_priv p
+    | Error _ -> Alcotest.fail "couldn't decode private key"
+  in
+  let pub_eq a b =
+    String.equal (BrainpoolP256.Dsa.pub_to_octets a) (BrainpoolP256.Dsa.pub_to_octets b)
+  in
+  Alcotest.(check bool __LOC__ true (pub_eq pub p))
+
+let brainpoolp256_ecdsa_sign () =
+  let d = of_hex "77ef213686eb279680d57c50750404af064c55f7b21d7406a44ae5204aba1077"
+  and k = of_hex "895f532869f2185d4c38bc66376a446bfb7aa3748510630c027491367df47fa8"
+  and e = of_hex "73475cb40a568e8da8a045ced110137e159f890ac4da883b6b17dc651b3a8049"
+  in
+  let r = of_hex "2bd423fa2ea59677ffb58462131083cef9821ed77a51079fad2fad1d88023a83"
+  and _s = of_hex "413fd3cc9abcf016d3ea635e26c80a199a13ae00c2c9af1f60d970231e9000a5"
+  in
+  let key = match BrainpoolP256.Dsa.priv_of_octets d with
+    | Ok p -> p
+    | Error _ -> Alcotest.fail "couldn't decode private key"
+  in
+  let (r', _s') = BrainpoolP256.Dsa.sign ~key ~k e in
+  Alcotest.(check string __LOC__ r r')
+
+let brainpoolp256_ecdsa_verify () =
+  let key =
+    match BrainpoolP256.Dsa.pub_of_octets
+            (of_hex {|04
+                      19e8be13f180c669aa31b31f931d80423f8a9d6c5adb80de93af2bd3010c14a5
+                      7a004f2c2be9c53ac6bc4254472c8a91749512b38e2c06f710d1bbfede742afa|})
+    with
+    | Ok a -> a
+    | Error _ -> assert false
+  and e = of_hex "73475cb40a568e8da8a045ced110137e159f890ac4da883b6b17dc651b3a8049"
+  and r = of_hex "3dab68bcf22882bdcc5ddec244f0b54119271570d80e467818c0de427a2c6962"
+  and s = of_hex "84223af79041e0d7e21c1289aa108f9a4c77d69ce6c4cc7da22532570db95670"
+  in
+  Alcotest.(check bool __LOC__ true (BrainpoolP256.Dsa.verify ~key (r, s) e))
+
+let brainpoolp256_ecdsa = [
+  "ECDSA gen", `Quick, brainpoolp256_ecdsa_gen ;
+  "ECDSA sign", `Quick, brainpoolp256_ecdsa_sign ;
+  "ECDSA verify", `Quick, brainpoolp256_ecdsa_verify ;
+]
+
+
+let brainpoolp384_ecdsa_gen () =
+  let d = of_hex "70b3653970f00be16919c4ac548693ad1f27a7d5db2e54b3660e61930abc7a24d8c0f5eb9896ce000c0b8491a1ced282" in
+  let p = match
+      BrainpoolP384.Dsa.pub_of_octets
+        (of_hex {|04
+                  796166fae3742405d0ba327cfc6b73232e046712f3f5623745c5d68292fef3cafacd79cbae8265fd0c13988d7774e1aa
+                  04ae9f697f6bdf5cd3629f8cf44405010488f6f3ebf7ea88babaa7469643bb9e4ee11f70a5f4f3b80730d89a4e8847e6|})
+    with
+    | Ok a -> a
+    | Error _ -> assert false
+  in
+  let pub = match BrainpoolP384.Dsa.priv_of_octets d with
+    | Ok p -> BrainpoolP384.Dsa.pub_of_priv p
+    | Error _ -> Alcotest.fail "couldn't decode private key"
+  in
+  let pub_eq a b =
+    String.equal (BrainpoolP384.Dsa.pub_to_octets a) (BrainpoolP384.Dsa.pub_to_octets b)
+  in
+  Alcotest.(check bool __LOC__ true (pub_eq pub p))
+
+let brainpoolp384_ecdsa_sign () =
+  let d = of_hex "2634a4c7ab5b2b3ef6c81ab4f0de9ec3fdce62ef1c0756ff3501adf4f0b118d5cc2ccf57175d093c57aee282e0a18c1d"
+  and k = of_hex "6a47ae7d54e9507d2eaf31d06d6e4319bdfdf068c8b1c746c838b2ae5912ff3b5a19a0c457e8a2736fc0ee245d49d2fd"
+  and e = of_hex "8f5e4d4e4972d73670383f94f727e58e683b6397b284c6493fab2754882f5e0847a359a67df5b6c91d3858a81e42e252"
+  in
+  let r = of_hex "72f0aa458f158a7a77954647d1f2926cf798885679506e49fb0ba6f8f786abeda0f8f41e2acf052d31cd19cf08464ced"
+  and s = of_hex "83fda4ab4b4513562cd9815aba60c6d0daaed84e57a54907ec3c1c74dc6126b57b7e37504ebe6cbfe05b9a8ac763f42e"
+  in
+  let key = match BrainpoolP384.Dsa.priv_of_octets d with
+    | Ok p -> p
+    | Error _ -> Alcotest.fail "couldn't decode private key"
+  in
+  let (r', s') = BrainpoolP384.Dsa.sign ~key ~k e in
+  Alcotest.(check bool __LOC__ true (String.equal r r' && String.equal s s'))
+
+let brainpoolp384_ecdsa_verify () =
+  let key =
+    match BrainpoolP384.Dsa.pub_of_octets
+            (of_hex {|04
+                      83a26ae2ae4c241d101bc03f74aa1f78e8559633394788ac1e193fa3b5ec8d1f05e737b2e454e2375b018cf06ef9e9a4
+                      57ab9b4414bf013e9f8b4e8c5801ee52eff820fb27ddf5d7ad1574944387d779cac830b402cfd5c207fe2053583af458|})
+    with
+    | Ok a -> a
+    | Error _ -> assert false
+  and e = of_hex "8f5e4d4e4972d73670383f94f727e58e683b6397b284c6493fab2754882f5e0847a359a67df5b6c91d3858a81e42e252"
+  and r = of_hex "839abac0eb2609b4c35260e7be9f0a86ef752e5035bf7acda64a00c3ff90fcee7ddf02fd0356b4cd151427d0ecf2b6dd"
+  and s = of_hex "3181eb62262eab42290333c85e64d6923a88048af95f8db8fe2d0dcccb22bd4e28a64120766b46bee610e60bed5ca5ee"
+  in
+  Alcotest.(check bool __LOC__ true (BrainpoolP384.Dsa.verify ~key (r, s) e))
+
+let brainpoolp384_ecdsa = [
+  "ECDSA gen", `Quick, brainpoolp384_ecdsa_gen ;
+  "ECDSA sign", `Quick, brainpoolp384_ecdsa_sign ;
+  "ECDSA verify", `Quick, brainpoolp384_ecdsa_verify ;
+]
+
+let brainpoolp512_ecdsa_gen () =
+  let d = of_hex "89e7f8007b0e30d3b2df95b55463658fce1db365ad115fa5f73766a75f6f08b91982086a1eabfd9da4937a6e90e470c18e0f4b79981a31ae482ac908d5115b36" in
+  let p = match
+      BrainpoolP512.Dsa.pub_of_octets
+        (of_hex {|04
+                  59ac5d9e0575b8ab6bfa14de0c9b5b07d76ca2325fd8469d32b248314e8ebcc663c07ee2065ceb38cb784e26e09bdfc08dfeaa215967a168def9577162a1c1c4
+                  000a6fb13d5a2ef437154f7c617b6396f00d5ba7fad5f23e33e6990167d72c775b61858f52801590e12551e8d35c4f998c10187c378e502866c8bb41f348bd59|})
+    with
+    | Ok a -> a
+    | Error _ -> assert false
+  in
+  let pub = match BrainpoolP512.Dsa.priv_of_octets d with
+    | Ok p -> BrainpoolP512.Dsa.pub_of_priv p
+    | Error _ -> Alcotest.fail "couldn't decode private key"
+  in
+  let pub_eq a b =
+    String.equal (BrainpoolP512.Dsa.pub_to_octets a) (BrainpoolP512.Dsa.pub_to_octets b)
+  in
+  Alcotest.(check bool __LOC__ true (pub_eq pub p))
+
+let brainpoolp512_ecdsa_sign () =
+  let d = of_hex "463a29fcce4907dd20d8e44402948f23c2906f956a98a17db5e6e51aa6f0c10a7f49567800b6b548101ee79d921c311f89c8329f4d7dbca4853a06612dd5125b"
+  and k = of_hex "5901efdb525257eb1afa30cd235bd9bc3b30806947e78dc1e6f7060042a0f283e8086078aa804af0036eac385cd8f45531d8a29f3da6a7fa5549f5275879f1da"
+  and e = of_hex "39ca7ce9ecc69f696bf7d20bb23dd1521b641f806cc7a6b724aaa6cdbffb3a023ff98ae73225156b2c6c9ceddbfc16f5453e8fa49fc10e5d96a3885546a46ef4"
+  in
+  let r = of_hex "0104960d88d6fd09be52b8dbcc83af4e2a9bd82d4f7408408835022415ea72688bd416b4fec04d56abc5a966801f6c6fccb7223f990a11ca7c509d8f2ac3098d"
+  and s = of_hex "40a80fbb9ac8e296c79f2e97a3f9b7a8bb181d3a8548ea72d817fa580a4ae23a5cca1c7501333f98d64fb08791aac1fbd2c791c2051d321e0925bbab8e49b268"
+  in
+  let key = match BrainpoolP512.Dsa.priv_of_octets d with
+    | Ok p -> p
+    | Error _ -> Alcotest.fail "couldn't decode private key"
+  in
+  let (r', s') = BrainpoolP512.Dsa.sign ~key ~k e in
+  Alcotest.(check bool __LOC__ true (String.equal r r' && String.equal s s'))
+
+let brainpoolp512_ecdsa_verify () =
+  let key =
+    match BrainpoolP512.Dsa.pub_of_octets
+            (of_hex {|04
+                      19cd31021886560ad25b61bb8dc60b3a3c4d80bee18cc1766692755457c4e0cf8bdc1461591006cc5be370987e2c99e3a0fd4c86979e25f15363e1566fa89343
+                      23cee843f886d3e57b0f4752e83342666e3413e60411400bc4eb23e0a4ae1fbda9069c8b843c9c8f3217c126c5d09070e4288d5809640131c396294ad771ded1|})
+    with
+    | Ok a -> a
+    | Error _ -> assert false
+  and e = of_hex "39ca7ce9ecc69f696bf7d20bb23dd1521b641f806cc7a6b724aaa6cdbffb3a023ff98ae73225156b2c6c9ceddbfc16f5453e8fa49fc10e5d96a3885546a46ef4"
+  and r = of_hex "60a96245d98dc4891068a775b2ddafc88fa25d287ae8b12498da5915ee78daed0d332139f10dd1a73726324a5683445605943b87dd0293ecc902fd28065954ff"
+  and s = of_hex "558d15a54bac0596554fb3240e9d68f0da8ec03a652a9d039509de89e5c5f5480ee591317be6aaa2b413e8427692a98c14602747b92f7b35ed0416be2cdfe7c5"
+  in
+  Alcotest.(check bool __LOC__ true (BrainpoolP512.Dsa.verify ~key (r, s) e))
+
+let brainpoolp512_ecdsa = [
+  "ECDSA gen", `Quick, brainpoolp512_ecdsa_gen ;
+  "ECDSA sign", `Quick, brainpoolp512_ecdsa_sign ;
+  "ECDSA verify", `Quick, brainpoolp512_ecdsa_verify ;
+]
+
+let secp256k1_ecdsa_gen () =
+  let d = of_hex "42202a98374f6dca439c0af88140e41f8eced3062682ec7f9fc8ac9ea83c7cb2" in
+  let p = match
+      P256k1.Dsa.pub_of_octets
+        (of_hex {|04
+                  131ca4e5811267fa90fc631d6298c2d7a4ecccc45cc60d378e0660b61f82fe8d
+                  cf5acf8ed3e0bbf735308cc415604bd34ab8f7fc8b4a22741117a7fbc72a7949|})
+    with
+    | Ok a -> a
+    | Error _ -> assert false
+  in
+  let pub = match P256k1.Dsa.priv_of_octets d with
+    | Ok p -> P256k1.Dsa.pub_of_priv p
+    | Error _ -> Alcotest.fail "couldn't decode private key"
+  in
+  let pub_eq a b =
+    String.equal (P256k1.Dsa.pub_to_octets a) (P256k1.Dsa.pub_to_octets b)
+  in
+  Alcotest.(check bool __LOC__ true (pub_eq pub p))
+
+let secp256k1_ecdsa_verify () =
+  let key =
+    match P256k1.Dsa.pub_of_octets
+            (of_hex {|04
+                      779dd197a5df977ed2cf6cb31d82d43328b790dc6b3b7d4437a427bd5847dfcd
+                      e94b724a555b6d017bb7607c3e3281daf5b1699d6ef4124975c9237b917d426f|})
+    with
+    | Ok a -> a
+    | Error _ -> assert false
+  and e = of_hex "4b688df40bcedbe641ddb16ff0a1842d9c67ea1c3bf63f3e0471baa664531d1a"
+  and r = of_hex "241097efbf8b63bf145c8961dbdf10c310efbb3b2676bbc0f8b08505c9e2f795"
+  and s = of_hex "021006b7838609339e8b415a7f9acb1b661828131aef1ecbc7955dfb01f3ca0e"
+  in
+  Alcotest.(check bool __LOC__ true (P256k1.Dsa.verify ~key (r, s) e))
+
+let secp256k1_ecdsa = [
+  "ECDSA gen", `Quick, secp256k1_ecdsa_gen ;
+  "ECDSA verify", `Quick, secp256k1_ecdsa_verify ;
+]
+
+let secp256k1_ecdsa_sign =
+  let case ?k ~h ~d ~r ~s () =
+    let msg = of_hex h in
+    let key = match P256k1.Dsa.priv_of_octets (of_hex d) with
+      | Ok p -> p
+      | Error _ -> Alcotest.fail "couldn't decode private key"
+    in
+    let k = Option.map (fun x -> of_hex x) k in
+    let (r', s') = P256k1.Dsa.sign ~key ?k msg in
+    Alcotest.(check string "r correct" (of_hex r) r');
+    Alcotest.(check string "s correct" (of_hex s) s')
+  in
+  let cases = [
+    case
+      ~d:"ebb2c082fd7727890a28ac82f6bdf97bad8de9f5d7c9028692de1a255cad3e0f"
+      ~h:"4b688df40bcedbe641ddb16ff0a1842d9c67ea1c3bf63f3e0471baa664531d1a"
+      ~k:"49a0d7b786ec9cde0d0721d72804befd06571c974b191efb42ecf322ba9ddd9a"
+      ~r:"241097efbf8b63bf145c8961dbdf10c310efbb3b2676bbc0f8b08505c9e2f795"
+      ~s:"021006b7838609339e8b415a7f9acb1b661828131aef1ecbc7955dfb01f3ca0e" ;
+    case
+      ~d:"0000000000000000000000000000000000000000000000000000000000000001"
+      ~h:"0000000000000000000000000000000000000000000000000000000000000001"
+      ~r:"6673FFAD2147741F04772B6F921F0BA6AF0C1E77FC439E65C36DEDF4092E8898"
+      ~s:"B3E568E9AD1F52577FEDF107FDA18F5EBB8E5C220BADF23532BF6FBCC67FB4B8" ;
+    case
+      ~d:"D30519BCAE8D180DBFCC94FE0B8383DC310185B0BE97B4365083EBCECCD75759"
+      ~h:"3F891FDA3704F0368DAB65FA81EBE616F4AA2A0854995DA4DC0B59D2CADBD64F"
+      ~k:"DC87789C4C1A09C97FF4DE72C0D0351F261F10A2B9009C80AEE70DDEC77201A0"
+      ~r:"A5C7B7756D34D8AAF6AA68F0B71644F0BEF90D8BFD126CE951B6060498345089"
+      ~s:"BC9644F1625AF13841E589FD00653AE8C763309184EA0DE481E8F06709E5D1CB" ;
+    case
+      ~d:"292efd39a4e53efb580ba4ba3e5bb47d6e7463cddab04335aa061d554c74bcc8"
+      ~h:"db72ce6fea09d442b4f31535df0a97f6c21d42be23e48b6bd088018cce75c3dd"
+      ~k:"654035b5acae79fff464d77b114f93b1b84caec325fdf7f3f050cc659245bfaa"
+      ~r:"9ae57e4e4eca88939152ee38a07860ae03cff51d84708eeceabc70d615b7d31b"
+      ~s:"808cddd65562c77c81a1c8d45e229f53edf19864069f8d62c3c3fa1f8c8c3c66" ;
+    case
+      ~d:"0deea9b194ea6d4f1b5de6b5468a80e0478ae0f03f4fce59bafe51e35763388e"
+      ~h:"a6442404392a831b481845c49d6009957ebd611bd366f4dd15f7578daef21678"
+      ~k:"e3253150b94868a179e34f819ec42cf14eb367d1685ee528e51f1dd031eabb29"
+      ~r:"5c5ab3fc0063da962440285f0df3a2cf031947920c990ff97b8a210a531d39a0"
+      ~s:"b45a4aff7d60bbaa1602a81d5c2f09d3d651344cc6c08723fd40ffaf79ba1c6a" ;
+    case
+      ~d:"634ccc8392372f66e9086c540f868a9ce93d5452aa1e0e1a5448ed15f4252c85"
+      ~h:"22a634e0114561e05c6e333e5bab22fbfe77e1691305fceae6697278a665447c"
+      ~k:"4a49d24c7b41392f8fd90ec5b49bdb949048ee0f55ccb35753ea8a38c4a942fb"
+      ~r:"c7700bcd35c0f82ca14c1c3d5a3b3b444a187593ebafcd5ec401f8a49b024553"
+      ~s:"3dbd18cf865697dfa6733dd0676063b769a1fd94f2d2a3b92e2680d4291c6128" ;
+    case
+      ~d:"576314d4c6ad800d5726b0cdd0e6e9429568ff96ffbd83aea38f6c9a3e6409d3"
+      ~h:"a168c68532a902215d7b3551bb1c39cf79df84d6bdc469b833bf72d4803d25d7"
+      ~k:"2e6511edb60aa7966007b383fa6ad9d0e6a54620182f0269509116d3e5e8f5af"
+      ~r:"41ee804ccacefd441972ca8d92c72c4b361c39eee5cb1f474de7f09d4b83f212"
+      ~s:"1614e19bab04de9ef3658bf6702d599bb518f598a122e1df92160bd5584dd42b" ;
+
+  ] in
+  List.mapi (fun i c -> "ECDSA sign " ^ string_of_int i, `Quick, c) cases
+
+let secp256k1_bip340_sign =
+  let open P256k1.Dsa_bip340 in
+  let secp256k1_bip340_gen () =
+    for _ = 1 to 10 do
+      let key, pub = generate () in
+      let pub' = pub_to_octets (pub_of_priv key) in
+      Alcotest.(check string "generate even" pub' (pub_to_octets pub));
+      Alcotest.(check int "even y" 0 String.(get_uint8 pub' (length pub'-1) land 1));
+      let msg = "42" in
+      let (r, s) = sign_bip340 ~key msg in
+      Alcotest.(check bool "verify" true (verify_bip340 ~key:pub (r, s) msg))
+    done
+  in
+  let case ~d ~x ~k ~h ~r ~s ~v () =
+    let msg = of_hex h in
+    let r, s = of_hex r, of_hex s in
+    let x = of_hex x in
+    if d <> "" then (
+      let key = match priv_of_octets (of_hex d) with
+        | Ok p -> p
+        | Error _ -> Alcotest.fail "couldn't decode private key"
+      in
+      let pub_x = get_x (pub_of_priv key) in
+      Alcotest.(check string "pub correct" x pub_x);
+      let aux_rand = of_hex k in
+      let (r', s') = sign_bip340 ~key ~aux_rand msg in
+      Alcotest.(check string "r correct" r r');
+      Alcotest.(check string "s correct" s s');
+    );
+    match pub_of_octets ("\002" ^ x) with
+    | Error _ -> Alcotest.(check bool "point parsing" v false)
+    | Ok key ->
+    let verify = verify_bip340 ~key (r, s) msg in
+    Alcotest.(check bool "verified even" v verify);
+    match pub_of_octets ("\003" ^ x) with
+    | Error _ -> Alcotest.(check bool "point parsing" v false)
+    | Ok key ->
+    let verify = verify_bip340 ~key (r, s) msg in
+    Alcotest.(check bool "verified odd" v verify)
+  in
+  (* test vectors from
+     https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv *)
+  let cases = [
+    case
+    ~d:"0000000000000000000000000000000000000000000000000000000000000003"
+    ~x:"F9308A019258C31049344F85F89D5229B531C845836F99B08601F113BCE036F9"
+    ~k:"0000000000000000000000000000000000000000000000000000000000000000"
+    ~h:"0000000000000000000000000000000000000000000000000000000000000000"
+    ~r:"E907831F80848D1069A5371B402410364BDF1C5F8307B0084C55F1CE2DCA8215"
+    ~s:"25F66A4A85EA8B71E482A74F382D2CE5EBEEE8FDB2172F477DF4900D310536C0"
+    ~v:true
+    ,"" ;
+
+  case
+    ~d:"B7E151628AED2A6ABF7158809CF4F3C762E7160F38B4DA56A784D9045190CFEF"
+    ~x:"DFF1D77F2A671C5F36183726DB2341BE58FEAE1DA2DECED843240F7B502BA659"
+    ~k:"0000000000000000000000000000000000000000000000000000000000000001"
+    ~h:"243F6A8885A308D313198A2E03707344A4093822299F31D0082EFA98EC4E6C89"
+    ~r:"6896BD60EEAE296DB48A229FF71DFE071BDE413E6D43F917DC8DCF8C78DE3341"
+    ~s:"8906D11AC976ABCCB20B091292BFF4EA897EFCB639EA871CFA95F6DE339E4B0A"
+    ~v:true,
+    "" ;
+
+  case
+    ~d:"C90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B14E5C9"
+    ~x:"DD308AFEC5777E13121FA72B9CC1B7CC0139715309B086C960E18FD969774EB8"
+    ~k:"C87AA53824B4D7AE2EB035A2B5BBBCCC080E76CDC6D1692C4B0B62D798E6D906"
+    ~h:"7E2D58D8B3BCDF1ABADEC7829054F90DDA9805AAB56C77333024B9D0A508B75C"
+    ~r:"5831AAEED7B44BB74E5EAB94BA9D4294C49BCF2A60728D8B4C200F50DD313C1B"
+    ~s:"AB745879A5AD954A72C45A91C3A51D3C7ADEA98D82F8481E0E1E03674A6F3FB7"
+    ~v:true,
+    "" ;
+
+  case
+    ~d:"0B432B2677937381AEF05BB02A66ECD012773062CF3FA2549E44F58ED2401710"
+    ~x:"25D1DFF95105F5253C4022F628A996AD3A0D95FBF21D468A1B33F8C160D8F517"
+    ~k:"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+    ~h:"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+    ~r:"7EB0509757E246F19449885651611CB965ECC1A187DD51B64FDA1EDC9637D5EC"
+    ~s:"97582B9CB13DB3933705B32BA982AF5AF25FD78881EBB32771FC5922EFC66EA3"
+    ~v:true,
+    "test fails if msg is reduced modulo p or n" ;
+
+  case
+    ~d:""
+    ~x:"D69C3509BB99E412E68B0FE8544E72837DFA30746D8BE2AA65975F29D22DC7B9"
+    ~k:""
+    ~h:"4DF3C3F68FCC83B27E9D42C90431A72499F17875C81A599B566C9889B9696703"
+    ~r:"00000000000000000000003B78CE563F89A0ED9414F5AA28AD0D96D6795F9C63"
+    ~s:"76AFB1548AF603B3EB45C9F8207DEE1060CB71C04E80F593060B07D28308D7F4"
+    ~v:true,
+    "" ;
+
+  case
+    ~d:""
+    ~x:"EEFDEA4CDB677750A420FEE807EACF21EB9898AE79B9768766E4FAA04A2D4A34"
+    ~k:""
+    ~h:"243F6A8885A308D313198A2E03707344A4093822299F31D0082EFA98EC4E6C89"
+    ~r:"6CFF5C3BA86C69EA4B7376F31A9BCB4F74C1976089B2D9963DA2E5543E177769"
+    ~s:"69E89B4C5564D00349106B8497785DD7D1D713A8AE82B32FA79D5F7FC407D39B"
+    ~v:false,
+    "public key not on the curve" ;
+
+  case
+    ~d:""
+    ~x:"DFF1D77F2A671C5F36183726DB2341BE58FEAE1DA2DECED843240F7B502BA659"
+    ~k:""
+    ~h:"243F6A8885A308D313198A2E03707344A4093822299F31D0082EFA98EC4E6C89"
+    ~r:"FFF97BD5755EEEA420453A14355235D382F6472F8568A18B2F057A1460297556"
+    ~s:"3CC27944640AC607CD107AE10923D9EF7A73C643E166BE5EBEAFA34B1AC553E2"
+    ~v:false,
+    "has_even_y(R) is false" ;
+
+  case
+    ~d:""
+    ~x:"DFF1D77F2A671C5F36183726DB2341BE58FEAE1DA2DECED843240F7B502BA659"
+    ~k:""
+    ~h:"243F6A8885A308D313198A2E03707344A4093822299F31D0082EFA98EC4E6C89"
+    ~r:"1FA62E331EDBC21C394792D2AB1100A7B432B013DF3F6FF4F99FCB33E0E1515F"
+    ~s:"28890B3EDB6E7189B630448B515CE4F8622A954CFE545735AAEA5134FCCDB2BD"
+    ~v:false,
+    "negated message" ;
+
+  case
+    ~d:""
+    ~x:"DFF1D77F2A671C5F36183726DB2341BE58FEAE1DA2DECED843240F7B502BA659"
+    ~k:""
+    ~h:"243F6A8885A308D313198A2E03707344A4093822299F31D0082EFA98EC4E6C89"
+    ~r:"6CFF5C3BA86C69EA4B7376F31A9BCB4F74C1976089B2D9963DA2E5543E177769"
+    ~s:"961764B3AA9B2FFCB6EF947B6887A226E8D7C93E00C5ED0C1834FF0D0C2E6DA6"
+    ~v:false,
+    "negated s value" ;
+
+  case
+    ~d:""
+    ~x:"DFF1D77F2A671C5F36183726DB2341BE58FEAE1DA2DECED843240F7B502BA659"
+    ~k:""
+    ~h:"243F6A8885A308D313198A2E03707344A4093822299F31D0082EFA98EC4E6C89"
+    ~r:"0000000000000000000000000000000000000000000000000000000000000000"
+    ~s:"123DDA8328AF9C23A94C1FEECFD123BA4FB73476F0D594DCB65C6425BD186051"
+    ~v:false,
+    "sG - eP is infinite. Test fails in single verification if has_even_y(inf) is defined as true and x(inf) as 0" ;
+
+  case
+    ~d:""
+    ~x:"DFF1D77F2A671C5F36183726DB2341BE58FEAE1DA2DECED843240F7B502BA659"
+    ~k:""
+    ~h:"243F6A8885A308D313198A2E03707344A4093822299F31D0082EFA98EC4E6C89"
+    ~r:"0000000000000000000000000000000000000000000000000000000000000001"
+    ~s:"7615FBAF5AE28864013C099742DEADB4DBA87F11AC6754F93780D5A1837CF197"
+    ~v:false,
+    "sG - eP is infinite. Test fails in single verification if has_even_y(inf) is defined as true and x(inf) as 1" ;
+
+  case
+    ~d:""
+    ~x:"DFF1D77F2A671C5F36183726DB2341BE58FEAE1DA2DECED843240F7B502BA659"
+    ~k:""
+    ~h:"243F6A8885A308D313198A2E03707344A4093822299F31D0082EFA98EC4E6C89"
+    ~r:"4A298DACAE57395A15D0795DDBFD1DCB564DA82B0F269BC70A74F8220429BA1D"
+    ~s:"69E89B4C5564D00349106B8497785DD7D1D713A8AE82B32FA79D5F7FC407D39B"
+    ~v:false,
+    "sig[0:32] is not an X coordinate on the curve" ;
+
+  case
+    ~d:""
+    ~x:"DFF1D77F2A671C5F36183726DB2341BE58FEAE1DA2DECED843240F7B502BA659"
+    ~k:""
+    ~h:"243F6A8885A308D313198A2E03707344A4093822299F31D0082EFA98EC4E6C89"
+    ~r:"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
+    ~s:"69E89B4C5564D00349106B8497785DD7D1D713A8AE82B32FA79D5F7FC407D39B"
+    ~v:false,
+    "sig[0:32] is equal to field size" ;
+
+  case
+    ~d:""
+    ~x:"DFF1D77F2A671C5F36183726DB2341BE58FEAE1DA2DECED843240F7B502BA659"
+    ~k:""
+    ~h:"243F6A8885A308D313198A2E03707344A4093822299F31D0082EFA98EC4E6C89"
+    ~r:"6CFF5C3BA86C69EA4B7376F31A9BCB4F74C1976089B2D9963DA2E5543E177769"
+    ~s:"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141"
+    ~v:false,
+    "sig[32:64] is equal to curve order" ;
+
+  case
+    ~d:""
+    ~x:"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC30"
+    ~k:""
+    ~h:"243F6A8885A308D313198A2E03707344A4093822299F31D0082EFA98EC4E6C89"
+    ~r:"6CFF5C3BA86C69EA4B7376F31A9BCB4F74C1976089B2D9963DA2E5543E177769"
+    ~s:"69E89B4C5564D00349106B8497785DD7D1D713A8AE82B32FA79D5F7FC407D39B"
+    ~v:false,
+    "public key is not a valid X coordinate because it exceeds the field size" ;
+
+  case
+    ~d:"0340034003400340034003400340034003400340034003400340034003400340"
+    ~x:"778CAA53B4393AC467774D09497A87224BF9FAB6F6E68B23086497324D6FD117"
+    ~k:"0000000000000000000000000000000000000000000000000000000000000000"
+    ~h:""
+    ~r:"71535DB165ECD9FBBC046E5FFAEA61186BB6AD436732FCCC25291A55895464CF"
+    ~s:"6069CE26BF03466228F19A3A62DB8A649F2D560FAC652827D1AF0574E427AB63"
+    ~v:true,
+    "message of size 0 (added 2022-12)" ;
+
+  case
+    ~d:"0340034003400340034003400340034003400340034003400340034003400340"
+    ~x:"778CAA53B4393AC467774D09497A87224BF9FAB6F6E68B23086497324D6FD117"
+    ~k:"0000000000000000000000000000000000000000000000000000000000000000"
+    ~h:"11"
+    ~r:"08A20A0AFEF64124649232E0693C583AB1B9934AE63B4C3511F3AE1134C6A303"
+    ~s:"EA3173BFEA6683BD101FA5AA5DBC1996FE7CACFC5A577D33EC14564CEC2BACBF"
+    ~v:true,
+    "message of size 1 (added 2022-12)" ;
+
+  case
+    ~d:"0340034003400340034003400340034003400340034003400340034003400340"
+    ~x:"778CAA53B4393AC467774D09497A87224BF9FAB6F6E68B23086497324D6FD117"
+    ~k:"0000000000000000000000000000000000000000000000000000000000000000"
+    ~h:"0102030405060708090A0B0C0D0E0F1011"
+    ~r:"5130F39A4059B43BC7CAC09A19ECE52B5D8699D1A71E3C52DA9AFDB6B50AC370"
+    ~s:"C4A482B77BF960F8681540E25B6771ECE1E5A37FD80E5A51897C5566A97EA5A5"
+    ~v:true,
+    "message of size 17 (added 2022-12)" ;
+
+  case
+    ~d:"0340034003400340034003400340034003400340034003400340034003400340"
+    ~x:"778CAA53B4393AC467774D09497A87224BF9FAB6F6E68B23086497324D6FD117"
+    ~k:"0000000000000000000000000000000000000000000000000000000000000000"
+    ~h:"99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999"
+    ~r:"403B12B0D8555A344175EA7EC746566303321E5DBFA8BE6F091635163ECA79A8"
+    ~s:"585ED3E3170807E7C03B720FC54C7B23897FCBA0E9D0B4A06894CFD249F22367"
+    ~v:true,
+    "message of size 100 (added 2022-12)" ;
+  ] in
+  let l = List.mapi (fun i (c, n) -> (if n = ""  then "BIP-340 case " ^ string_of_int i else n), `Quick, c) cases in
+  ("BIP-340 gen/sign/verify", `Quick, secp256k1_bip340_gen) :: l
+
 let pub_key_compression (module Dsa:Mirage_crypto_ec.Dsa) () =
   for _ = 1 to 20 do
     let _, pub = Dsa.generate () in
@@ -852,5 +1355,11 @@ let () =
       ("ECDSA RFC 6979 P521", ecdsa_rfc6979_p521);
       ("X25519", [ "RFC 7748", `Quick, x25519 ]);
       ("ED25519", ed25519);
-      ("ECDSA P521 regression", [ "regreesion1", `Quick, p521_regression ]);
+      ("ECDSA P521 regression", [ "regression1", `Quick, p521_regression ]);
+      ("secp256k1 ECDSA", secp256k1_ecdsa);
+      ("secp256k1 ECDSA sign", secp256k1_ecdsa_sign);
+      ("secp256k1 BIP-340", secp256k1_bip340_sign);
+      ("brainpoolP256r1 ECDSA", brainpoolp256_ecdsa);
+      ("brainpoolP384r1 ECDSA", brainpoolp384_ecdsa);
+      ("brainpoolP512r1 ECDSA", brainpoolp512_ecdsa);
     ]
