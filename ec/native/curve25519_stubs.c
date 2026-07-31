@@ -1857,3 +1857,23 @@ CAMLprim value mc_25519_pub_ok(value key)
   success = x25519_ge_frombytes_vartime(&B, _st_uint8(key));
   CAMLreturn(Val_bool(success));
 }
+
+/* Add two RFC 8032-encoded Edwards25519 points [a] and [b], writing the
+   encoding of [a + b] to [out]. Returns false if either point fails to
+   decode (in which case [out] is left with a meaningless value). Uses
+   variable-time decoding: NOT constant time. */
+CAMLprim value mc_25519_point_add(value out, value a, value b)
+{
+  CAMLparam3(out, a, b);
+  ge_p3 A, B, R;
+  ge_cached Bc;
+  ge_p1p1 t;
+  int success = 0;
+  success = x25519_ge_frombytes_vartime(&A, _st_uint8(a));
+  success &= x25519_ge_frombytes_vartime(&B, _st_uint8(b));
+  x25519_ge_p3_to_cached(&Bc, &B);
+  x25519_ge_add(&t, &A, &Bc);
+  x25519_ge_p1p1_to_p3(&R, &t);
+  ge_p3_tobytes(Bytes_val(out), &R);
+  CAMLreturn(Val_bool(success));
+}

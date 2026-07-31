@@ -38,10 +38,9 @@
    (folding fresh randomness into the transcript-bound nonce) -- which
    is also exactly how schnorrkel's own upstream test suite tests it.
 
-   Scope: VRF is not implemented (a separate transcript/proof
-   protocol); see {!vrf_output}. *)
-
-let unimplemented fn = failwith ("not yet implemented: Sr25519." ^ fn)
+   Scope: {!vrf_output} implements the deterministic VRF pre-output
+   (schnorrkel's VRFInOut.output); the randomized DLEQ proof and the
+   make_bytes output-expansion step are not implemented. *)
 
 type error = [ `Invalid_format | `Invalid_length | `Invalid_range | `Not_on_curve ]
 
@@ -97,10 +96,9 @@ let fpow a e = Z.powm a e p
 let is_negative e = Z.testbit (fmod e) 0
 let ct_abs e = if is_negative e then fneg e else e
 
-(* RFC 9496 Section 4.1 implementation constants (only those needed for
-   Decode/Encode; ONE_MINUS_D_SQ / D_MINUS_ONE_SQ / SQRT_AD_MINUS_ONE
-   are only used by the "Element Derivation" hash-to-group function,
-   which this module does not implement). *)
+(* RFC 9496 Section 4.1 implementation constants. ONE_MINUS_D_SQ /
+   D_MINUS_ONE_SQ / SQRT_AD_MINUS_ONE are used only by the "Element
+   Derivation" one-way map (hash-to-group); see {!ristretto_map} below. *)
 let edwards_d =
   Z.of_string "37095705934669439343138083508754565189542113879843219016388785533085940283555"
 
@@ -111,6 +109,16 @@ let invsqrt_a_minus_d =
   Z.of_string "54469307008909316920995813868745141605393597292927456921205312896311721017578"
 
 let p_minus_5_div_8 = Z.div (Z.sub p (Z.of_int 5)) (Z.of_int 8)
+
+(* One-way map constants (RFC 9496 Section 4.1). *)
+let one_minus_d_sq =
+  Z.of_string "1159843021668779879193775521855586647937357759715417654439879720876111806838"
+
+let d_minus_one_sq =
+  Z.of_string "40440834346308536858101042469323190826248399146238708352240133220865137265952"
+
+let sqrt_ad_minus_one =
+  Z.of_string "25063068953384623474111414158702152701244531502492656460079210482610430750235"
 
 (* RFC 9496 Section 4.2: SQRT_RATIO_M1(u, v). *)
 let sqrt_ratio_m1 u v =
@@ -201,6 +209,44 @@ let ristretto_encode (pt : point) : string =
   let y = if is_negative (fmul x z_inv) then fneg y else y in
   let s = ct_abs (fmul den_inv (fsub Z.one y)) in
   le_bytes_of s 32
+
+(* RFC 9496 Section 4.3.4 "Element Derivation" one-way map. MAP takes a
+   field element and returns a group element (given here in the internal
+   affine representation, converting the RFC's extended (X, Y, Z, T) via
+   x = X/Z, y = Y/Z; the complete addition law then combines the two
+   halves). NOT constant time: branch-on-value sign/square selection. *)
+let ristretto_map t =
+  let r = fmul sqrt_m1 (fmul t t) in
+  let u = fmul (fadd r Z.one) one_minus_d_sq in
+  let v = fmul (fsub (fneg Z.one) (fmul r edwards_d)) (fadd r edwards_d) in
+  let was_square, s = sqrt_ratio_m1 u v in
+  let s_prime = fneg (ct_abs (fmul s t)) in
+  let s = if was_square then s else s_prime in
+  let c = if was_square then fneg Z.one else r in
+  let n = fsub (fmul (fmul c (fsub r Z.one)) d_minus_one_sq) v in
+  let s_sq = fmul s s in
+  let w0 = fmul (fmul (Z.of_int 2) s) v in
+  let w1 = fmul n sqrt_ad_minus_one in
+  let w2 = fsub Z.one s_sq in
+  let w3 = fadd Z.one s_sq in
+  let big_x = fmul w0 w3 and big_y = fmul w2 w1 and big_z = fmul w1 w3 in
+  if Z.equal big_z Z.zero then identity
+  else
+    let zinv = finv big_z in
+    { x = fmul big_x zinv; y = fmul big_y zinv }
+
+(* RFC 9496 Section 4.3.4: split 64 uniform bytes into two 32-byte
+   halves, map each (masking the high bit and reducing mod p), and add
+   the two group elements. *)
+let field_of_half half =
+  let b = Bytes.of_string half in
+  Bytes.set b 31 (Char.chr (Char.code (Bytes.get b 31) land 0x7f));
+  fmod (le_of_bytes (Bytes.unsafe_to_string b))
+
+let ristretto_point_from_uniform_bytes b =
+  point_add
+    (ristretto_map (field_of_half (String.sub b 0 32)))
+    (ristretto_map (field_of_half (String.sub b 32 32)))
 
 (* The canonical generator is internally the standard Edwards25519 base
    point (RFC 8032), chosen so that its Ristretto encoding coincides
@@ -611,4 +657,21 @@ let verify_deprecated ?(context = default_context) ~key:(pk : pub) (signature : 
     let r' = point_add (scalar_mult k (point_neg a)) (scalar_mult s basepoint) in
     String.equal (ristretto_encode r') big_r
 
-let vrf_output ~key:(_ : priv) (_ : string) : string = unimplemented "vrf_output"
+let ristretto_from_uniform_bytes (b : string) : string =
+  if String.length b <> 64 then
+    invalid_arg "Sr25519.ristretto_from_uniform_bytes: input must be 64 bytes";
+  ristretto_encode (ristretto_point_from_uniform_bytes b)
+
+(* Schnorrkel VRF pre-output (schnorrkel::vrf's VRFInOut.output). The VRF
+   input is the malleable hash of the signing transcript
+   (challenge_bytes "VRFHash" -> from_uniform_bytes, per schnorrkel's
+   [vrf_malleable_hash]); the pre-output is [key_scalar * input], encoded
+   as a 32-byte ristretto element. The randomized DLEQ proof, and
+   [VRFInOut::make_bytes] (which folds the input/output points through a
+   further "VRFResult" transcript to produce application randomness), are
+   deliberately out of scope here. *)
+let vrf_output ~key:(seed : priv) (msg : string) : string =
+  let key_scalar, _ = expand_ed25519 seed in
+  let t = signing_transcript ~context:default_context msg in
+  let input = ristretto_point_from_uniform_bytes (challenge_bytes t "VRFHash" 64) in
+  ristretto_encode (scalar_mult key_scalar input)

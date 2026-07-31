@@ -272,4 +272,42 @@ module Ed25519 : sig
   (** [verify ~key signature msg] verifies the [signature] on the message
       [msg] with the public [key]. The return value is [true] if verification
       was successful, [false] otherwise. *)
+
+  (** {2 Low-level primitives}
+
+      Direct access to the underlying scalar and group arithmetic, for
+      building higher-level constructions (such as BIP32-Ed25519
+      hierarchical key derivation) that need more than opaque
+      sign/verify. Scalars are 32-byte little-endian values interpreted
+      modulo the group order [L]; points are 32-byte RFC 8032 encodings.
+      Point decoding is variable-time: {b not} constant time. *)
+  module Primitive : sig
+    val scalar_reduce : string -> string
+    (** [scalar_reduce wide] reduces the 64-byte little-endian value
+        [wide] modulo [L], returning a 32-byte scalar.
+        @raise Invalid_argument if [wide] is not 64 bytes. *)
+
+    val scalar_muladd : string -> string -> string -> string
+    (** [scalar_muladd a b c] is [(a * b + c) mod L] over 32-byte
+        little-endian scalars. *)
+
+    val scalar_mult_base : string -> string
+    (** [scalar_mult_base s] is the RFC 8032 encoding of [s * B] for the
+        Ed25519 base point [B] and 32-byte scalar [s]. *)
+
+    val point_add : string -> string -> (string, error) result
+    (** [point_add p q] adds two RFC 8032-encoded points, returning the
+        encoding of [p + q], or [Error `Not_on_curve] if either point
+        fails to decode. *)
+
+    val point_valid : string -> bool
+    (** [point_valid p] is [true] iff [p] is a valid 32-byte RFC 8032
+        point encoding. *)
+
+    val verify_double_base : k:string -> pub:string -> s:string -> bool * string
+    (** [verify_double_base ~k ~pub ~s] returns [(ok, r)] where [r] is the
+        RFC 8032 encoding of [s * B - k * P] (with [P] the point encoded
+        by [pub]) and [ok] is [false] if [pub] fails to decode. This is
+        the core relation checked by Ed25519 {!verify}. *)
+  end
 end

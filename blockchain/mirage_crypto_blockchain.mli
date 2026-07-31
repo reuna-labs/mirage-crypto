@@ -2,19 +2,35 @@
 
     Cryptographic primitives commonly used in blockchain protocols.
 
-    {b Fully implemented}: {!Blake2b}, {!Ripemd160}, {!Keccak256},
-    {!Blake3}, {!Secp256k1}, {!Bip340}.
+    All modules are implemented: {!Hashes}, {!Blake2b}, {!Ripemd160},
+    {!Keccak256}, {!Blake3}, {!Secp256k1} (ECDSA, including public-key
+    recovery), {!Bip340}, {!Bls12_381}, {!Sr25519} (Schnorrkel signatures
+    and VRF pre-output), {!Stark_curve}, {!Poseidon}, and
+    {!Ed25519_bip32}.
 
-    {b Stub only} (documented API surface, every function raises
-    [Failure "not yet implemented: ..."]): {!Bls12_381}, {!Sr25519},
-    {!Stark_curve}, {!Poseidon}, {!Ed25519_bip32}. These exist so the
-    public API shape is settled ahead of a future implementation pass;
-    see each module's doc comment for what specifically blocks a real
-    implementation.
-
-    {b Non-constant-time warning}: {!Secp256k1} and {!Bip340} use plain,
-    non-constant-time scalar multiplication. See their module doc
+    {b Non-constant-time warning}: {!Secp256k1}, {!Bip340}, {!Bls12_381},
+    {!Stark_curve}, {!Sr25519}, and {!Ed25519_bip32} use plain,
+    non-constant-time scalar multiplication (and, for {!Sr25519},
+    branch-on-value Ristretto255 field operations). See their module doc
     comments below before using them with secret key material. *)
+
+(** {b SHA-256 helpers}. Thin wrappers over [Digestif.SHA256] shared by
+    the blockchain codecs: raw SHA-256, Bitcoin's double-SHA256, and the
+    BIP340 "tagged hash" (also used by BIP341 Taproot). *)
+module Hashes : sig
+  val sha256 : string -> string
+  (** [sha256 msg] is the 32-byte SHA-256 digest of [msg]. *)
+
+  val sha256d : string -> string
+  (** [sha256d msg] is [sha256 (sha256 msg)], Bitcoin's "SHA256d" used
+      for block and transaction identifiers. *)
+
+  val tagged_hash : tag:string -> string -> string
+  (** [tagged_hash ~tag msg] is
+      [sha256 (sha256 tag || sha256 tag || msg)] per BIP340's "Design /
+      Tagged Hashes". BIP341 Taproot reuses it with tags ["TapLeaf"],
+      ["TapBranch"], ["TapTweak"], and ["TapSighash"]. *)
+end
 
 (** {b BLAKE2b}, RFC 7693. Thin wrapper over [Digestif.BLAKE2B]. *)
 module Blake2b : sig
@@ -145,6 +161,29 @@ module Secp256k1 : sig
 
   val verify : key:pub -> signature -> string -> bool
   (** [verify ~key sig digest] verifies [sig] over the 32-byte [digest]. *)
+
+  val sign_recoverable : key:priv -> string -> signature * int
+  (** Like {!sign}, but additionally returns a recovery id in [[0, 3]]
+      that, together with the signature and message digest, lets
+      {!recover} reconstruct the public key. The id encodes the parity of
+      the y-coordinate of the ephemeral point [R] (bit 0) and whether its
+      x-coordinate exceeded the curve order [n] (bit 1). Ethereum's
+      transaction [v] is [recid + 27] (legacy / [eth_sign]) or
+      [recid + 35 + 2 * chain_id] (EIP-155); that mapping is left to the
+      caller.
+      @raise Invalid_argument if [digest] is not 32 bytes. *)
+
+  val recover : msg:string -> signature -> recid:int -> (pub, error) result
+  (** [recover ~msg sig ~recid] recovers the public key that produced
+      [sig] over the 32-byte digest [msg], using the recovery id [recid]
+      (in [[0, 3]], as returned by {!sign_recoverable}). Any valid [s] in
+      [[1, n)] is accepted (low-S is not required for recovery). Returns
+      [Error `Invalid_length] if [msg] is not 32 bytes,
+      [Error `Invalid_format] if [recid] is out of range,
+      [Error `Invalid_range] if the signature scalars or the
+      reconstructed x-coordinate are out of range, [Error `Not_on_curve]
+      if no curve point has that x-coordinate, and [Error `At_infinity]
+      in the degenerate recovered-identity case. *)
 end
 
 (** {b BIP340} Schnorr signatures over secp256k1
@@ -340,7 +379,8 @@ end
     known-answer test vectors of its own -- this is also how
     schnorrkel's own upstream test suite tests it (sign, then verify).
 
-    {b Scope.} VRF is not implemented; see {!vrf_output}. *)
+    {b Scope.} {!vrf_output} provides the deterministic VRF pre-output;
+    the randomized DLEQ proof is not implemented. *)
 module Sr25519 : sig
   type error = [ `Invalid_format | `Invalid_length | `Invalid_range | `Not_on_curve ]
 
@@ -378,10 +418,23 @@ module Sr25519 : sig
       produced by that legacy path; ordinary sr25519 signatures should
       always be checked with {!verify}. *)
 
+  val ristretto_from_uniform_bytes : string -> string
+  (** [ristretto_from_uniform_bytes b] is the RFC 9496 Section 4.3.4
+      one-way map (hash-to-group): 64 uniformly-distributed bytes [b] are
+      mapped to a ristretto255 group element, returned as its 32-byte
+      encoding. This is the primitive underlying {!vrf_output}'s input
+      hashing, exposed for general hash-to-group use.
+      @raise Invalid_argument if [b] is not 64 bytes. *)
+
   val vrf_output : key:priv -> string -> string
-  (** Schnorrkel also defines a VRF construction over the same key type;
-      stubbed here for completeness of the intended surface. Every call
-      raises [Failure "not yet implemented: Sr25519.vrf_output"]. *)
+  (** [vrf_output ~key msg] is the Schnorrkel VRF pre-output
+      (schnorrkel's [VRFInOut.output]) for message [msg] under the
+      default ["substrate"] signing context: the VRF input is the
+      malleable hash of the signing transcript
+      ([challenge_bytes "VRFHash"] then {!ristretto_from_uniform_bytes}),
+      and the result is [key_scalar * input], encoded as a 32-byte
+      ristretto element. The (randomized) DLEQ proof and
+      [VRFInOut::make_bytes] output-expansion step are out of scope. *)
 end
 
 (** {b Stark Curve}: the StarkNet/StarkEx short-Weierstrass curve
@@ -509,22 +562,17 @@ end
 (** {b Ed25519-BIP32} (a.k.a. ed25519e), hierarchical deterministic key
     derivation extending Ed25519, per Cardano's "BIP32-Ed25519:
     Hierarchical Deterministic Keys over a Non-linear Keyspace"
-    (Khovratovich & Law, 2017).
+    (Khovratovich & Law, 2017); child derivation follows Cardano's
+    DerivationScheme V2.
 
-    {b STUB -- NOT IMPLEMENTED.}
+    {b NOT CONSTANT TIME.} Built on
+    {!Mirage_crypto_ec.Ed25519.Primitive}; inherits its variable-time
+    point decoding and does plain byte arithmetic over secret scalars.
 
-    {b Dependency gap.} This repo's [mirage-crypto-ec] exposes
-    [Ed25519.priv]/[Ed25519.pub] only as opaque, fully-encoded key
-    types; there is no [Ed25519.Primitive]-style submodule (generator,
-    [add], [scalar_mult]) analogous to what P256/P384/P521 expose under
-    [Dsa.Primitive]. BIP32-Ed25519 child-key derivation needs direct
-    access to the 32-byte scalar and curve point (for scalar tweaking:
-    [k_child = k_parent + 8*Z_L mod L] and the analogous point addition
-    on the public side) that raw Ed25519 signing does not require. A
-    real implementation of this module therefore also requires
-    extending [ec/mirage_crypto_ec.mli] first; that is out of scope
-    here. Every function below raises
-    [Failure "not yet implemented: Ed25519_bip32.<fn>"]. *)
+    Master key generation uses the paper's SHA-512 scheme (k =
+    SHA512(seed), clamp [kL], chain code = SHA256(0x01 || seed)); the
+    3rd-highest bit of [kL]'s last byte must be clear, otherwise
+    {!master_key_of_seed} returns [Error `Invalid_derivation]. *)
 module Ed25519_bip32 : sig
   type error = [ `Invalid_format | `Invalid_length | `Invalid_derivation ]
 
@@ -537,6 +585,16 @@ module Ed25519_bip32 : sig
 
   type extended_pub
   (** 32-byte point plus 32-byte chain code. *)
+
+  val extended_priv_of_octets : string -> (extended_priv, error) result
+  (** Decodes a 96-byte [kL || kR || chain_code] extended private key. *)
+
+  val extended_priv_to_octets : extended_priv -> string
+  val extended_pub_of_octets : string -> (extended_pub, error) result
+  (** Decodes a 64-byte [point || chain_code] extended public key;
+      [Error `Invalid_format] if the point is not a valid encoding. *)
+
+  val extended_pub_to_octets : extended_pub -> string
 
   val master_key_of_seed : string -> (extended_priv, error) result
 

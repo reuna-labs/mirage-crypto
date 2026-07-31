@@ -89,6 +89,28 @@ let blake3_derive_key_cases =
              assert_oct_equal (vx derived)
                (Blake3.derive_key ~context:blake3_context (blake3_input len))))
 
+(* ===== SHA-256 helpers (Hashes) ===== *)
+let hashes_cases =
+  [
+    test_case (fun _ ->
+        (* FIPS 180-4 SHA-256("abc"). *)
+        assert_oct_equal ~msg:"sha256(abc)"
+          (vx "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
+          (Hashes.sha256 "abc");
+        (* sha256d("abc") = sha256(sha256("abc")). *)
+        assert_oct_equal ~msg:"sha256d(abc)"
+          (vx "4f8b42c22dd3729b519ba6f68d2da7cc5b2d606d05daed5ad5128cc03e6c6358")
+          (Hashes.sha256d "abc");
+        assert_oct_equal ~msg:"sha256d = sha256 . sha256"
+          (Hashes.sha256 (Hashes.sha256 "abc"))
+          (Hashes.sha256d "abc"));
+    test_case (fun _ ->
+        (* The hoisted tagged_hash must agree with Bip340's (delegated). *)
+        assert_oct_equal ~msg:"tagged_hash agrees with Bip340"
+          (Bip340.tagged_hash ~tag:"BIP0340/challenge" "hello")
+          (Hashes.tagged_hash ~tag:"BIP0340/challenge" "hello"));
+  ]
+
 (* ===== secp256k1 =====
 
    The ECDSA vector below was generated independently via Python's
@@ -134,6 +156,60 @@ let secp256k1_ecdsa_case =
       assert_bool "verify accepts own signature" (Secp256k1.verify ~key:pub signature (vx digest));
       assert_bool "verify rejects tampered digest"
         (not (Secp256k1.verify ~key:pub signature (vx ("00" ^ String.sub digest 2 62)))))
+
+(* Public-key recovery: the fixed vector is go-ethereum's canonical
+   ecrecover test (crypto/signature_test.go: testmsg/testsig/testpubkey),
+   with the trailing recovery byte 0x01 as [recid]. *)
+let secp256k1_recover_case =
+  test_case (fun _ ->
+      let msg = "ce0677bb30baa8cf067c88db9811f4333d131bf8bcf12fe7065d211dce971008" in
+      let r = "90f27b8b488db00b00606796d2987f6a5f59ae62ea05effe84fef5b8b0e54998" in
+      let s = "4a691139ad57a3f0b906637673aa2f63d1f55cb1a69199d4009eea23ceaddc93" in
+      let expected_pub =
+        "04e32df42865e97135acfb65f3bae71bdc86f4d49150ad6a440b6f158781098"
+        ^ "80a0a2b2667f7e725ceea70c673093bf67663e0312623c8e091b13cf2c0f11ef652"
+      in
+      let sg =
+        match Secp256k1.signature_of_octets (vx (r ^ s)) with
+        | Ok x -> x
+        | Error _ -> assert_failure "bad signature"
+      in
+      (match Secp256k1.recover ~msg:(vx msg) sg ~recid:1 with
+      | Ok pub ->
+        assert_oct_equal ~msg:"recovered pubkey (go-ethereum vector)"
+          (vx expected_pub)
+          (Secp256k1.point_to_octets ~compress:false pub)
+      | Error _ -> assert_failure "recover failed on known vector");
+      assert_bool "wrong recid does not recover the same key"
+        (match Secp256k1.recover ~msg:(vx msg) sg ~recid:0 with
+        | Ok pub ->
+          not (String.equal (vx expected_pub)
+                 (Secp256k1.point_to_octets ~compress:false pub))
+        | Error _ -> true);
+      (* sign_recoverable -> recover round-trip, key 0x3d. *)
+      let key =
+        match Secp256k1.scalar_of_octets
+                (vx "000000000000000000000000000000000000000000000000000000000000003d")
+        with
+        | Ok k -> k
+        | Error _ -> assert_failure "bad private key"
+      in
+      let digest = vx "3f0a377ba0a4a460ecb616f6507ce0d8cfa3e704025d4fda3ed0c5ca05468728" in
+      let sg2, recid = Secp256k1.sign_recoverable ~key digest in
+      let pub = Secp256k1.pub_of_priv key in
+      (match Secp256k1.recover ~msg:digest sg2 ~recid with
+      | Ok rpub ->
+        assert_bool "round-trip recovers the signer"
+          (Z.equal rpub.Secp256k1.x pub.Secp256k1.x
+          && Z.equal rpub.Secp256k1.y pub.Secp256k1.y)
+      | Error _ -> assert_failure "round-trip recover failed");
+      assert_oct_equal ~msg:"recoverable signature matches deterministic sign"
+        (Secp256k1.signature_to_octets (Secp256k1.sign ~key digest))
+        (Secp256k1.signature_to_octets sg2);
+      assert_bool "recid out of range rejected"
+        (match Secp256k1.recover ~msg:digest sg2 ~recid:4 with
+        | Error `Invalid_format -> true
+        | _ -> false))
 
 (* ===== BIP340 (official test vectors from
    https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv) ===== *)
@@ -574,39 +650,164 @@ let sr25519_tamper_case =
         assert_bool "verify rejects a different message"
           (not (Sr25519.verify ~key:pub signature "message two")))
 
+(* RFC 9496 Appendix A.4 one-way-map (hash-to-group) test vectors:
+   64-byte uniform input -> 32-byte ristretto255 encoding. *)
+let ristretto_one_way_map_case =
+  test_case (fun _ ->
+      let vectors =
+        [
+          ( "5d1be09e3d0c82fc538112490e35701979d99e06ca3e2b5b54bffe8b4dc772c1"
+            ^ "4d98b696a1bbfb5ca32c436cc61c16563790306c79eaca7705668b47dffe5bb6",
+            "3066f82a1a747d45120d1740f14358531a8f04bbffe6a819f86dfe50f44a0a46" );
+          ( "f116b34b8f17ceb56e8732a60d913dd10cce47a6d53bee9204be8b44f6678b27"
+            ^ "0102a56902e2488c46120e9276cfe54638286b9e4b3cdb470b542d46c2068d38",
+            "f26e5b6f7d362d2d2a94c5d0e7602cb4773c95a2e5c31a64f133189fa76ed61b" );
+          ( "8422e1bbdaab52938b81fd602effb6f89110e1e57208ad12d9ad767e2e25510c"
+            ^ "27140775f9337088b982d83d7fcf0b2fa1edffe51952cbe7365e95c86eaf325c",
+            "006ccd2a9e6867e6a2c5cea83d3302cc9de128dd2a9a57dd8ee7b9d7ffe02826" );
+          ( "165d697a1ef3d5cf3c38565beefcf88c0f282b8e7dbd28544c483432f1cec767"
+            ^ "5debea8ebb4e5fe7d6f6e5db15f15587ac4d4d4a1de7191e0c1ca6664abcc413",
+            "ae81e7dedf20a497e10c304a765c1767a42d6e06029758d2d7e8ef7cc4c41179" );
+          ( "a836e6c9a9ca9f1e8d486273ad56a78c70cf18f0ce10abb1c7172ddd605d7fd2"
+            ^ "979854f47ae1ccf204a33102095b4200e5befc0465accc263175485f0e17ea5c",
+            "e2705652ff9f5e44d3e841bf1c251cf7dddb77d140870d1ab2ed64f1a9ce8628" );
+        ]
+      in
+      List.iter
+        (fun (input, expected) ->
+          assert_oct_equal ~msg:"RFC 9496 one-way map"
+            (vx expected)
+            (Sr25519.ristretto_from_uniform_bytes (vx input)))
+        vectors)
+
+(* vrf_output is deterministic; its result must be a valid ristretto
+   point, stable across calls, and message-dependent. *)
+let sr25519_vrf_output_case =
+  test_case (fun _ ->
+      match Sr25519.priv_of_octets (String.make 32 '\042') with
+      | Error _ -> assert_failure "bad test seed"
+      | Ok priv ->
+        let out1 = Sr25519.vrf_output ~key:priv "vrf message" in
+        let out2 = Sr25519.vrf_output ~key:priv "vrf message" in
+        assert_oct_equal ~msg:"vrf_output is deterministic" out1 out2;
+        assert_bool "vrf_output is a valid ristretto point (32 bytes)"
+          (String.length out1 = 32);
+        (match Sr25519.pub_of_octets out1 with
+        | Ok _ -> ()
+        | Error _ -> assert_failure "vrf_output is not a decodable ristretto point");
+        assert_bool "vrf_output depends on the message"
+          (not (String.equal out1 (Sr25519.vrf_output ~key:priv "other message"))))
+
 let sr25519_cases =
   ristretto_valid_cases @ ristretto_invalid_cases @ sr25519_seed_to_pubkey_cases
-  @ [ sr25519_legacy_signature_case; sr25519_sign_verify_roundtrip_case; sr25519_tamper_case ]
+  @ [ sr25519_legacy_signature_case; sr25519_sign_verify_roundtrip_case;
+      sr25519_tamper_case; ristretto_one_way_map_case; sr25519_vrf_output_case ]
 
-(* ===== Stub modules: confirm they fail loudly rather than returning wrong
-   data silently. ===== *)
-
-let expect_unimplemented f =
-  test_case (fun _ ->
-      match f () with
-      | _ -> assert_failure "expected Failure \"not yet implemented: ...\""
-      | exception Failure msg ->
-        assert_bool ("unexpected failure message: " ^ msg)
-          (String.length msg >= 20 && String.sub msg 0 20 = "not yet implemented:"))
-
-let stub_cases =
+(* ===== Ed25519-BIP32 (V2). Fixed derivation vectors are from
+   BitBoxSwiss/rust-bip32-ed25519's tests/testdata/table.json, which
+   cross-checks against an independent ed25519-bip32 implementation. ===== *)
+let ed25519_bip32_cases =
+  let module B = Ed25519_bip32 in
+  let root_kl = "c8e9654cee5526f2a0ea31c7b05f57f5295135e46ded2c747191f34ab98f3d50" in
+  let root_kr = "8757f37b66d61b1f102b00ffd4007c7660d4948c9ec809c847a84b15e60d89b7" in
+  let root_cc = "59b469554385d460a79105f422421e2de565afa315a8defd37dbc3ab2b63546d" in
+  let root =
+    match B.extended_priv_of_octets (vx (root_kl ^ root_kr ^ root_cc)) with
+    | Ok r -> r
+    | Error _ -> assert_failure "bad root xprv"
+  in
   [
-    expect_unimplemented (fun () ->
-        match Sr25519.priv_of_octets (String.make 32 '\000') with
-        | Ok priv -> Sr25519.vrf_output ~key:priv ""
-        | Error _ -> assert_failure "bad test seed");
-    expect_unimplemented (fun () -> Ed25519_bip32.master_key_of_seed "");
+    (* soft derivation, index 0 *)
+    test_case (fun _ ->
+        let child_kl = "a0b23454924c145df960caba91f3a1ec65bc097b3e7f47849d614e19c08f3d50" in
+        let child_kr = "1bac817a12e10402e991257cef4df7f8553bb33684315f70177be041f2c79b63" in
+        let child_cc = "5bcc2e27c743f9d3302e8850ef27214d2b9fb000a901034008c323e6ccfd2f63" in
+        let child_pub = "9dce4c2940f0ad02461c96dbce2be07cc05bfd7f6110192f4c3f59db334f3f75" in
+        let child =
+          match B.derive_priv_normal root ~index:0l with
+          | Ok c -> c
+          | Error _ -> assert_failure "soft derivation failed"
+        in
+        assert_oct_equal ~msg:"soft child xprv"
+          (vx (child_kl ^ child_kr ^ child_cc))
+          (B.extended_priv_to_octets child);
+        assert_oct_equal ~msg:"soft child extended pub"
+          (vx (child_pub ^ child_cc))
+          (B.extended_pub_to_octets (B.pub_of_priv child));
+        match B.derive_pub_normal (B.pub_of_priv root) ~index:0l with
+        | Ok pchild ->
+          assert_oct_equal ~msg:"public-only derivation agrees with private"
+            (vx (child_pub ^ child_cc))
+            (B.extended_pub_to_octets pchild)
+        | Error _ -> assert_failure "public derivation failed");
+    (* hardened derivation, index 2^31 *)
+    test_case (fun _ ->
+        let child_kl = "800cdbee97b1151e0c241bacc25e88debb501e2c08356201c0871249bc8f3d50" in
+        let child_kr = "ac0fb5dbfb854692498b502444e936d35642fde5ae4244905d0aef2743152e13" in
+        let child_cc = "11b22d1d5a245253e0905fd7cbb9e131ebc60609774e5ca2712afb7f35427de5" in
+        let child =
+          match B.derive_priv_hardened root ~index:Int32.min_int with
+          | Ok c -> c
+          | Error _ -> assert_failure "hardened derivation failed"
+        in
+        assert_oct_equal ~msg:"hardened child xprv"
+          (vx (child_kl ^ child_kr ^ child_cc))
+          (B.extended_priv_to_octets child));
+    (* index-range guards *)
+    test_case (fun _ ->
+        assert_bool "normal rejects a hardened index"
+          (match B.derive_priv_normal root ~index:Int32.min_int with
+          | Error `Invalid_derivation -> true
+          | _ -> false);
+        assert_bool "hardened rejects a soft index"
+          (match B.derive_priv_hardened root ~index:0l with
+          | Error `Invalid_derivation -> true
+          | _ -> false);
+        assert_bool "public derivation rejects a hardened index"
+          (match B.derive_pub_normal (B.pub_of_priv root) ~index:Int32.min_int with
+          | Error `Invalid_derivation -> true
+          | _ -> false));
+    (* sign / verify round-trip and tamper *)
+    test_case (fun _ ->
+        let child =
+          match B.derive_priv_normal root ~index:0l with
+          | Ok c -> c
+          | Error _ -> assert_failure "derivation failed"
+        in
+        let pub = B.pub_of_priv child in
+        let msg = "bip32-ed25519 signing test" in
+        let signature = B.sign ~key:child msg in
+        assert_bool "signature verifies" (B.verify ~key:pub signature ~msg);
+        assert_bool "verify rejects a different message"
+          (not (B.verify ~key:pub signature ~msg:"other message")));
+    (* master_key_of_seed: clamping and usability *)
+    test_case (fun _ ->
+        let rec find n =
+          if n > 100 then assert_failure "no valid seed found"
+          else
+            match B.master_key_of_seed (Printf.sprintf "reuna-bip32-seed-%d" n) with
+            | Ok m -> m
+            | Error _ -> find (n + 1)
+        in
+        let bytes = B.extended_priv_to_octets (find 0) in
+        assert_bool "xprv is 96 bytes" (String.length bytes = 96);
+        let kl0 = Char.code bytes.[0] and kl31 = Char.code bytes.[31] in
+        assert_bool "kL low 3 bits cleared" (kl0 land 0x07 = 0);
+        assert_bool "kL top bit cleared" (kl31 land 0x80 = 0);
+        assert_bool "kL bit 254 set" (kl31 land 0x40 <> 0));
   ]
 
 let suite =
   "blockchain" >::: [
+    "hashes" >::: hashes_cases;
     "blake2b" >::: blake2b_cases;
     "ripemd160" >::: ripemd160_cases;
     "keccak256" >::: keccak256_cases @ [ keccak256_multiblock_case ];
     "blake3_hash" >::: blake3_hash_cases;
     "blake3_keyed" >::: blake3_keyed_cases;
     "blake3_derive_key" >::: blake3_derive_key_cases;
-    "secp256k1" >::: [ secp256k1_generator_on_curve_case; secp256k1_ecdsa_case ];
+    "secp256k1" >::: [ secp256k1_generator_on_curve_case; secp256k1_ecdsa_case;
+                       secp256k1_recover_case ];
     "bip340_sign_verify" >::: bip340_full_cases;
     "bip340_verify_only" >::: bip340_verify_cases;
     "stark_curve" >::: [
@@ -618,5 +819,5 @@ let suite =
     "poseidon" >::: poseidon_cases;
     "bls12_381" >::: bls12_381_cases;
     "sr25519" >::: sr25519_cases;
-    "stubs" >::: stub_cases;
+    "ed25519_bip32" >::: ed25519_bip32_cases;
   ]

@@ -1341,6 +1341,34 @@ df f8 a0 4f d3 dd 1d f0  07 78 3a 2f 29 d6 61 61
       (P521.Dsa.verify ~key (sigr, sigs) data)
   | Error _ -> Alcotest.fail "regression failed"
 
+let ed25519_primitive =
+  let module P = Ed25519.Primitive in
+  let one = "\001" ^ String.make 31 '\000' in
+  let zero = String.make 32 '\000' in
+  [
+    ( "point_add is the group law on the base point", `Quick, fun () ->
+      for _ = 1 to 20 do
+        let x = P.scalar_reduce (Mirage_crypto_rng.generate 64) in
+        let y = P.scalar_reduce (Mirage_crypto_rng.generate 64) in
+        let sum = P.scalar_muladd one x y in
+        let expected = P.scalar_mult_base sum in
+        match P.point_add (P.scalar_mult_base x) (P.scalar_mult_base y) with
+        | Ok got -> Alcotest.(check string) "x*B + y*B = (x+y)*B" expected got
+        | Error _ -> Alcotest.fail "point_add rejected valid points"
+      done );
+    ( "point_valid accepts real points, rejects bad length", `Quick, fun () ->
+      let _, pub = Ed25519.generate () in
+      Alcotest.(check bool) "generated pub valid" true
+        (P.point_valid (Ed25519.pub_to_octets pub));
+      Alcotest.(check bool) "wrong length invalid" false (P.point_valid "nope") );
+    ( "verify_double_base with k=0 yields s*B", `Quick, fun () ->
+      let _, pub = Ed25519.generate () in
+      let s = P.scalar_reduce (Mirage_crypto_rng.generate 64) in
+      let ok, r = P.verify_double_base ~k:zero ~pub:(Ed25519.pub_to_octets pub) ~s in
+      Alcotest.(check bool) "pub decoded" true ok;
+      Alcotest.(check string) "s*B - 0*A = s*B" (P.scalar_mult_base s) r );
+  ]
+
 let () =
   Mirage_crypto_rng_unix.use_default ();
   Alcotest.run "EC"
@@ -1355,6 +1383,7 @@ let () =
       ("ECDSA RFC 6979 P521", ecdsa_rfc6979_p521);
       ("X25519", [ "RFC 7748", `Quick, x25519 ]);
       ("ED25519", ed25519);
+      ("ED25519 primitives", ed25519_primitive);
       ("ECDSA P521 regression", [ "regression1", `Quick, p521_regression ]);
       ("secp256k1 ECDSA", secp256k1_ecdsa);
       ("secp256k1 ECDSA sign", secp256k1_ecdsa_sign);
