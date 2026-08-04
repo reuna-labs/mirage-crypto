@@ -306,3 +306,65 @@ let sign ~key:d msg =
 
 let verify ~key:q { r; s } msg =
   String.length msg = 32 && verify_z ~pub:q (r, s) (z_of_octets_be msg)
+
+(* Public-key recovery ("ecrecover"). The recoverable signing path
+   mirrors [sign_z] but additionally reports a recovery id in [0, 3]:
+   bit 0 is the parity of the y-coordinate of the ephemeral point R, and
+   bit 1 records whether R's x-coordinate exceeded the curve order n (so
+   the x-coordinate can be reconstructed as r or r + n). Low-S
+   normalization negates s but leaves R unchanged, which flips the point
+   used in recovery, so the recid's parity bit is flipped to match. *)
+
+let sign_recoverable_z ~priv:d z =
+  let rec loop () =
+    let k = K_gen_sha256.gen_k ~priv:d z in
+    match of_jacobian (scalar_mult_jacobian k (to_jacobian g)) with
+    | None -> loop () (* astronomically unlikely; treat as bad k, retry *)
+    | Some { x = xr; y = yr } ->
+      let r = Z.erem xr n in
+      if Z.equal r Z.zero then loop ()
+      else
+        let kinv = Z.invert k n in
+        let s = Z.(erem (kinv * erem (z + (r * d)) n) n) in
+        if Z.equal s Z.zero then loop ()
+        else
+          let recid =
+            (if Z.geq xr n then 2 else 0) lor (if Z.testbit yr 0 then 1 else 0)
+          in
+          if Z.gt s half_n then (r, Z.sub n s, recid lxor 1) else (r, s, recid)
+  in
+  loop ()
+
+let sign_recoverable ~key:d msg =
+  if String.length msg <> 32 then
+    invalid_arg "Secp256k1.sign_recoverable: digest must be 32 bytes";
+  let z = z_of_octets_be msg in
+  let r, s, recid = sign_recoverable_z ~priv:d z in
+  ({ r; s }, recid)
+
+(* Q = r^-1 (s * R - z * G), with R reconstructed from r and recid.
+   (-z mod n) * G is used instead of negating a Jacobian point. *)
+let recover_z ~recid { r; s } z =
+  if recid < 0 || recid > 3 then Error `Invalid_format
+  else if not (Z.zero < r && r < n && Z.zero < s && s < n) then Error `Invalid_range
+  else
+    let x = if recid land 2 <> 0 then Z.add r n else r in
+    if Z.geq x p then Error `Invalid_range
+    else
+      let rhs = fadd (fmul x (fmul x x)) curve_b in
+      let y0 = Z.powm rhs Z.((p + one) / Z.of_int 4) p in
+      if not (Z.equal (fmul y0 y0) rhs) then Error `Not_on_curve
+      else
+        let want_odd = recid land 1 = 1 in
+        let y = if Bool.equal (Z.testbit y0 0) want_odd then y0 else Z.sub p y0 in
+        let big_r = { x; y } in
+        let s_r = scalar_mult_jacobian s (to_jacobian big_r) in
+        let neg_z_g = scalar_mult_jacobian (Z.erem (Z.neg z) n) (to_jacobian g) in
+        let rinv = Z.invert r n in
+        match of_jacobian (scalar_mult_jacobian rinv (jadd s_r neg_z_g)) with
+        | None -> Error `At_infinity
+        | Some q -> Ok q
+
+let recover ~msg sg ~recid =
+  if String.length msg <> 32 then Error `Invalid_length
+  else recover_z ~recid sg (z_of_octets_be msg)

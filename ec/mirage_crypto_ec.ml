@@ -1328,6 +1328,7 @@ module Ed25519 = struct
   external muladd : bytes -> string -> string -> string -> unit = "mc_25519_muladd" [@@noalloc]
   external double_scalar_mult : bytes -> string -> string -> string -> bool = "mc_25519_double_scalar_mult" [@@noalloc]
   external pub_ok : string -> bool = "mc_25519_pub_ok" [@@noalloc]
+  external point_add : bytes -> string -> string -> bool = "mc_25519_point_add" [@@noalloc]
 
   let key_len = 32
 
@@ -1438,4 +1439,28 @@ module Ed25519 = struct
         false
     else
       false
+
+  (* Low-level scalar/point access for higher-level constructions (e.g.
+     BIP32-Ed25519). Scalars are 32-byte little-endian values mod L;
+     points are 32-byte RFC 8032 encodings. Point decoding is
+     variable-time (NOT constant time). *)
+  module Primitive = struct
+    let scalar_reduce wide =
+      if String.length wide <> 2 * key_len then
+        invalid_arg "Ed25519.Primitive.scalar_reduce: expected 64 bytes";
+      let b = Bytes.of_string wide in
+      reduce_l b;
+      String.sub (Bytes.unsafe_to_string b) 0 key_len
+
+    let scalar_muladd a b c = muladd a b c
+    let scalar_mult_base s = scalar_mult_base_to_bytes s
+
+    let point_add p q =
+      let tmp = Bytes.create key_len in
+      if point_add tmp p q then Ok (Bytes.unsafe_to_string tmp)
+      else Error `Not_on_curve
+
+    let point_valid p = String.length p = key_len && pub_ok p
+    let verify_double_base ~k ~pub ~s = double_scalar_mult k pub s
+  end
 end

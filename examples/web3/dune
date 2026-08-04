@@ -1,0 +1,3 @@
+(executable
+ (name web3_workload)
+ (libraries mirage-crypto-blockchain mirage-crypto-rng.unix))

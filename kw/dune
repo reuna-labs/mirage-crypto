@@ -1,0 +1,4 @@
+(library
+ (name mirage_crypto_kw)
+ (public_name mirage-crypto-kw)
+ (libraries mirage-crypto))

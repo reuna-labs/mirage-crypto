@@ -17,6 +17,7 @@ depends: [
   "dune" {>= "2.7"}
   "mirage-crypto" {=version}
   "mirage-crypto-rng" {=version}
+  "mirage-crypto-ec" {=version}
   "digestif" {>= "1.2.0"}
   "zarith" {>= "1.13"}
   "eqaf" {>= "0.8"}
@@ -34,21 +35,20 @@ Stark Curve signature scheme, the Poseidon hash over the STARK field,
 BLS12-381 (G1/G2 group arithmetic, the optimal ate pairing, RFC 9380
 hash-to-curve for G2, and BLS signatures in the minimal-pubkey-size
 configuration), and sr25519 (Ristretto255 over Curve25519, Schnorrkel
-Schnorr signatures, and a Merlin/STROBE128 transcript for Fiat-Shamir
-challenges and randomized nonces, as used by Substrate/Polkadot).
+Schnorr signatures, a Merlin/STROBE128 transcript for Fiat-Shamir
+challenges and randomized nonces, and the ristretto255 one-way map with
+the Schnorrkel VRF pre-output, as used by Substrate/Polkadot), and
+Ed25519-BIP32 hierarchical deterministic key derivation (Cardano's
+DerivationScheme V2, built on mirage-crypto-ec's Ed25519 primitives).
+Secp256k1 additionally provides public-key recovery ("ecrecover").
 
-IMPORTANT: the Secp256k1, Bip340, Stark_curve, Bls12_381, and Sr25519
-modules use plain (non-constant-time) double-and-add scalar
+IMPORTANT: the Secp256k1, Bip340, Stark_curve, Bls12_381, Sr25519, and
+Ed25519_bip32 modules use plain (non-constant-time) double-and-add scalar
 multiplication -- and, for Sr25519, branch-on-value Ristretto255 field
 operations -- and are NOT hardened against timing side-channels. They
 are quick reference implementations pending a future constant-time
 revamp; see the "NOT CONSTANT TIME" banners in
 mirage_crypto_blockchain.mli. Do not use them to handle secret keys in
 adversarial or timing-observable environments.
-
-Ed25519-BIP32 is exposed only as a documented interface stub in this
-release; calling it raises Failure "not yet implemented: ...". See the
-module doc comments for the intended API and implementation notes for a
-future phase.
 """
 x-maintenance-intent: [ "(latest)" ]

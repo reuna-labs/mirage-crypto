@@ -84,3 +84,9 @@
  (libraries mirage-crypto-rng-miou-unix duration ohex)
  (package   mirage-crypto-rng-miou-unix)
  (enabled_if (<> %{os_type} "Win32")))
+
+(test
+ (name test_kw_runner)
+ (libraries test_common mirage-crypto mirage-crypto-kw ounit2)
+ (package mirage-crypto-kw)
+ (modules test_kw test_kw_runner))

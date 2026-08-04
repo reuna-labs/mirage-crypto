@@ -10,9 +10,7 @@ let pp_error = Secp256k1.pp_error
 type priv = Secp256k1.scalar
 type xonly_pub = Z.t
 
-let tagged_hash ~tag msg =
-  let h = Digestif.SHA256.(to_raw_string (digest_string tag)) in
-  Digestif.SHA256.(to_raw_string (digest_string (h ^ h ^ msg)))
+let tagged_hash = Hashes.tagged_hash
 
 (* BIP340 "lift_x": the unique point on the curve with the given
    x-coordinate and an even y, or [None] if [x] is not on the curve. *)
