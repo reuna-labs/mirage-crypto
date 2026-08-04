@@ -1,0 +1,30 @@
+opam-version: "2.0"
+homepage:     "https://github.com/mirage/mirage-crypto"
+dev-repo:     "git+https://github.com/mirage/mirage-crypto.git"
+bug-reports:  "https://github.com/mirage/mirage-crypto/issues"
+doc:          "https://mirage.github.io/mirage-crypto/doc"
+authors:      ["David Kaloper <dk505@cam.ac.uk>" "Hannes Mehnert <hannes@mehnert.org>" ]
+maintainer:   "Hannes Mehnert <hannes@mehnert.org>"
+license:      "ISC"
+synopsis:     "AES Key Wrap (RFC 3394) and Key Wrap with Padding (RFC 5649) for mirage-crypto"
+
+build: [ ["dune" "subst"] {dev}
+         ["dune" "build" "-p" name "-j" jobs ]
+         ["dune" "runtest" "-p" name "-j" jobs] {with-test} ]
+
+depends: [
+  "ocaml" {>= "4.13.0"}
+  "dune" {>= "2.7"}
+  "mirage-crypto" {=version}
+  "ounit2" {with-test}
+  "ohex" {with-test & >= "0.2.0"}
+]
+description: """
+Mirage-crypto-kw provides AES Key Wrap (RFC 3394) and AES Key Wrap with
+Padding (RFC 5649).
+
+Key wrap is a deterministic, nonce-free way to protect key material under
+another key, with integrity included. Combined with RSA-OAEP it is PKCS#11's
+CKM_RSA_AES_KEY_WRAP, the standard way key material travels between an
+application and an HSM, a KMIP service or a cloud KMS.
+"""
