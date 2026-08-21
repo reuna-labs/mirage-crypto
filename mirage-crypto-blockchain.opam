@@ -18,7 +18,7 @@ depends: [
   "mirage-crypto" {=version}
   "mirage-crypto-rng" {=version}
   "mirage-crypto-ec" {=version}
-  "digestif" {>= "1.2.0"}
+  "digestif" {>= "1.4.0"}
   "zarith" {>= "1.13"}
   "eqaf" {>= "0.8"}
   "ounit2" {with-test}
@@ -29,7 +29,8 @@ Mirage-crypto-blockchain provides cryptographic primitives commonly used in
 blockchain protocols.
 
 Fully implemented: Blake2b and RIPEMD-160 (thin wrappers over digestif),
-Keccak-256 (Ethereum's pre-standardization Keccak, distinct from SHA3-256),
+Keccak-224/256/384/512 (the pre-standardization Keccak padding, distinct
+from SHA-3; Keccak-256 is Ethereum's),
 BLAKE3, secp256k1 ECDSA / BIP340 Schnorr signatures, the StarkNet/StarkEx
 Stark Curve signature scheme, the Poseidon hash over the STARK field,
 BLS12-381 (G1/G2 group arithmetic, the optimal ate pairing, RFC 9380

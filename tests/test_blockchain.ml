@@ -46,6 +46,68 @@ let keccak256_multiblock_case =
         (vx "bfb0aa97863e797943cf7c33bb7e880bb4543f3d2703c0923c6901c2af57b890")
         (Keccak256.digest msg))
 
+(* ===== Keccak-224/384/512 =====
+
+   Same legacy 0x01 padding as Keccak-256, at the other three digest sizes.
+   Each triple is ("", "abc", the 200-byte 0x00..0xc7 message); 200 bytes is
+   longer than twice the sponge rate for all three (144, 104 and 72), so the
+   third case exercises the multi-block absorb path in every variant.
+   Cross-checked against OpenSSL 3.6.3. *)
+
+let keccak_sized_cases =
+  let msg200 = String.init 200 (fun i -> Char.chr i) in
+  [
+    ( "keccak224",
+      Keccak.K224.digest,
+      28,
+      [
+        ("", "f71837502ba8e10837bdd8d365adb85591895602fc552b48b7390abd");
+        ("abc", "c30411768506ebe1c2871b1ee2e87d38df342317300a9b97a95ec6a8");
+        (msg200, "1922a6155bf6bb5ade5100c99771912596e45d8273347d5daca1f3c9");
+      ] );
+    ( "keccak384",
+      Keccak.K384.digest,
+      48,
+      [
+        ( "",
+          "2c23146a63a29acf99e73b88f8c24eaa7dc60aa771780ccc006afbfa8fe2479b2dd2b21362337441ac12b515911957ff"
+        );
+        ( "abc",
+          "f7df1165f033337be098e7d288ad6a2f74409d7a60b49c36642218de161b1f99f8c681e4afaf31a34db29fb763e3c28e"
+        );
+        ( msg200,
+          "bdb00a13330573e75652bec64443b6ca9512b487fb7e1693540d04d55d68ff98b25cd30abd53bbbc27ba1c12195c479d"
+        );
+      ] );
+    ( "keccak512",
+      Keccak.K512.digest,
+      64,
+      [
+        ( "",
+          "0eab42de4c3ceb9235fc91acffe746b29c29a8c366b7c60e4e67c466f36a4304c00fa9caf9d87976ba469bcbe06713b435f091ef2769fb160cdab33d3670680e"
+        );
+        ( "abc",
+          "18587dc2ea106b9a1563e32b3312421ca164c7f1f07bc922a9c83d77cea3a1e5d0c69910739025372dc14ac9642629379540c17e2a65b19d77aa511a9d00bb96"
+        );
+        ( msg200,
+          "f452d81b62b961f8023f8228cbe780379b36c49ddcef29e0dffb01a930c2cc53a694ed6ae3f0d224a2f1be55814a81841b90d56bcdf4a48a633f258a32dc14fc"
+        );
+      ] );
+  ]
+  |> List.map (fun (name, digest, size, cases) ->
+         name
+         >::: (test_case (fun _ -> assert_equal size (String.length (digest "")))
+              :: List.map
+                   (fun (msg, expected) ->
+                     test_case (fun _ -> assert_oct_equal (vx expected) (digest msg)))
+                   cases))
+
+(* [Keccak256] must stay exactly [Keccak.K256]. *)
+let keccak256_alias_case =
+  test_case (fun _ ->
+      let msg = String.init 200 (fun i -> Char.chr i) in
+      assert_oct_equal (Keccak.K256.digest msg) (Keccak256.digest msg))
+
 (* ===== BLAKE3 (subset of the official test_vectors.json) =====
 
    Input for length [n] is the repeating byte pattern [0, 1, .., 250, 0, 1,
@@ -802,7 +864,9 @@ let suite =
     "hashes" >::: hashes_cases;
     "blake2b" >::: blake2b_cases;
     "ripemd160" >::: ripemd160_cases;
-    "keccak256" >::: keccak256_cases @ [ keccak256_multiblock_case ];
+    "keccak256"
+    >::: keccak256_cases @ [ keccak256_multiblock_case; keccak256_alias_case ];
+    "keccak sizes" >::: keccak_sized_cases;
     "blake3_hash" >::: blake3_hash_cases;
     "blake3_keyed" >::: blake3_keyed_cases;
     "blake3_derive_key" >::: blake3_derive_key_cases;

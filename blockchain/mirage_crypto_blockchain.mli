@@ -56,12 +56,37 @@ module Ripemd160 : sig
       Bitcoin address-derivation composite ("Hash160"). *)
 end
 
-(** {b Keccak-256}, the pre-NIST-standardization Keccak padding used by
+(** {b Keccak}, the pre-NIST-standardization Keccak padding used by
     Ethereum, Solidity's [keccak256], and most blockchain codebases.
-    Thin wrapper over [Digestif.KECCAK_256] (available since digestif
-    1.1.0). This is {b not} interchangeable with SHA3-256: the two use
-    different padding domain-separator bytes ([0x01] vs NIST's [0x06])
-    and produce different digests for the same input. *)
+    Thin wrappers over [Digestif.KECCAK_*]. This is {b not}
+    interchangeable with SHA-3: the two use different padding
+    domain-separator bytes ([0x01] vs NIST's [0x06]) and produce
+    different digests for the same input.
+
+    Keccak-256 is by far the common case here; the other three sizes are
+    provided because a few protocols and the original Keccak submission
+    use them. *)
+module Keccak : sig
+  module type S = sig
+    val digest_size : int
+    val digest : string -> string
+    (** [digest msg] is the [digest_size]-byte Keccak digest of [msg]. *)
+  end
+
+  module K224 : S
+  (** Keccak-224, 28-byte digest. *)
+
+  module K256 : S
+  (** Keccak-256, 32-byte digest. *)
+
+  module K384 : S
+  (** Keccak-384, 48-byte digest. *)
+
+  module K512 : S
+  (** Keccak-512, 64-byte digest. *)
+end
+
+(** {b Keccak-256}. Retained for compatibility; exactly [Keccak.K256]. *)
 module Keccak256 : sig
   val digest_size : int
   (** [32] bytes. *)

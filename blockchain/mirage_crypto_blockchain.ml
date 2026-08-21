@@ -1,6 +1,7 @@
 module Hashes = Hashes
 module Blake2b = Blake2b
 module Ripemd160 = Ripemd160
+module Keccak = Keccak
 module Keccak256 = Keccak256
 module Blake3 = Blake3
 module Secp256k1 = Secp256k1
