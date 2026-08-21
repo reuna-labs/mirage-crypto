@@ -1548,6 +1548,322 @@ let ed25519_primitive_into =
         (fun () -> P.scalar_mult_base_into dst "short") );
   ]
 
+(* secp256k1 Primitive: cross-checked against
+   Mirage_crypto_blockchain.Secp256k1, an independent zarith
+   implementation of the same curve in this repository. *)
+module K = P256k1.Primitive
+module B = Mirage_crypto_blockchain.Secp256k1
+
+let rev_string s = String.init (String.length s) (fun i ->
+    s.[String.length s - 1 - i])
+
+let z_of_be s = Z.of_bits (rev_string s)
+
+let be_of_z z =
+  let bits = Z.to_bits z in
+  let padded = bits ^ String.make (max 0 (32 - String.length bits)) '\000' in
+  rev_string (String.sub padded 0 32)
+
+let secp256k1_n = B.n
+let secp256k1_p = B.p
+
+let k_zero = K.scalar_zero
+let k_one = K.scalar_one
+let k_n_minus_1 = be_of_z (Z.pred secp256k1_n)
+let k_edge_scalars = [ k_zero; k_one; k_n_minus_1 ]
+
+let rec k_random_scalar () =
+  let c = Mirage_crypto_rng.generate 32 in
+  match K.scalar_of_octets c with
+  | Ok s when s <> k_zero -> s
+  | _ -> k_random_scalar ()
+
+let k_g = K.scalar_mult_base k_one
+
+let k_point_eq name a b =
+  Alcotest.(check string) name (K.point_to_octets a) (K.point_to_octets b)
+
+let k_scalar_eq name a b =
+  Alcotest.(check string) name (Ohex.encode a) (Ohex.encode b)
+
+let b_point_of_k p =
+  match B.point_of_octets (K.point_to_octets p) with
+  | Ok q -> q
+  | Error _ -> Alcotest.fail "blockchain rejected our point encoding"
+
+let secp256k1_primitive =
+  [
+    ( "scalar field laws on edge cases and random values", `Quick, fun () ->
+      let some_scalars =
+        k_edge_scalars @ List.init 5 (fun _ -> k_random_scalar ())
+      in
+      let triples =
+        List.concat_map (fun a ->
+            List.concat_map (fun b ->
+                List.map (fun c -> (a, b, c)) some_scalars)
+              some_scalars)
+          some_scalars
+      in
+      List.iter (fun (a, b, c) ->
+          k_scalar_eq "add assoc"
+            (K.scalar_add (K.scalar_add a b) c)
+            (K.scalar_add a (K.scalar_add b c));
+          k_scalar_eq "mul assoc"
+            (K.scalar_mul (K.scalar_mul a b) c)
+            (K.scalar_mul a (K.scalar_mul b c));
+          k_scalar_eq "distributivity"
+            (K.scalar_mul a (K.scalar_add b c))
+            (K.scalar_add (K.scalar_mul a b) (K.scalar_mul a c)))
+        triples;
+      List.iter (fun a ->
+          List.iter (fun b ->
+              k_scalar_eq "add comm" (K.scalar_add a b) (K.scalar_add b a);
+              k_scalar_eq "mul comm" (K.scalar_mul a b) (K.scalar_mul b a))
+            some_scalars;
+          k_scalar_eq "additive identity" (K.scalar_add a k_zero) a;
+          k_scalar_eq "multiplicative identity" (K.scalar_mul a k_one) a;
+          k_scalar_eq "additive inverse"
+            (K.scalar_add a (K.scalar_negate a)) k_zero;
+          if a <> k_zero then
+            k_scalar_eq "multiplicative inverse"
+              (K.scalar_mul a (K.scalar_inv a)) k_one)
+        some_scalars;
+      k_scalar_eq "negate zero" (K.scalar_negate k_zero) k_zero;
+      k_scalar_eq "inv zero is zero (by convention)"
+        (K.scalar_inv k_zero) k_zero;
+      k_scalar_eq "negate one" (K.scalar_negate k_one) k_n_minus_1;
+      k_scalar_eq "(n-1) + 1 = 0" (K.scalar_add k_n_minus_1 k_one) k_zero;
+      k_scalar_eq "(n-1)^2 = 1" (K.scalar_mul k_n_minus_1 k_n_minus_1) k_one );
+    ( "scalar arithmetic agrees with zarith", `Quick, fun () ->
+      let n = secp256k1_n in
+      let all_ff = String.make 32 '\xff' in
+      let check a b =
+        let za = Z.rem (z_of_be a) n and zb = Z.rem (z_of_be b) n in
+        k_scalar_eq "add vs zarith" (K.scalar_add a b)
+          (be_of_z Z.((za + zb) mod n));
+        k_scalar_eq "mul vs zarith" (K.scalar_mul a b)
+          (be_of_z Z.(za * zb mod n));
+        k_scalar_eq "negate vs zarith" (K.scalar_negate a)
+          (be_of_z (Z.erem (Z.neg za) n));
+        if Z.sign za <> 0 then
+          k_scalar_eq "inv vs zarith" (K.scalar_inv a)
+            (be_of_z (Z.invert za n))
+      in
+      List.iter (fun a -> List.iter (check a) k_edge_scalars) k_edge_scalars;
+      for _ = 1 to 10 do
+        check (k_random_scalar ()) (k_random_scalar ())
+      done;
+      (* documented behaviour: non-canonical inputs are reduced mod n *)
+      check all_ff all_ff;
+      check all_ff k_one );
+    ( "scalar_of_octets validates length and range", `Quick, fun () ->
+      let ok s = Alcotest.(check bool) "accepted" true
+          (match K.scalar_of_octets s with Ok s' -> s' = s | Error _ -> false)
+      and err e s = Alcotest.(check bool) "rejected" true
+          (match K.scalar_of_octets s with Ok _ -> false | Error e' -> e' = e)
+      in
+      ok k_zero; ok k_one; ok k_n_minus_1;
+      err `Invalid_range (be_of_z secp256k1_n);
+      err `Invalid_range (String.make 32 '\xff');
+      err `Invalid_length "";
+      err `Invalid_length (String.make 31 '\000');
+      err `Invalid_length (String.make 33 '\000') );
+    ( "scalar_mult k G = scalar_mult_base k = zarith", `Quick, fun () ->
+      List.iter (fun k ->
+          let via_base = K.scalar_mult_base k
+          and via_var = K.scalar_mult k k_g in
+          k_point_eq "scalar_mult k G = scalar_mult_base k" via_base via_var;
+          match B.scalar_of_octets k with
+          | Error _ -> Alcotest.fail "blockchain rejected scalar"
+          | Ok bk ->
+            match B.scalar_mult bk B.g with
+            | Error _ -> Alcotest.fail "blockchain scalar_mult failed"
+            | Ok bp ->
+              Alcotest.(check string) "matches blockchain zarith impl"
+                (B.point_to_octets ~compress:true bp)
+                (K.point_to_octets via_base))
+        (k_one :: k_n_minus_1 :: List.init 10 (fun _ -> k_random_scalar ())) );
+    ( "scalar_mult agrees with repeated add for small k", `Quick, fun () ->
+      let acc = ref k_g in
+      for k = 2 to 20 do
+        acc := K.point_add !acc k_g;
+        k_point_eq (Printf.sprintf "k = %d" k)
+          (K.scalar_mult_base (be_of_z (Z.of_int k))) !acc
+      done );
+    ( "point addition: commutative, identity, inverses, doubling", `Quick,
+      fun () ->
+      let p = K.scalar_mult_base (k_random_scalar ())
+      and q = K.scalar_mult_base (k_random_scalar ()) in
+      k_point_eq "commutative" (K.point_add p q) (K.point_add q p);
+      let neg_p = K.scalar_mult k_n_minus_1 p in
+      let inf = K.point_add p neg_p in
+      Alcotest.(check bool) "p + (-p) is the identity" true
+        (K.point_is_infinity inf);
+      Alcotest.(check bool) "p is not the identity" false
+        (K.point_is_infinity p);
+      k_point_eq "p + 0 = p" (K.point_add p inf) p;
+      k_point_eq "0 + p = p" (K.point_add inf p) p;
+      Alcotest.(check bool) "0 + 0 = 0" true
+        (K.point_is_infinity (K.point_add inf inf));
+      k_point_eq "p + p = 2p"
+        (K.point_add p p) (K.scalar_mult (be_of_z (Z.of_int 2)) p);
+      k_point_eq "k * 0 = 0" (K.scalar_mult (k_random_scalar ()) inf) inf;
+      Alcotest.(check string) "identity encodes as a single zero byte"
+        "\000" (K.point_to_octets inf) );
+    ( "point addition agrees with blockchain zarith impl", `Quick, fun () ->
+      for _ = 1 to 10 do
+        let p = K.scalar_mult_base (k_random_scalar ())
+        and q = K.scalar_mult_base (k_random_scalar ()) in
+        match B.add (b_point_of_k p) (b_point_of_k q) with
+        | Error _ -> Alcotest.fail "blockchain add failed"
+        | Ok bsum ->
+          Alcotest.(check string) "sum matches"
+            (B.point_to_octets ~compress:true bsum)
+            (K.point_to_octets (K.point_add p q))
+      done );
+    ( "serialisation round-trips; uncompressed accepted", `Quick, fun () ->
+      for _ = 1 to 10 do
+        let p = K.scalar_mult_base (k_random_scalar ()) in
+        let enc = K.point_to_octets p in
+        Alcotest.(check int) "compressed is 33 bytes" 33 (String.length enc);
+        Alcotest.(check bool) "prefix is 02 or 03" true
+          (String.get_uint8 enc 0 = 2 || String.get_uint8 enc 0 = 3);
+        (match K.point_of_octets enc with
+         | Ok p' -> k_point_eq "compressed round-trip" p p'
+         | Error _ -> Alcotest.fail "round-trip decode failed");
+        let unc = B.point_to_octets ~compress:false (b_point_of_k p) in
+        match K.point_of_octets unc with
+        | Ok p' -> k_point_eq "uncompressed decode" p p'
+        | Error _ -> Alcotest.fail "uncompressed decode failed"
+      done );
+    ( "invalid point encodings are rejected", `Quick, fun () ->
+      let rejects name buf =
+        match K.point_of_octets buf with
+        | Ok _ -> Alcotest.fail (name ^ ": expected rejection")
+        | Error _ -> ()
+      in
+      rejects "empty" "";
+      rejects "identity" "\000";
+      rejects "bad prefix" ("\001" ^ String.make 32 '\002');
+      rejects "compressed, one byte short"
+        ("\002" ^ String.make 31 '\003');
+      rejects "compressed, one byte long"
+        ("\002" ^ String.make 33 '\003');
+      rejects "uncompressed, truncated" ("\004" ^ String.make 63 '\005');
+      rejects "bare x coordinate" (String.make 32 '\006');
+      rejects "x >= p, compressed" ("\002" ^ be_of_z secp256k1_p);
+      rejects "x >= p, uncompressed"
+        ("\004" ^ be_of_z secp256k1_p ^ String.make 32 '\007');
+      (* an x whose x^3 + 7 is a quadratic non-residue: no such point *)
+      let non_residue_x =
+        let p = secp256k1_p in
+        let rec go x =
+          let rhs = Z.((x * x * x + of_int 7) mod p) in
+          if Z.(equal (powm rhs (pred p / of_int 2) p) one) then
+            go (Z.succ x)
+          else x
+        in
+        go Z.one
+      in
+      (match B.point_of_octets ("\002" ^ be_of_z non_residue_x) with
+       | Ok _ -> Alcotest.fail "oracle disagrees: x should not be on curve"
+       | Error _ -> ());
+      rejects "not on curve, compressed" ("\002" ^ be_of_z non_residue_x);
+      (* a valid x with a corrupted y *)
+      let p = K.scalar_mult_base (k_random_scalar ()) in
+      let unc = B.point_to_octets ~compress:false (b_point_of_k p) in
+      let bad_y = Bytes.of_string unc in
+      Bytes.set_uint8 bad_y 64 (Bytes.get_uint8 bad_y 64 lxor 1);
+      let bad_y = Bytes.to_string bad_y in
+      (match B.point_of_octets bad_y with
+       | Ok _ -> ()  (* y xor 1 may occasionally be the other root *)
+       | Error _ -> rejects "not on curve, uncompressed" bad_y) );
+    ( "scalar_mult validates its scalar", `Quick, fun () ->
+      let expect_invalid_arg name f =
+        match f () with
+        | _ -> Alcotest.fail (name ^ ": expected Invalid_argument")
+        | exception Invalid_argument _ -> ()
+      in
+      expect_invalid_arg "zero scalar"
+        (fun () -> K.scalar_mult k_zero k_g);
+      expect_invalid_arg "scalar = n"
+        (fun () -> K.scalar_mult (be_of_z secp256k1_n) k_g);
+      expect_invalid_arg "short scalar" (fun () -> K.scalar_mult "short" k_g);
+      expect_invalid_arg "zero scalar (base)"
+        (fun () -> K.scalar_mult_base k_zero);
+      expect_invalid_arg "scalar = n (base)"
+        (fun () -> K.scalar_mult_base (be_of_z secp256k1_n));
+      expect_invalid_arg "short scalar (base)"
+        (fun () -> K.scalar_mult_base "short") );
+  ]
+
+let secp256k1_primitive_into =
+  let expect_invalid_arg name f =
+    match f () with
+    | () -> Alcotest.fail (name ^ ": expected Invalid_argument")
+    | exception Invalid_argument _ -> ()
+  in
+  (* computed lazily: the RNG is only seeded once the suite runs *)
+  let scalars () =
+    k_edge_scalars @ [ String.make 32 '\xff' ]
+    @ List.init 5 (fun _ -> k_random_scalar ())
+  in
+  [
+    ( "each _into variant agrees with its allocating counterpart", `Quick,
+      fun () ->
+      let scalars = scalars () in
+      List.iter (fun a ->
+          List.iter (fun b ->
+              let dst = Bytes.create 32 in
+              K.scalar_add_into dst a b;
+              k_scalar_eq "add" (K.scalar_add a b) (Bytes.to_string dst);
+              let dst = Bytes.create 32 in
+              K.scalar_mul_into dst a b;
+              k_scalar_eq "mul" (K.scalar_mul a b) (Bytes.to_string dst))
+            scalars;
+          let dst = Bytes.create 32 in
+          K.scalar_negate_into dst a;
+          k_scalar_eq "negate" (K.scalar_negate a) (Bytes.to_string dst);
+          let dst = Bytes.create 32 in
+          K.scalar_inv_into dst a;
+          k_scalar_eq "inv" (K.scalar_inv a) (Bytes.to_string dst))
+        scalars );
+    ( "_into result may overwrite an operand buffer view", `Quick, fun () ->
+      (* dst and operands are distinct values here (string vs bytes), but
+         make sure results are stable when dst is reused across calls *)
+      let dst = Bytes.create 32 in
+      let a = k_random_scalar () and b = k_random_scalar () in
+      K.scalar_add_into dst a b;
+      let first = Bytes.to_string dst in
+      K.scalar_add_into dst a b;
+      k_scalar_eq "stable" first (Bytes.to_string dst) );
+    ( "wrong-sized buffers raise Invalid_argument", `Quick, fun () ->
+      List.iter (fun n ->
+          let dst = Bytes.create n in
+          expect_invalid_arg "scalar_add_into dst"
+            (fun () -> K.scalar_add_into dst k_one k_one);
+          expect_invalid_arg "scalar_mul_into dst"
+            (fun () -> K.scalar_mul_into dst k_one k_one);
+          expect_invalid_arg "scalar_negate_into dst"
+            (fun () -> K.scalar_negate_into dst k_one);
+          expect_invalid_arg "scalar_inv_into dst"
+            (fun () -> K.scalar_inv_into dst k_one))
+        [ 0; 31; 33 ];
+      let dst = Bytes.create 32 in
+      expect_invalid_arg "scalar_add_into a"
+        (fun () -> K.scalar_add_into dst "short" k_one);
+      expect_invalid_arg "scalar_add_into b"
+        (fun () -> K.scalar_add_into dst k_one "short");
+      expect_invalid_arg "scalar_mul_into a"
+        (fun () -> K.scalar_mul_into dst "short" k_one);
+      expect_invalid_arg "scalar_mul_into b"
+        (fun () -> K.scalar_mul_into dst k_one "short");
+      expect_invalid_arg "scalar_negate_into a"
+        (fun () -> K.scalar_negate_into dst "short");
+      expect_invalid_arg "scalar_inv_into a"
+        (fun () -> K.scalar_inv_into dst "short") );
+  ]
+
 let () =
   Mirage_crypto_rng_unix.use_default ();
   Alcotest.run "EC"
@@ -1568,6 +1884,8 @@ let () =
       ("secp256k1 ECDSA", secp256k1_ecdsa);
       ("secp256k1 ECDSA sign", secp256k1_ecdsa_sign);
       ("secp256k1 BIP-340", secp256k1_bip340_sign);
+      ("secp256k1 primitives", secp256k1_primitive);
+      ("secp256k1 primitives into", secp256k1_primitive_into);
       ("secp256k1 add_scalar", secp256k1_add_scalar);
       ("P-256 add_scalar", p256_add_scalar);
       ("P-384 add_scalar", p384_add_scalar);

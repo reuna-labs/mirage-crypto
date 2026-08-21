@@ -220,6 +220,142 @@ module type P256k1 = sig
   (** Digital signature algorithm. *)
   module Dsa_bip340 : Dsa_bip340 with type priv = Dsa.priv and type pub = Dsa.pub
 
+  (** {2 Low-level primitives}
+
+      Direct access to the underlying scalar and group arithmetic, for
+      building higher-level constructions (such as FROST threshold
+      signatures) that need more than opaque sign/verify. Scalars are
+      32-byte big-endian values in the scalar field mod [n], the group
+      order; on the wire, points use the
+      {{:http://www.secg.org/sec1-v2.pdf}SEC 1} encoding.
+
+      The scalar arithmetic is fiat-crypto generated word-by-word
+      Montgomery code and runs in constant time; each operation's inputs
+      are reduced modulo [n] when loaded (the same property the ECDSA
+      code relies on for message digests), and its output is the
+      canonical representative in [[0, n)]. Use {!scalar_of_octets} when
+      a value is required to already be canonical. Point encoding and
+      decoding operate on public values and are {b not} constant
+      time. *)
+  module Primitive : sig
+
+    type point
+    (** The type for points on the curve, including the point at
+        infinity (the group identity). *)
+
+    (** {2 Scalars mod n} *)
+
+    val scalar_zero : string
+    (** [scalar_zero] is the scalar 0. *)
+
+    val scalar_one : string
+    (** [scalar_one] is the scalar 1. *)
+
+    val scalar_of_octets : string -> (string, error) result
+    (** [scalar_of_octets buf] validates [buf] as a canonical scalar:
+        32 bytes, big-endian, in the range [[0, n)]. Returns the scalar
+        unchanged (scalars are their own encoding), [Error
+        `Invalid_length] or [Error `Invalid_range] otherwise. Unlike
+        {!Dsa.priv_of_octets}, zero is accepted: it is a valid scalar
+        field element, just not a valid private key. The comparison is
+        constant time. *)
+
+    val scalar_add : string -> string -> string
+    (** [scalar_add a b] is [(a + b) mod n]. Constant time. *)
+
+    val scalar_add_into : bytes -> string -> string -> unit
+    (** [scalar_add_into dst a b] writes [(a + b) mod n] into the
+        32-byte [dst]. Same computation as {!scalar_add}, but the caller
+        supplies the destination, so a secret scalar can be kept in a
+        buffer the caller is able to overwrite once it is no longer
+        needed; internal temporaries are wiped before returning.
+        @raise Invalid_argument if [dst], [a], or [b] is not 32 bytes. *)
+
+    val scalar_mul : string -> string -> string
+    (** [scalar_mul a b] is [(a * b) mod n]. Constant time. *)
+
+    val scalar_mul_into : bytes -> string -> string -> unit
+    (** [scalar_mul_into dst a b] writes [(a * b) mod n] into the
+        32-byte [dst]. Same computation as {!scalar_mul}, with a
+        caller-supplied destination and wiped temporaries, as
+        {!scalar_add_into}.
+        @raise Invalid_argument if [dst], [a], or [b] is not 32 bytes. *)
+
+    val scalar_negate : string -> string
+    (** [scalar_negate a] is [(n - a) mod n]; the negation of zero is
+        zero. Constant time. *)
+
+    val scalar_negate_into : bytes -> string -> unit
+    (** [scalar_negate_into dst a] writes [(n - a) mod n] into the
+        32-byte [dst]. Same computation as {!scalar_negate}, with a
+        caller-supplied destination and wiped temporaries, as
+        {!scalar_add_into}.
+        @raise Invalid_argument if [dst] or [a] is not 32 bytes. *)
+
+    val scalar_inv : string -> string
+    (** [scalar_inv a] is the multiplicative inverse [a^(-1) mod n],
+        computed by Bernstein-Yang inversion with a fixed iteration
+        count: constant time. By convention [scalar_inv scalar_zero] is
+        [scalar_zero] (zero has no inverse). *)
+
+    val scalar_inv_into : bytes -> string -> unit
+    (** [scalar_inv_into dst a] writes [a^(-1) mod n] into the 32-byte
+        [dst]. Same computation as {!scalar_inv}, with a caller-supplied
+        destination and wiped temporaries, as {!scalar_add_into}.
+        @raise Invalid_argument if [dst] or [a] is not 32 bytes. *)
+
+    (** {2 Points} *)
+
+    val point_of_octets : string -> (point, error) result
+    (** [point_of_octets buf] decodes a SEC 1 encoded point: compressed
+        (33 bytes, [0x02]/[0x03] prefix) or uncompressed (65 bytes,
+        [0x04] prefix). The coordinates are validated to be in range and
+        on the curve; the encoding of the point at infinity (a single
+        [0x00] byte) is rejected with [Error `At_infinity].
+
+        This operates on a public value, so it is not constant time. *)
+
+    val point_to_octets : point -> string
+    (** [point_to_octets p] is the compressed SEC 1 encoding of [p]
+        (33 bytes). The point at infinity — which {!point_of_octets}
+        does not accept back, but {!point_add} can produce — encodes as
+        a single [0x00] byte.
+
+        This is intended for public values, and is not constant time. *)
+
+    val point_add : point -> point -> point
+    (** [point_add p q] is the group law: [p + q]. Computed with a
+        complete (unified) projective addition formula, so it is correct
+        for all inputs — [p = q] (doubling), the identity on either
+        side, and inverse points, in which case the result is the
+        identity. The formula is branch-free and identity inputs and
+        outputs are handled with constant-time selects. *)
+
+    val point_is_infinity : point -> bool
+    (** [point_is_infinity p] is [true] iff [p] is the point at infinity
+        (the group identity). *)
+
+    val scalar_mult : string -> point -> point
+    (** [scalar_mult k p] is [k * p], the scalar multiple of [p] by the
+        32-byte big-endian scalar [k], for [k] in [[1, n - 1]].
+        [scalar_mult k p] is [p] when [p] is the identity.
+
+        The multiplication is a regular-wNAF ladder with a fixed
+        sequence of complete point operations and constant-time table
+        lookups: constant time with respect to [k] (and to the
+        coordinates of [p]), which is what allows applying it to secret
+        key shares. Whether [p] is the identity is decided by a branch,
+        so only that fact — never [k] — is timing-visible.
+        @raise Invalid_argument if [k] is not 32 bytes or not in
+        [[1, n - 1]]. *)
+
+    val scalar_mult_base : string -> point
+    (** [scalar_mult_base k] is [k * G] for the secp256k1 base point
+        [G] and [k] in [[1, n - 1]]. Fixed-base comb multiplication with
+        constant-time table lookups: constant time with respect to [k].
+        @raise Invalid_argument if [k] is not 32 bytes or not in
+        [[1, n - 1]]. *)
+  end
 end
 
 

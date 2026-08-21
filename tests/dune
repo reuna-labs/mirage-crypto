@@ -46,7 +46,10 @@
 (test
  (name test_ec)
  (modules test_ec)
- (libraries test_common alcotest mirage-crypto-ec mirage-crypto-rng.unix)
+ ; mirage-crypto-blockchain and zarith are used to cross-check the
+ ; P256k1.Primitive results against an independent implementation
+ (libraries test_common alcotest mirage-crypto-ec mirage-crypto-rng.unix
+   mirage-crypto-blockchain zarith)
  (package mirage-crypto-ec))
 
 (test

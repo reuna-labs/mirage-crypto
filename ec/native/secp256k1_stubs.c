@@ -115,3 +115,51 @@ CAMLprim value mc_secp256k1_scalar_mult_add(value out, value a, value b, value p
     var_smul_wnaf_two(PT_OUT(out), _st_uint8(a), _st_uint8(b), PT(p));
     CAMLreturn(Val_unit);
 }
+
+/* out := p + q, on the affine Montgomery-form representation the OCaml layer
+ * uses for points, where Y = 0 encodes the point at infinity (no finite
+ * secp256k1 point has y = 0).
+ *
+ * Each input is lifted to projective coordinates with constant-time selects:
+ * the identity to (0 : 1 : 0), any other point to (X : Y : 1).  The sum is
+ * computed by the existing point_add_proj, ECCKiila's complete addition
+ * (https://eprint.iacr.org/2015/1060 Alg 7, a = 0), which is valid for all
+ * inputs including doubling and the identity.  Conversion back to affine is
+ * the same inv/mul tail the var_smul/fixed_smul routines above use; it maps
+ * a projective identity result (Z = 0) back to (0, 0) because the
+ * Bernstein-Yang fiat_secp256k1_inv sends 0 to 0.
+ *
+ * point_add_proj forbids aliasing R with its third argument only; here R,
+ * P and Q are all distinct locals.  All reads of the inputs happen before
+ * any write to out, so out may alias p or q. */
+CAMLprim value mc_secp256k1_point_add(value out, value p, value q)
+{
+	CAMLparam3(out, p, q);
+	pt_prj_t P, Q, R;
+	fe_t zero;
+	limb_t nz;
+	fiat_secp256k1_uint1 fin;
+
+	fe_set_zero(zero);
+
+	fiat_secp256k1_nonzero(&nz, PT(p)->Y);
+	fin = (fiat_secp256k1_uint1)(!!nz);
+	fiat_secp256k1_selectznz(P.X, fin, zero, PT(p)->X);
+	fiat_secp256k1_selectznz(P.Y, fin, const_one, PT(p)->Y);
+	fiat_secp256k1_selectznz(P.Z, fin, zero, const_one);
+
+	fiat_secp256k1_nonzero(&nz, PT(q)->Y);
+	fin = (fiat_secp256k1_uint1)(!!nz);
+	fiat_secp256k1_selectznz(Q.X, fin, zero, PT(q)->X);
+	fiat_secp256k1_selectznz(Q.Y, fin, const_one, PT(q)->Y);
+	fiat_secp256k1_selectznz(Q.Z, fin, zero, const_one);
+
+	point_add_proj(&R, &Q, &P);
+
+	/* convert to affine -- same as the scalar multiplication tails above */
+	fiat_secp256k1_inv(R.Z, R.Z);
+	fiat_secp256k1_mul(PT_OUT(out)->X, R.X, R.Z);
+	fiat_secp256k1_mul(PT_OUT(out)->Y, R.Y, R.Z);
+
+	CAMLreturn(Val_unit);
+}

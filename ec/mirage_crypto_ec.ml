@@ -76,9 +76,31 @@ module type Dh_dsa = sig
   module Dsa : Dsa
 end
 
+module type P256k1_primitive = sig
+  type point
+  val scalar_zero : string
+  val scalar_one : string
+  val scalar_of_octets : string -> (string, error) result
+  val scalar_add : string -> string -> string
+  val scalar_add_into : bytes -> string -> string -> unit
+  val scalar_mul : string -> string -> string
+  val scalar_mul_into : bytes -> string -> string -> unit
+  val scalar_negate : string -> string
+  val scalar_negate_into : bytes -> string -> unit
+  val scalar_inv : string -> string
+  val scalar_inv_into : bytes -> string -> unit
+  val point_of_octets : string -> (point, error) result
+  val point_to_octets : point -> string
+  val point_add : point -> point -> point
+  val point_is_infinity : point -> bool
+  val scalar_mult : string -> point -> point
+  val scalar_mult_base : string -> point
+end
+
 module type P256k1 = sig
   include Dh_dsa
   module Dsa_bip340 : Dsa_bip340 with type priv = Dsa.priv and type pub = Dsa.pub
+  module Primitive : P256k1_primitive
 end
 
 type field_element = Fe of string [@@unboxed]
@@ -1026,6 +1048,171 @@ module P256k1 : P256k1  = struct
   module Fn = Make_scalar_element_bip340(Params)(Foreign_n)
   module Dsa = Make_dsa_bip340(Params)(Fn)(P)
   module Dsa_bip340 = Dsa
+
+  (* Low-level scalar (mod n) and group access for higher-level
+     constructions (e.g. FROST threshold signatures). Scalars are
+     32-byte big-endian values; point encoding is SEC 1. *)
+  module Primitive = struct
+    type nonrec point = point
+
+    external point_add_c : out_point -> point -> point -> unit = "mc_secp256k1_point_add" [@@noalloc]
+
+    module S = Make_scalar(Params)
+
+    let key_len = Params.byte_length
+
+    let err name what =
+      invalid_arg ("P256k1.Primitive." ^ name ^ ": " ^ what)
+
+    let check_dst name dst =
+      if Bytes.length dst <> key_len then
+        err name "expected 32 byte destination"
+
+    let check_scalar name v =
+      if String.length v <> key_len then
+        err name "expected 32 byte scalar"
+
+    let wipe b = Bytes.fill b 0 (Bytes.length b) '\000'
+
+    let se b = Se (Bytes.unsafe_to_string b)
+
+    (* Load 32 big-endian octets as a canonical Montgomery-domain residue
+       mod n, into a buffer the caller wipes. The final Montgomery
+       multiplication reduces any 256-bit value modulo n (the same
+       property [mont_from_be_octets] relies on for hash values in
+       [Make_dsa]). The in-place [to_montgomery] follows the existing
+       precedent in [Make_scalar_element]: fiat-generated code only
+       writes its output after all reads. *)
+    let load_mont buf =
+      let le = Bytes.create key_len in
+      for i = 0 to key_len - 1 do
+        Bytes.unsafe_set le (key_len - 1 - i) (String.unsafe_get buf i)
+      done;
+      let t = Bytes.create Params.fe_length in
+      Foreign_n.from_bytes (Se_out t) (Bytes.unsafe_to_string le);
+      wipe le;
+      Foreign_n.to_montgomery (Se_out t) (se t);
+      t
+
+    (* Convert a Montgomery-domain residue to canonical big-endian octets
+       in [dst], wiping the intermediate and [t]. *)
+    let store_from_mont dst t =
+      Foreign_n.from_montgomery (Se_out t) (se t);
+      let le = Bytes.create key_len in
+      Foreign_n.to_bytes le (se t);
+      wipe t;
+      for i = 0 to key_len - 1 do
+        Bytes.unsafe_set dst (key_len - 1 - i) (Bytes.unsafe_get le i)
+      done;
+      wipe le
+
+    let scalar_zero = String.make 32 '\000'
+
+    let scalar_one = String.make 31 '\000' ^ "\001"
+
+    let scalar_of_octets buf =
+      if String.length buf <> key_len then
+        Error `Invalid_length
+      else if Eqaf.compare_be_with_len ~len:key_len Params.n buf > 0 then
+        Ok buf
+      else
+        Error `Invalid_range
+
+    let binop_into name op dst a b =
+      check_dst name dst;
+      check_scalar name a;
+      check_scalar name b;
+      let ta = load_mont a and tb = load_mont b in
+      let tr = Bytes.create Params.fe_length in
+      op (Se_out tr) (se ta) (se tb);
+      wipe ta;
+      wipe tb;
+      store_from_mont dst tr
+
+    let scalar_add_into dst a b = binop_into "scalar_add_into" Foreign_n.add dst a b
+
+    let scalar_mul_into dst a b = binop_into "scalar_mul_into" Foreign_n.mul dst a b
+
+    let scalar_negate_into dst a =
+      check_dst "scalar_negate_into" dst;
+      check_scalar "scalar_negate_into" a;
+      let ta = load_mont a in
+      let tr = Bytes.create Params.fe_length in
+      Foreign_n.opp (Se_out tr) (se ta);
+      wipe ta;
+      store_from_mont dst tr
+
+    (* Same composition as [Make_scalar_element.inv]: the Bernstein-Yang
+       inversion maps the Montgomery residue of [a] to the plain-domain
+       inverse, so a [to_montgomery] brings it back to the Montgomery
+       domain that [store_from_mont] expects. Inversion of a fixed
+       iteration count; 0 maps to 0. *)
+    let scalar_inv_into dst a =
+      check_dst "scalar_inv_into" dst;
+      check_scalar "scalar_inv_into" a;
+      let ta = load_mont a in
+      let tr = Bytes.create Params.fe_length in
+      Foreign_n.inv (Se_out tr) (se ta);
+      wipe ta;
+      Foreign_n.to_montgomery (Se_out tr) (se tr);
+      store_from_mont dst tr
+
+    let alloc1 into a =
+      let dst = Bytes.create key_len in
+      into dst a;
+      Bytes.unsafe_to_string dst
+
+    let alloc2 into a b =
+      let dst = Bytes.create key_len in
+      into dst a b;
+      Bytes.unsafe_to_string dst
+
+    let scalar_add a b = alloc2 scalar_add_into a b
+    let scalar_mul a b = alloc2 scalar_mul_into a b
+    let scalar_negate a = alloc1 scalar_negate_into a
+    let scalar_inv a = alloc1 scalar_inv_into a
+
+    (* [P.of_octets] assumes a well-formed SEC 1 prefix and raises from
+       [String.sub] on truncated compressed input, so validate the length
+       against the leading byte first. The identity (a single zero byte)
+       is rejected here: this API only handles finite points on the wire,
+       like [Dh] does. *)
+    let point_of_octets buf =
+      match String.length buf with
+      | 1 when String.get_uint8 buf 0 = 0x00 -> Error `At_infinity
+      | 33 when (match String.get_uint8 buf 0 with 0x02 | 0x03 -> true | _ -> false) ->
+        P.of_octets buf
+      | 65 when String.get_uint8 buf 0 = 0x04 ->
+        P.of_octets buf
+      | 0 -> Error `Invalid_format
+      | _ ->
+        (match String.get_uint8 buf 0 with
+         | 0x00 | 0x02 | 0x03 | 0x04 -> Error `Invalid_length
+         | _ -> Error `Invalid_format)
+
+    let point_to_octets p = P.to_octets ~compress:true p
+
+    let point_is_infinity p = P.is_infinity p
+
+    let point_add a b =
+      let tmp = Bytes.create (Params.fe_length * 2) in
+      point_add_c (Point_out tmp) a b;
+      Point (Bytes.unsafe_to_string tmp)
+
+    let scalar name k =
+      if String.length k <> key_len then
+        err name "expected 32 byte scalar"
+      else
+        match S.of_octets k with
+        | Ok sc -> sc
+        | Error _ -> err name "scalar not in range [1, n - 1]"
+
+    let scalar_mult k p =
+      let k = scalar "scalar_mult" k in
+      if P.is_infinity p then p else P.scalar_mult k p
+
+    let scalar_mult_base k = P.scalar_mult_base (scalar "scalar_mult_base" k)
+  end
 end
 
 module P384 : Dh_dsa = struct
