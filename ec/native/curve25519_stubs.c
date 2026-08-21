@@ -1862,6 +1862,40 @@ CAMLprim value mc_25519_pub_ok(value key)
    encoding of [a + b] to [out]. Returns false if either point fails to
    decode (in which case [out] is left with a meaningless value). Uses
    variable-time decoding: NOT constant time. */
+/* Birational map from the Edwards curve to its Montgomery form:
+     u = (1 + y) / (1 - y)  (mod 2^255 - 19)
+   The x-coordinate sign is irrelevant to u, so only y is needed and no point
+   decompression happens here. Returns false when the denominator is zero
+   (y = 1), which is the identity and has no Montgomery u. */
+CAMLprim value mc_25519_pub_to_x25519(value out, value pub)
+{
+  CAMLparam2(out, pub);
+  fe y, one, num, den, u;
+  fe_loose num_l, den_l;
+  uint8_t zero[32];
+  int i, is_zero;
+
+  /* fe_frombytes masks the sign bit and reduces mod p. */
+  fe_frombytes(&y, _st_uint8(pub));
+  fe_1(&one);
+  fe_add(&num_l, &one, &y);
+  fe_sub(&den_l, &one, &y);
+  fe_carry(&num, &num_l);
+  fe_carry(&den, &den_l);
+
+  /* Detect 1 - y == 0 before inverting: fe_invert(0) is 0, which would
+     silently yield u = 0 rather than an error. */
+  fe_tobytes(zero, &den);
+  is_zero = 0;
+  for (i = 0; i < 32; i++) is_zero |= zero[i];
+  if (is_zero == 0) CAMLreturn(Val_bool(0));
+
+  fe_invert(&den, &den);
+  fe_mul_ttt(&u, &num, &den);
+  fe_tobytes(Bytes_val(out), &u);
+  CAMLreturn(Val_bool(1));
+}
+
 CAMLprim value mc_25519_point_add(value out, value a, value b)
 {
   CAMLparam3(out, a, b);

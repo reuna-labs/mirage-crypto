@@ -301,18 +301,63 @@ module Ed25519 : sig
       modulo the group order [L]; points are 32-byte RFC 8032 encodings.
       Point decoding is variable-time: {b not} constant time. *)
   module Primitive : sig
+    val to_x25519_pub : string -> (string, error) result
+    (** [to_x25519_pub pub] maps an Ed25519 public key to the corresponding
+        Curve25519 u-coordinate, via the birational map
+        [u = (1 + y) / (1 - y)]. This is what protocols that sign with
+        Ed25519 and key-exchange with X25519 need in order to derive a shared
+        secret from a peer's signing key.
+
+        Only [y] is used, so the sign bit is ignored and no point
+        decompression takes place. Returns [Error `Not_on_curve] for [y = 1],
+        the one input with no Montgomery image.
+
+        This operates on a public value, so it is not constant time.
+        @raise Invalid_argument if [pub] is not 32 bytes. *)
+
+    val to_x25519_priv : string -> string
+    (** [to_x25519_priv secret] is the X25519 scalar for an Ed25519 private
+        key: the clamped low half of [SHA-512 secret], as RFC 8032 derives for
+        signing.
+        @raise Invalid_argument if [secret] is not 32 bytes. *)
+
     val scalar_reduce : string -> string
     (** [scalar_reduce wide] reduces the 64-byte little-endian value
         [wide] modulo [L], returning a 32-byte scalar.
         @raise Invalid_argument if [wide] is not 64 bytes. *)
 
+    val scalar_reduce_into : bytes -> string -> unit
+    (** [scalar_reduce_into dst wide] reduces the 64-byte little-endian
+        value [wide] modulo [L], writing the 32-byte scalar into [dst].
+        Same computation as {!scalar_reduce}, but the caller supplies the
+        destination, so a secret scalar can be kept in a buffer the
+        caller is able to overwrite once it is no longer needed.
+        @raise Invalid_argument if [dst] is not 32 bytes or [wide] is not
+        64 bytes. *)
+
     val scalar_muladd : string -> string -> string -> string
     (** [scalar_muladd a b c] is [(a * b + c) mod L] over 32-byte
         little-endian scalars. *)
 
+    val scalar_muladd_into : bytes -> string -> string -> string -> unit
+    (** [scalar_muladd_into dst a b c] writes [(a * b + c) mod L] over
+        32-byte little-endian scalars into the 32-byte [dst]. Same
+        computation as {!scalar_muladd}, but the caller supplies the
+        destination, so a secret scalar can be kept in a buffer the
+        caller is able to overwrite once it is no longer needed.
+        @raise Invalid_argument if [dst], [a], [b], or [c] is not 32
+        bytes. *)
+
     val scalar_mult_base : string -> string
     (** [scalar_mult_base s] is the RFC 8032 encoding of [s * B] for the
         Ed25519 base point [B] and 32-byte scalar [s]. *)
+
+    val scalar_mult_base_into : bytes -> string -> unit
+    (** [scalar_mult_base_into dst s] writes the RFC 8032 encoding of
+        [s * B], for the Ed25519 base point [B] and 32-byte scalar [s],
+        into the 32-byte [dst]. Same computation as {!scalar_mult_base},
+        with a caller-supplied destination.
+        @raise Invalid_argument if [dst] or [s] is not 32 bytes. *)
 
     val point_add : string -> string -> (string, error) result
     (** [point_add p q] adds two RFC 8032-encoded points, returning the

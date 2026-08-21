@@ -1466,6 +1466,88 @@ let ed25519_primitive =
       Alcotest.(check string) "s*B - 0*A = s*B" (P.scalar_mult_base s) r );
   ]
 
+let ed25519_primitive_into =
+  let module P = Ed25519.Primitive in
+  let zero = String.make 32 '\000' in
+  let one = "\001" ^ String.make 31 '\000' in
+  (* the Ed25519 group order L = 2^252 + 27742317777372353535851937790883648493,
+     little-endian *)
+  let l = of_hex "edd3f55c1a631258d69cf7a2def9de1400000000000000000000000000000010" in
+  let l_minus_1 =
+    of_hex "ecd3f55c1a631258d69cf7a2def9de1400000000000000000000000000000010"
+  in
+  let all_ff = String.make 32 '\xff' in
+  let scalars = [ zero; one; l_minus_1; all_ff ] in
+  let pad32 s = s ^ String.make 32 '\000' in
+  let wides =
+    [ String.make 64 '\000'; pad32 one; pad32 l_minus_1; pad32 l;
+      String.make 64 '\xff' ]
+  in
+  let expect_invalid_arg name f =
+    match f () with
+    | () -> Alcotest.fail (name ^ ": expected Invalid_argument")
+    | exception Invalid_argument _ -> ()
+  in
+  [
+    ( "scalar_reduce_into agrees with scalar_reduce", `Quick, fun () ->
+      let check wide =
+        let dst = Bytes.create 32 in
+        P.scalar_reduce_into dst wide;
+        Alcotest.(check string) "reduce" (P.scalar_reduce wide)
+          (Bytes.to_string dst)
+      in
+      List.iter check wides;
+      for _ = 1 to 20 do check (Mirage_crypto_rng.generate 64) done );
+    ( "scalar_muladd_into agrees with scalar_muladd", `Quick, fun () ->
+      let check a b c =
+        let dst = Bytes.create 32 in
+        P.scalar_muladd_into dst a b c;
+        Alcotest.(check string) "muladd" (P.scalar_muladd a b c)
+          (Bytes.to_string dst)
+      in
+      List.iter (fun a ->
+          List.iter (fun b -> List.iter (fun c -> check a b c) scalars)
+            scalars)
+        scalars;
+      for _ = 1 to 20 do
+        check (Mirage_crypto_rng.generate 32) (Mirage_crypto_rng.generate 32)
+          (Mirage_crypto_rng.generate 32)
+      done );
+    ( "scalar_mult_base_into agrees with scalar_mult_base", `Quick, fun () ->
+      let check s =
+        let dst = Bytes.create 32 in
+        P.scalar_mult_base_into dst s;
+        Alcotest.(check string) "mult_base" (P.scalar_mult_base s)
+          (Bytes.to_string dst)
+      in
+      List.iter check scalars;
+      for _ = 1 to 10 do
+        check (P.scalar_reduce (Mirage_crypto_rng.generate 64))
+      done );
+    ( "wrong-sized buffers raise Invalid_argument", `Quick, fun () ->
+      let wide = String.make 64 '\000' in
+      List.iter (fun n ->
+          let dst = Bytes.create n in
+          expect_invalid_arg "scalar_reduce_into dst"
+            (fun () -> P.scalar_reduce_into dst wide);
+          expect_invalid_arg "scalar_muladd_into dst"
+            (fun () -> P.scalar_muladd_into dst zero zero zero);
+          expect_invalid_arg "scalar_mult_base_into dst"
+            (fun () -> P.scalar_mult_base_into dst zero))
+        [ 0; 31; 33 ];
+      let dst = Bytes.create 32 in
+      expect_invalid_arg "scalar_reduce_into wide"
+        (fun () -> P.scalar_reduce_into dst (String.make 63 '\000'));
+      expect_invalid_arg "scalar_muladd_into a"
+        (fun () -> P.scalar_muladd_into dst "short" zero zero);
+      expect_invalid_arg "scalar_muladd_into b"
+        (fun () -> P.scalar_muladd_into dst zero "short" zero);
+      expect_invalid_arg "scalar_muladd_into c"
+        (fun () -> P.scalar_muladd_into dst zero zero "short");
+      expect_invalid_arg "scalar_mult_base_into s"
+        (fun () -> P.scalar_mult_base_into dst "short") );
+  ]
+
 let () =
   Mirage_crypto_rng_unix.use_default ();
   Alcotest.run "EC"
@@ -1481,6 +1563,7 @@ let () =
       ("X25519", [ "RFC 7748", `Quick, x25519 ]);
       ("ED25519", ed25519);
       ("ED25519 primitives", ed25519_primitive);
+      ("ED25519 primitives into", ed25519_primitive_into);
       ("ECDSA P521 regression", [ "regression1", `Quick, p521_regression ]);
       ("secp256k1 ECDSA", secp256k1_ecdsa);
       ("secp256k1 ECDSA sign", secp256k1_ecdsa_sign);

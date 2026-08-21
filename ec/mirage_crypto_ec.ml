@@ -1344,8 +1344,15 @@ module Ed25519 = struct
   external double_scalar_mult : bytes -> string -> string -> string -> bool = "mc_25519_double_scalar_mult" [@@noalloc]
   external pub_ok : string -> bool = "mc_25519_pub_ok" [@@noalloc]
   external point_add : bytes -> string -> string -> bool = "mc_25519_point_add" [@@noalloc]
+  external pub_to_x25519 : bytes -> string -> bool = "mc_25519_pub_to_x25519" [@@noalloc]
 
   let key_len = 32
+
+  (* Keep handles on the raw externals before the allocating wrappers
+     below shadow their names; [Primitive] needs them to write into
+     caller-supplied buffers. *)
+  let muladd_raw : bytes -> string -> string -> string -> unit = muladd
+  let scalar_mult_base_raw : bytes -> string -> unit = scalar_mult_base_to_bytes
 
   let scalar_mult_base_to_bytes p =
     let tmp = Bytes.create key_len in
@@ -1460,15 +1467,77 @@ module Ed25519 = struct
      points are 32-byte RFC 8032 encodings. Point decoding is
      variable-time (NOT constant time). *)
   module Primitive = struct
+    let check_dst name dst =
+      if Bytes.length dst <> key_len then
+        invalid_arg ("Ed25519.Primitive." ^ name ^
+                     ": expected 32 byte destination")
+
+    let to_x25519_pub_into dst pub =
+      check_dst "to_x25519_pub_into" dst;
+      if String.length pub <> key_len then
+        invalid_arg "Ed25519.Primitive.to_x25519_pub: expected a 32 byte key";
+      if pub_to_x25519 dst pub then Ok () else Error `Not_on_curve
+
+    let to_x25519_pub pub =
+      let dst = Bytes.create key_len in
+      match to_x25519_pub_into dst pub with
+      | Ok () -> Ok (Bytes.unsafe_to_string dst)
+      | Error _ as e -> e
+
+    let to_x25519_priv secret =
+      if String.length secret <> key_len then
+        invalid_arg "Ed25519.Primitive.to_x25519_priv: expected a 32 byte key";
+      (* The X25519 scalar is exactly the clamped first half of SHA-512 of the
+         seed, which is what RFC 8032 already derives for signing. *)
+      let h = sha512 [ secret ] in
+      let s = Bytes.sub h 0 key_len in
+      Bytes.set_uint8 s 0 (Bytes.get_uint8 s 0 land 248);
+      Bytes.set_uint8 s 31 (Bytes.get_uint8 s 31 land 127 lor 64);
+      Bytes.fill h 0 (Bytes.length h) '\000';
+      Bytes.unsafe_to_string s
+
+    let scalar_reduce_into dst wide =
+      check_dst "scalar_reduce_into" dst;
+      if String.length wide <> 2 * key_len then
+        invalid_arg "Ed25519.Primitive.scalar_reduce_into: expected 64 bytes";
+      (* [reduce_l] works in place on a 64-byte buffer, so a temporary is
+         unavoidable; wipe it once the result has been copied out. *)
+      let tmp = Bytes.of_string wide in
+      reduce_l tmp;
+      Bytes.blit tmp 0 dst 0 key_len;
+      Bytes.fill tmp 0 (2 * key_len) '\000'
+
     let scalar_reduce wide =
       if String.length wide <> 2 * key_len then
         invalid_arg "Ed25519.Primitive.scalar_reduce: expected 64 bytes";
-      let b = Bytes.of_string wide in
-      reduce_l b;
-      String.sub (Bytes.unsafe_to_string b) 0 key_len
+      let dst = Bytes.create key_len in
+      scalar_reduce_into dst wide;
+      Bytes.unsafe_to_string dst
 
-    let scalar_muladd a b c = muladd a b c
-    let scalar_mult_base s = scalar_mult_base_to_bytes s
+    let scalar_muladd_into dst a b c =
+      check_dst "scalar_muladd_into" dst;
+      if String.length a <> key_len || String.length b <> key_len ||
+         String.length c <> key_len then
+        invalid_arg
+          "Ed25519.Primitive.scalar_muladd_into: expected 32 byte scalars";
+      muladd_raw dst a b c
+
+    let scalar_muladd a b c =
+      let dst = Bytes.create key_len in
+      scalar_muladd_into dst a b c;
+      Bytes.unsafe_to_string dst
+
+    let scalar_mult_base_into dst s =
+      check_dst "scalar_mult_base_into" dst;
+      if String.length s <> key_len then
+        invalid_arg
+          "Ed25519.Primitive.scalar_mult_base_into: expected 32 byte scalar";
+      scalar_mult_base_raw dst s
+
+    let scalar_mult_base s =
+      let dst = Bytes.create key_len in
+      scalar_mult_base_into dst s;
+      Bytes.unsafe_to_string dst
 
     let point_add p q =
       let tmp = Bytes.create key_len in
