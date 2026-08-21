@@ -719,6 +719,103 @@ let secp256k1_bip340_sign =
   let l = List.mapi (fun i (c, n) -> (if n = ""  then "BIP-340 case " ^ string_of_int i else n), `Quick, c) cases in
   ("BIP-340 gen/sign/verify", `Quick, secp256k1_bip340_gen) :: l
 
+(* add_scalar: (a + b) mod n, in constant time. The known answers below pin
+   down both the plain addition and the reduction, which is the part an
+   implementation is most likely to get wrong or silently skip. *)
+let add_scalar_tests (type a) (module Dsa : Mirage_crypto_ec.Dsa with type priv = a)
+    ~name ~n_hex =
+  let bl = Dsa.byte_length in
+  let scalar_of_int k =
+    let b = Bytes.make bl '\000' in
+    Bytes.set_uint8 b (bl - 1) k;
+    match Dsa.priv_of_octets (Bytes.unsafe_to_string b) with
+    | Ok p -> p
+    | Error _ -> Alcotest.failf "%s: %d is not a valid scalar" name k
+  in
+  let n = of_hex n_hex in
+  let minus k =
+    (* n - k, computed on the byte string so the test does not lean on the
+       thing it is testing. *)
+    let b = Bytes.of_string n in
+    let borrow = ref k in
+    for i = bl - 1 downto 0 do
+      let v = Bytes.get_uint8 b i - !borrow in
+      if v < 0 then (Bytes.set_uint8 b i (v + 256); borrow := 1)
+      else (Bytes.set_uint8 b i v; borrow := 0)
+    done;
+    match Dsa.priv_of_octets (Bytes.unsafe_to_string b) with
+    | Ok p -> p
+    | Error _ -> Alcotest.failf "%s: n - %d is not a valid scalar" name k
+  in
+  let octets = Dsa.priv_to_octets in
+  let ok = function
+    | Ok p -> p
+    | Error e -> Alcotest.failf "%s: unexpected %a" name pp_error e
+  in
+  [
+    ( "1 + 2 = 3", `Quick, fun () ->
+      Alcotest.(check string) "sum"
+        (octets (scalar_of_int 3))
+        (octets (ok (Dsa.add_scalar (scalar_of_int 1) (scalar_of_int 2)))) );
+    ( "(n - 1) + 2 = 1 (wraps)", `Quick, fun () ->
+      Alcotest.(check string) "sum"
+        (octets (scalar_of_int 1))
+        (octets (ok (Dsa.add_scalar (minus 1) (scalar_of_int 2)))) );
+    ( "(n - 2) + 5 = 3 (wraps)", `Quick, fun () ->
+      Alcotest.(check string) "sum"
+        (octets (scalar_of_int 3))
+        (octets (ok (Dsa.add_scalar (minus 2) (scalar_of_int 5)))) );
+    ( "(n - 1) + 1 = 0 is rejected", `Quick, fun () ->
+      match Dsa.add_scalar (minus 1) (scalar_of_int 1) with
+      | Error `Invalid_range -> ()
+      | Error e -> Alcotest.failf "%s: wrong error %a" name pp_error e
+      | Ok _ -> Alcotest.failf "%s: a zero sum must be rejected" name );
+    ( "commutative", `Quick, fun () ->
+      for i = 1 to 20 do
+        let a = scalar_of_int i and b = minus (i + 3) in
+        Alcotest.(check string) "a + b = b + a"
+          (octets (ok (Dsa.add_scalar a b)))
+          (octets (ok (Dsa.add_scalar b a)))
+      done );
+    ( "associative", `Quick, fun () ->
+      let a = scalar_of_int 7 and b = scalar_of_int 11 and c = minus 5 in
+      let l = ok (Dsa.add_scalar (ok (Dsa.add_scalar a b)) c) in
+      let r = ok (Dsa.add_scalar a (ok (Dsa.add_scalar b c))) in
+      Alcotest.(check string) "(a + b) + c = a + (b + c)" (octets l) (octets r) );
+    ( "agrees with generated keys", `Quick, fun () ->
+      (* d + (n - d) is zero for any key, whatever it happens to be. *)
+      for _ = 1 to 10 do
+        let d, _ = Dsa.generate () in
+        let b = Bytes.of_string n in
+        let borrow = ref 0 in
+        let k = Dsa.priv_to_octets d in
+        for i = bl - 1 downto 0 do
+          let v = Bytes.get_uint8 b i - String.get_uint8 k i - !borrow in
+          if v < 0 then (Bytes.set_uint8 b i (v + 256); borrow := 1)
+          else (Bytes.set_uint8 b i v; borrow := 0)
+        done;
+        match Dsa.priv_of_octets (Bytes.unsafe_to_string b) with
+        | Error e -> Alcotest.failf "%s: n - d invalid: %a" name pp_error e
+        | Ok neg -> (
+          match Dsa.add_scalar d neg with
+          | Error `Invalid_range -> ()
+          | Error e -> Alcotest.failf "%s: wrong error %a" name pp_error e
+          | Ok _ -> Alcotest.failf "%s: d + (n - d) must be zero" name)
+      done );
+  ]
+
+let secp256k1_add_scalar =
+  add_scalar_tests (module P256k1.Dsa) ~name:"secp256k1"
+    ~n_hex:"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141"
+
+let p256_add_scalar =
+  add_scalar_tests (module P256.Dsa) ~name:"P-256"
+    ~n_hex:"FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551"
+
+let p384_add_scalar =
+  add_scalar_tests (module P384.Dsa) ~name:"P-384"
+    ~n_hex:"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC7634D81F4372DDF581A0DB248B0A77AECEC196ACCC52973"
+
 let pub_key_compression (module Dsa:Mirage_crypto_ec.Dsa) () =
   for _ = 1 to 20 do
     let _, pub = Dsa.generate () in
@@ -1388,6 +1485,9 @@ let () =
       ("secp256k1 ECDSA", secp256k1_ecdsa);
       ("secp256k1 ECDSA sign", secp256k1_ecdsa_sign);
       ("secp256k1 BIP-340", secp256k1_bip340_sign);
+      ("secp256k1 add_scalar", secp256k1_add_scalar);
+      ("P-256 add_scalar", p256_add_scalar);
+      ("P-384 add_scalar", p384_add_scalar);
       ("brainpoolP256r1 ECDSA", brainpoolp256_ecdsa);
       ("brainpoolP384r1 ECDSA", brainpoolp384_ecdsa);
       ("brainpoolP512r1 ECDSA", brainpoolp512_ecdsa);

@@ -105,6 +105,16 @@ module type Dsa = sig
   val pub_of_priv : priv -> pub
   (** [pub_of_priv p] extracts the public key from the private key [p]. *)
 
+  val add_scalar : priv -> priv -> (priv, error) result
+  (** [add_scalar a b] is the private key [(a + b) mod n], where [n] is the
+      group order, or [Error `Invalid_range] if the sum is zero.
+
+      Constant time. This is the scalar half of the additive key derivation
+      that BIP32 hierarchical wallets and BIP341 Taproot output keys are
+      built from; without it a caller has to leave the library to do
+      arbitrary-precision arithmetic on a secret, which is exactly where a
+      timing leak gets reintroduced. *)
+
   (** {2 Key generation} *)
 
   val generate : ?g:Mirage_crypto_rng.g -> unit -> priv * pub
@@ -148,6 +158,15 @@ end
 (** BIP-340 Schnorr signature algorithm on curve secp256k1. *)
 module type Dsa_bip340 = sig
   include Dsa
+
+  val negate_scalar : priv -> priv
+  (** [negate_scalar d] is the private key [n - d], where [n] is the group
+      order. Constant time.
+
+      BIP340 defines signing against the point with even [y], and BIP341
+      tweaks against [lift_x] of the internal key, so both need this when the
+      key's point has odd [y]. {!sign_bip340} applies it internally; callers
+      preparing a Taproot output key need it themselves. *)
 
   (** {2 Serialisation} *)
 

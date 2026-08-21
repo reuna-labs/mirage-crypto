@@ -54,6 +54,7 @@ module type Dsa = sig
   val pub_of_octets : string -> (pub, error) result
   val pub_to_octets : ?compress:bool -> pub -> string
   val pub_of_priv : priv -> pub
+  val add_scalar : priv -> priv -> (priv, error) result
   val generate : ?g:Mirage_crypto_rng.g -> unit -> priv * pub
   val sign : key:priv -> ?k:string -> string -> string * string
   val verify : key:pub -> string * string -> string -> bool
@@ -64,6 +65,7 @@ end
 
 module type Dsa_bip340 = sig
   include Dsa
+  val negate_scalar : priv -> priv
   val get_x : pub -> string
   val sign_bip340 : key:priv -> ?aux_rand:string -> string -> string * string
   val verify_bip340 : key:pub -> string * string -> string -> bool
@@ -737,6 +739,14 @@ module Make_dsa (P : Parameters) (Se : Scalar_element) (Pt : Point) (H : Digesti
 
   let pub_of_priv priv = Pt.scalar_mult_base priv
 
+  (* Montgomery representation is linear in addition, so
+     mont(a) + mont(b) = mont(a + b) and no extra reduction is needed. The
+     result goes back through S.of_octets, which rejects zero and anything
+     at or above the group order in constant time. *)
+  let add_scalar a b =
+    let mont k = Se.mont_from_be_octets (S.to_octets k) in
+    Se.add (mont a) (mont b) |> Se.from_montgomery |> Se.to_be_octets |> S.of_octets
+
   let verify ~key (r, s) msg =
     try
       let r = padded r and s = padded s in
@@ -820,10 +830,15 @@ module Make_dsa_bip340 (P : Parameters) (Se : Scalar_element_bip340) (Pt : Point
       | None -> zero (* Return zero bytes for infinity *)
       | Some (x, _) -> rev_string x (* Reverse to get big-endian format *)
 
+  (* [n - d]. For d in [1, n) the result is also in [1, n), so of_octets
+     cannot fail here. Constant time. *)
+  let negate_scalar d =
+    S.to_octets d |> Se.mont_from_be_octets |> Se.opp |> Se.from_montgomery
+    |> Se.to_be_octets |> S.of_octets |> Result.get_ok
+
   (* Generate key pair with even public y *)
   let generate ?g () : priv * pub =
-    let neg d = S.to_octets d |> Se.mont_from_be_octets |> Se.opp |>
-      Se.from_montgomery |> Se.to_be_octets |> S.of_octets |> Result.get_ok in
+    let neg = negate_scalar in
     let key, pubkey = generate ?g () in
     let key, pubkey =
       if has_even_y pubkey then key, pubkey else
