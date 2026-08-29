@@ -1,5 +1,5 @@
 module Hashes = Hashes
-module Blake2b = Blake2b
+module Blake2b = Mirage_crypto_blockchain_core.Blake2b
 module Ripemd160 = Ripemd160
 module Keccak = Keccak
 module Keccak256 = Keccak256
@@ -10,4 +10,4 @@ module Bls12_381 = Bls12_381
 module Sr25519 = Sr25519
 module Stark_curve = Stark_curve
 module Poseidon = Poseidon
-module Ed25519_bip32 = Ed25519_bip32
+module Ed25519_bip32 = Mirage_crypto_blockchain_core.Ed25519_bip32

@@ -15,6 +15,7 @@ build: [ ["dune" "subst"] {dev}
 depends: [
   "ocaml" {>= "4.13.0"}
   "dune" {>= "2.7"}
+  "mirage-crypto-blockchain-core" {=version}
   "mirage-crypto" {=version}
   "mirage-crypto-rng" {=version}
   "mirage-crypto-ec" {=version}

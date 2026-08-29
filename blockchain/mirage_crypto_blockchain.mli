@@ -32,16 +32,10 @@ module Hashes : sig
       ["TapBranch"], ["TapTweak"], and ["TapSighash"]. *)
 end
 
-(** {b BLAKE2b}, RFC 7693. Thin wrapper over [Digestif.BLAKE2B]. *)
-module Blake2b : sig
-  val digest : ?digest_size:int -> string -> string
-  (** [digest ?digest_size msg] is the BLAKE2b digest of [msg].
-      [digest_size] defaults to 64 (bytes); RFC 7693 permits [1, 64].
-      @raise Invalid_argument if [digest_size] is out of range. *)
-
-  val hmac : ?digest_size:int -> key:string -> string -> string
-  (** [hmac ?digest_size ~key msg] is HMAC-BLAKE2b(key, msg). *)
-end
+(** {b BLAKE2b}, RFC 7693. Re-exported from
+    {!Mirage_crypto_blockchain_core}, which carries it without the bignum
+    dependency the rest of this library has. *)
+module Blake2b = Mirage_crypto_blockchain_core.Blake2b
 
 (** {b RIPEMD-160}. Thin wrapper over [Digestif.RMD160]. *)
 module Ripemd160 : sig
@@ -598,41 +592,7 @@ end
     SHA512(seed), clamp [kL], chain code = SHA256(0x01 || seed)); the
     3rd-highest bit of [kL]'s last byte must be clear, otherwise
     {!master_key_of_seed} returns [Error `Invalid_derivation]. *)
-module Ed25519_bip32 : sig
-  type error = [ `Invalid_format | `Invalid_length | `Invalid_derivation ]
-
-  val pp_error : Format.formatter -> error -> unit
-
-  type extended_priv
-  (** 64-byte scalar-pair (the "extended" Ed25519 secret key format)
-      plus 32-byte chain code, per BIP32-Ed25519's master key
-      generation. *)
-
-  type extended_pub
-  (** 32-byte point plus 32-byte chain code. *)
-
-  val extended_priv_of_octets : string -> (extended_priv, error) result
-  (** Decodes a 96-byte [kL || kR || chain_code] extended private key. *)
-
-  val extended_priv_to_octets : extended_priv -> string
-  val extended_pub_of_octets : string -> (extended_pub, error) result
-  (** Decodes a 64-byte [point || chain_code] extended public key;
-      [Error `Invalid_format] if the point is not a valid encoding. *)
-
-  val extended_pub_to_octets : extended_pub -> string
-
-  val master_key_of_seed : string -> (extended_priv, error) result
-
-  val derive_priv_normal : extended_priv -> index:int32 -> (extended_priv, error) result
-  (** "Normal" (non-hardened) child derivation; [index < 2^31]. *)
-
-  val derive_priv_hardened : extended_priv -> index:int32 -> (extended_priv, error) result
-  (** Hardened child derivation; [index >= 2^31]. *)
-
-  val derive_pub_normal : extended_pub -> index:int32 -> (extended_pub, error) result
-  (** Public-only derivation; only valid for non-hardened indices. *)
-
-  val pub_of_priv : extended_priv -> extended_pub
-  val sign : key:extended_priv -> string -> string
-  val verify : key:extended_pub -> string -> msg:string -> bool
-end
+module Ed25519_bip32 = Mirage_crypto_blockchain_core.Ed25519_bip32
+(** {b BIP32-Ed25519} hierarchical deterministic keys, DerivationScheme V2 --
+    the scheme Cardano uses. Re-exported from {!Mirage_crypto_blockchain_core};
+    see there for the constant-time caveat. *)

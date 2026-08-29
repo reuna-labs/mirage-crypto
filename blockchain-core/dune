@@ -1,0 +1,11 @@
+; The bignum-free half of mirage-crypto-blockchain. Deliberately no zarith:
+; these two modules need only digestif and the ec Ed25519 primitives, and
+; keeping them separable is what lets an Ed25519-only consumer -- Cardano --
+; link them into a Solo5 unikernel with no GMP anywhere in the duniverse.
+;
+; Nothing that needs a bignum may be added here. Put it in ../blockchain.
+(library
+ (name mirage_crypto_blockchain_core)
+ (public_name mirage-crypto-blockchain-core)
+ (libraries mirage-crypto-ec digestif)
+ (private_modules blake2b ed25519_bip32))

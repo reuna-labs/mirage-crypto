@@ -1,0 +1,35 @@
+opam-version: "2.0"
+homepage:     "https://github.com/mirage/mirage-crypto"
+dev-repo:     "git+https://github.com/mirage/mirage-crypto.git"
+bug-reports:  "https://github.com/mirage/mirage-crypto/issues"
+doc:          "https://mirage.github.io/mirage-crypto/doc"
+authors:      ["David Kaloper <dk505@cam.ac.uk>" "Hannes Mehnert <hannes@mehnert.org>" ]
+maintainer:   "Hannes Mehnert <hannes@mehnert.org>"
+license:      "ISC"
+synopsis: "Bignum-free blockchain primitives: BLAKE2b and BIP32-Ed25519"
+
+build: [ ["dune" "subst"] {dev}
+         ["dune" "build" "-p" name "-j" jobs ]
+         ["dune" "runtest" "-p" name "-j" jobs] {with-test} ]
+
+depends: [
+  "ocaml" {>= "4.13.0"}
+  "dune" {>= "2.7"}
+  "mirage-crypto-ec" {=version}
+  "digestif" {>= "1.2.0"}
+  "eqaf" {>= "0.8"}
+  "ounit2" {with-test}
+  "ohex" {with-test & >= "0.2.0"}
+]
+description: """
+BLAKE2b at any digest width, and BIP32-Ed25519 hierarchical deterministic keys
+(Khovratovich & Law, DerivationScheme V2 -- the scheme Cardano uses).
+
+Split out of mirage-crypto-blockchain because these two need only digestif and
+the ec Ed25519 primitives, while the rest of that library needs zarith and
+therefore GMP. A consumer that uses no curve but Ed25519 can depend on this and
+cross-compile to a MirageOS/Solo5 unikernel without a vendored GMP build.
+
+mirage-crypto-blockchain depends on this package and re-exports both modules
+unchanged."""
+x-maintenance-intent: [ "(latest)" ]
