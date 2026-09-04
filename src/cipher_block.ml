@@ -122,10 +122,16 @@ module Block = struct
 end
 
 module Counters = struct
+  let check_block_count max blocks =
+    if Int64.unsigned_compare (Int64.of_int blocks) max > 0 then
+      invalid_arg "CTR: too many blocks"
+  [@@inline always]
+
   module type S = sig
     type ctr
     val size : int
     val add  : ctr -> int64 -> ctr
+    val check_blocks : int -> unit
     val of_octets : string -> ctr
     val unsafe_count_into : ctr -> bytes -> off:int -> blocks:int -> unit
   end
@@ -135,6 +141,7 @@ module Counters = struct
     let size = 8
     let of_octets cs = String.get_int64_be cs 0
     let add = Int64.add
+    let check_blocks = check_block_count Int64.minus_one
     let unsafe_count_into t buf ~off ~blocks =
       let ctr = Bytes.create 8 in
       Bytes.set_int64_be ctr 0 t;
@@ -148,9 +155,10 @@ module Counters = struct
       let buf = Bytes.unsafe_of_string cs in
       Bytes.(get_int64_be buf 0, get_int64_be buf 8)
     let add (w1, w0) n =
-      let w0'  = Int64.add w0 n in
-      let flip = if Int64.logxor w0 w0' < 0L then w0' > w0 else w0' < w0 in
-      ((if flip then Int64.succ w1 else w1), w0')
+      let w0' = Int64.add w0 n in
+      let carry = Int64.unsigned_compare w0' w0 < 0 in
+      ((if carry then Int64.succ w1 else w1), w0')
+    let check_blocks _ = ()
     let unsafe_count_into (w1, w0) buf ~off ~blocks =
       let ctr = Bytes.create 16 in
       Bytes.set_int64_be ctr 0 w1; Bytes.set_int64_be ctr 8 w0;
@@ -162,6 +170,7 @@ module Counters = struct
     let add (w1, w0) n =
       let hi = 0xffffffff00000000L and lo = 0x00000000ffffffffL in
       (w1, Int64.(logor (logand hi w0) (add n w0 |> logand lo)))
+    let check_blocks = check_block_count 0xfffffffeL
     let unsafe_count_into (w1, w0) buf ~off ~blocks =
       let ctr = Bytes.create 16 in
       Bytes.set_int64_be ctr 0 w1; Bytes.set_int64_be ctr 8 w0;
@@ -173,10 +182,13 @@ let check_offset ~tag ~buf ~off ~len actual_len =
   if off < 0 then
     invalid_arg "%s: %s off %u < 0"
       tag buf off;
+  if len < 0 then
+    invalid_arg "%s: %s len %u < 0"
+      tag buf len;
   if actual_len - off < len then
     invalid_arg "%s: %s length %u - off %u < len %u"
       tag buf actual_len off len
-[@@inline]
+[@@inline always]
 
 module Modes = struct
   module ECB_of (Core : Block.Core) : Block.ECB = struct
@@ -237,7 +249,7 @@ module Modes = struct
       if len mod block <> 0 then
         invalid_arg "CBC: argument length %u not of block size"
           len
-    [@@inline]
+    [@@inline always]
 
     let next_iv ?(off = 0) cs ~iv =
       check_block_size ~iv (String.length cs - off) ;
@@ -305,9 +317,10 @@ module Modes = struct
 
     let unsafe_stream_into ~key ~ctr buf ~off len =
       let blocks = imax 0 len / block_size in
+      let slack = imax 0 len mod block_size in
+      Ctr.check_blocks (blocks + if slack = 0 then 0 else 1);
       Ctr.unsafe_count_into ctr buf ~off ~blocks ;
       Core.encrypt ~key ~blocks (Bytes.unsafe_to_string buf) off buf off ;
-      let slack = imax 0 len mod block_size in
       if slack <> 0 then begin
         let buf' = Bytes.create block_size in
         let ctr = Ctr.add ctr (Int64.of_int blocks) in
@@ -419,7 +432,11 @@ module Modes = struct
               (pack64s (bits64 adata) (Int64.of_int (len * 8)), 0, 16)))
         ~src_off:0 dst ~dst_off:tag_off tag_size
 
+    let check_blocks len = Counters.C128be32.check_blocks (len // block_size)
+    [@@inline always]
+
     let unsafe_authenticate_encrypt_into ~key:{ key; hkey } ~nonce ?adata src ~src_off dst ~dst_off ~tag_off len =
+      check_blocks len;
       let ctr = counter ~hkey nonce in
       CTR.(unsafe_encrypt_into ~key ~ctr:(add_ctr ctr 1L) src ~src_off dst ~dst_off len);
       unsafe_tag_into ~key ~hkey ~ctr ?adata (Bytes.unsafe_to_string dst) ~off:dst_off ~len dst ~tag_off
@@ -442,11 +459,13 @@ module Modes = struct
       String.sub r (String.length data) tag_size
 
     let unsafe_authenticate_decrypt_into ~key:{ key; hkey } ~nonce ?adata src ~src_off ~tag_off dst ~dst_off len =
+      check_blocks len;
       let ctr = counter ~hkey nonce in
-      CTR.(unsafe_encrypt_into ~key ~ctr:(add_ctr ctr 1L) src ~src_off dst ~dst_off len);
       let ctag = Bytes.create tag_size in
       unsafe_tag_into ~key ~hkey ~ctr ?adata src ~off:src_off ~len ctag ~tag_off:0;
-      Eqaf.equal (String.sub src tag_off tag_size) (Bytes.unsafe_to_string ctag)
+      let r = Eqaf.equal (String.sub src tag_off tag_size) (Bytes.unsafe_to_string ctag) in
+      if r then CTR.(unsafe_encrypt_into ~key ~ctr:(add_ctr ctr 1L) src ~src_off dst ~dst_off len);
+      r
 
     let authenticate_decrypt_into ~key ~nonce ?adata src ~src_off ~tag_off dst ~dst_off len =
       check_offset ~tag:"GCM" ~buf:"src" ~off:src_off ~len (String.length src);
@@ -597,20 +616,13 @@ module Modes = struct
       Ccm.unsafe_generation_encryption_into ~cipher ~key ~nonce ~adata
         src ~src_off dst ~dst_off ~tag_off len
 
-    let valid_nonce nonce =
-      let nsize = String.length nonce in
-      if nsize < 7 || nsize > 13 then
-        invalid_arg "CCM: nonce length not between 7 and 13: %u" nsize
-
     let authenticate_encrypt_into ~key ~nonce ?adata src ~src_off dst ~dst_off ~tag_off len =
       check_offset ~tag:"CCM" ~buf:"src" ~off:src_off ~len (String.length src);
       check_offset ~tag:"CCM" ~buf:"dst" ~off:dst_off ~len (Bytes.length dst);
       check_offset ~tag:"CCM" ~buf:"dst tag" ~off:tag_off ~len:tag_size (Bytes.length dst);
-      valid_nonce nonce;
       unsafe_authenticate_encrypt_into ~key ~nonce ?adata src ~src_off dst ~dst_off ~tag_off len
 
     let authenticate_encrypt ~key ~nonce ?adata cs =
-      valid_nonce nonce;
       let l = String.length cs in
       let dst = Bytes.create (l + tag_size) in
       unsafe_authenticate_encrypt_into ~key ~nonce ?adata cs ~src_off:0 dst ~dst_off:0 ~tag_off:l l;
@@ -627,7 +639,6 @@ module Modes = struct
       check_offset ~tag:"CCM" ~buf:"src" ~off:src_off ~len (String.length src);
       check_offset ~tag:"CCM" ~buf:"src tag" ~off:tag_off ~len:tag_size (String.length src);
       check_offset ~tag:"CCM" ~buf:"dst" ~off:dst_off ~len (Bytes.length dst);
-      valid_nonce nonce;
       unsafe_authenticate_decrypt_into ~key ~nonce ?adata src ~src_off ~tag_off dst ~dst_off len
 
     let authenticate_decrypt ~key ~nonce ?adata data =

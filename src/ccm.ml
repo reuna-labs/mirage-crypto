@@ -2,6 +2,17 @@ open Uncommon
 
 let block_size = 16
 
+let valid_nonce nonce =
+  let nsize = String.length nonce in
+  if nsize < 7 || nsize > 13 then
+    invalid_arg "CCM: nonce length not between 7 and 13: %u" nsize
+
+let valid_message_length nonce len =
+  let l = 15 - String.length nonce in
+  let bits = 8 * l in
+  if bits < Sys.int_size && len >= 1 lsl bits then
+    invalid_arg "CCM: message length %u does not fit in %u bytes" len l
+
 let flags bit6 len1 len2 =
   bit6 lsl 6 + len1 lsl 3 + len2
 
@@ -41,7 +52,7 @@ let gen_adata a =
   in
   let to_pad =
     let leftover = (llen + String.length a) mod block_size in
-    block_size - leftover
+    if leftover = 0 then 0 else block_size - leftover
   in
   llen + String.length a + to_pad,
   fun buf off ->
@@ -75,6 +86,8 @@ let prepare_header nonce adata plen tlen =
 type mode = Encrypt | Decrypt
 
 let crypto_core_into ~cipher ~mode ~key ~nonce ~adata src ~src_off dst ~dst_off len =
+  valid_nonce nonce;
+  valid_message_length nonce len;
   let cbcheader = prepare_header nonce adata len block_size in
 
   let small_q = 15 - String.length nonce in
@@ -149,4 +162,6 @@ let unsafe_decryption_verification_into ~cipher ~key ~nonce ~adata src ~src_off 
   let tag = String.sub src tag_off block_size in
   let t = crypto_core_into ~cipher ~mode:Decrypt ~key ~nonce ~adata src ~src_off dst ~dst_off len in
   crypto_t t nonce cipher key ;
-  Eqaf.equal tag (Bytes.unsafe_to_string t)
+  let r  = Eqaf.equal tag (Bytes.unsafe_to_string t) in
+  if not r then Bytes.unsafe_fill dst dst_off len '\000';
+  r

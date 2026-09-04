@@ -4,6 +4,8 @@ module Log = (val Logs.src_log src : Logs.LOG)
 
 open Mirage_crypto_rng
 
+module Pfortuna = Pfortuna
+
 let periodic fn delta =
   let rec one () =
     let () = fn () in
@@ -40,6 +42,7 @@ let _1s = 1_000_000_000
 let initialize (type a) ?g ?(sleep= _1s) (rng : a generator) =
   if Atomic.compare_and_set running false true
   then begin
+    entropy_test ();
     let seed =
       let init = Entropy.[ bootstrap; bootstrap; whirlwind_bootstrap; bootstrap; ] in
       List.mapi (fun i fn -> fn i) init |> String.concat "" in
@@ -49,6 +52,12 @@ let initialize (type a) ?g ?(sleep= _1s) (rng : a generator) =
       with No_default_generator -> () in
     let rng = create ?g ~seed ~time:now rng in
     set_default_generator rng;
+    let seed =
+      Array.init 4 (fun _ ->
+          let r = Mirage_crypto_rng.generate 8 in
+          Int64.to_int (String.get_int64_be r 0))
+    in
+    Random.full_init seed;
     let hook = Mkernel.Hook.add (Entropy.timer_accumulator None) in
     (hook, rdrand sleep)
   end else invalid_arg miou_generator_already_launched

@@ -179,7 +179,7 @@ let decrypt_blinded_unsafe ~crt_hardening ?g ~key:({ e; n; _} as key : priv) c =
 
 let (encrypt_z, decrypt_z) =
   let check_params n msg =
-    if msg < two then invalid_arg "Rsa: message: %a" Z.pp_print msg;
+    if msg < two then raise Insufficient_key;
     if n <= msg then raise Insufficient_key in
   (fun ~(key : pub) msg -> check_params key.n msg ; encrypt_unsafe ~key msg),
   (fun ~crt_hardening ~mask ~(key : priv) msg ->
@@ -342,7 +342,7 @@ module OAEP (H : Digestif.S) = struct
     and mdb = String.sub msg (1 + hlen) (String.length msg - 1 - hlen)
     in
     let db = Bytes.unsafe_to_string (MGF.mask ~seed:(Bytes.unsafe_to_string (MGF.mask ~seed:mdb ms)) mdb) in
-    let i  = ct_find_uint8 ~default:0 ~off:hlen ~f:((<>) 0x00) db in
+    let i  = ct_find_uint8 ~default:hlen ~off:hlen ~f:((<>) 0x00) db in
     let c1 = Eqaf.equal (String.sub db 0 hlen) H.(digest_string label |> to_raw_string)
     and c2 = String.get_uint8 b0 0 = 0x00
     and c3 = String.get_uint8 db i = 0x01 in

@@ -409,7 +409,7 @@ end
     type ctr
 
     val add_ctr : ctr -> int64 -> ctr
-    (** [add_ctr ctr n] adds [n] to [ctr]. *)
+    (** [add_ctr ctr n] adds the unsigned 64-bit value [n] to [ctr]. *)
 
     val next_ctr : ?off:int -> string -> ctr:ctr -> ctr
     (** [next_ctr ~off msg ~ctr] is the state of the counter after encrypting or
@@ -555,7 +555,7 @@ end
     (**/**)
   end
 
-  (** {e Galois/Counter Mode}. *)
+  (** {e Galois/Counter Mode}. Messages may span at most [2^32 - 2] blocks. *)
   module type GCM = sig
 
     include AEAD
@@ -599,7 +599,11 @@ val accelerated : [`XOR | `AES | `GHASH] list
 (** Operations using non-portable, hardware-dependent implementation in
       this build of the library. *)
 
-(** The ChaCha20 cipher proposed by D.J. Bernstein. *)
+(** The ChaCha20 cipher proposed by D.J. Bernstein.
+
+    In AEAD mode, messages may span at most [2^32 - 1] blocks with a 12-byte
+    nonce and [2^64 - 1] blocks with an 8-byte nonce because counter 0 is used
+    to derive the Poly1305 key. *)
 module Chacha20 : sig
   include AEAD
 
@@ -612,10 +616,11 @@ module Chacha20 : sig
       the counter is 8 byte, same as the nonce) and the IETF RFC 8439
       specification (where nonce is 12 bytes, and counter 4 bytes).
 
-      @raise Invalid_argument if invalid parameters are provided. Valid
-      parameters are: [key] must be 32 bytes and [nonce] 12 bytes for the
-      IETF mode (and counter fit into 32 bits), or [key] must be either 16
-      bytes or 32 bytes and [nonce] 8 bytes.
+      @raise Invalid_argument if invalid parameters are provided or [data] spans
+      more than [2^32] blocks in IETF mode or [2^64 - 1] blocks in the original
+      mode. Valid parameters are: [key] must be 32 bytes and [nonce] 12 bytes
+      for the IETF mode (and counter fit into 32 bits), or [key] must be either
+      16 bytes or 32 bytes and [nonce] 8 bytes.
   *)
 end
 

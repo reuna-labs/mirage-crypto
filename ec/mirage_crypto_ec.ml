@@ -56,7 +56,8 @@ module type Dsa = sig
   val pub_of_priv : priv -> pub
   val add_scalar : priv -> priv -> (priv, error) result
   val generate : ?g:Mirage_crypto_rng.g -> unit -> priv * pub
-  val sign : key:priv -> ?k:string -> string -> string * string
+  val sign : ?mask:[ `No | `Yes | `Yes_with of Mirage_crypto_rng.g ] ->
+    key:priv -> ?k:string -> string -> string * string
   val verify : key:pub -> string * string -> string -> bool
   module K_gen (H : Digestif.S) : sig
     val generate : key:priv -> string -> string
@@ -441,7 +442,8 @@ module Make_point_base (P : Parameters) (F : Foreign_point) (Fe : Field_element)
       match String.get_uint8 buf 0 with
       | 0x00 when String.length buf = 1 ->
         Ok (at_infinity ())
-      | 0x02 | 0x03 when String.length P.pident > 0 ->
+      | 0x02 | 0x03 when String.length P.pident > 0
+                        && String.length buf = len + 1 ->
         decompress buf
       | 0x04 when String.length buf = 1 + len + len ->
         let x = String.sub buf 1 len in
@@ -699,7 +701,10 @@ module Make_dsa (P : Parameters) (Se : Scalar_element) (Pt : Point) (H : Digesti
 
   type pub = point
 
-  let pub_of_octets = Pt.of_octets
+  let pub_of_octets buf =
+    match Pt.of_octets buf with
+    | Ok p when Pt.is_infinity p -> Error `At_infinity
+    | x -> x
 
   let pub_to_octets ?(compress = false) pk = Pt.to_octets ~compress pk
 
@@ -716,6 +721,19 @@ module Make_dsa (P : Parameters) (Se : Scalar_element) (Pt : Point) (H : Digesti
     let q = Pt.scalar_mult_base d in
     (d, q)
 
+  let blind mask =
+    let rec rng g =
+      let r = Mirage_crypto_rng.generate ?g P.byte_length in
+      if S.is_in_range r then
+        Some (Se.mont_from_be_octets r)
+      else
+        rng g
+    in
+    match mask with
+    | `No -> None
+    | `Yes -> rng None
+    | `Yes_with g -> rng (Some g)
+
   let x_of_finite_point_mod_n p =
     match Pt.to_affine p with
     | None -> None
@@ -724,7 +742,11 @@ module Make_dsa (P : Parameters) (Se : Scalar_element) (Pt : Point) (H : Digesti
       let x = Se.mul x Se.one in
       Some (Se.to_be_octets x)
 
-  let sign ~key ?k msg =
+  let sign ?(mask = `Yes) ~key ?k msg =
+    (* blinding: literature: s = k^-1 * (m + r * priv_key) mod n
+       we blind: s = (k * blind)^-1 * (blind * m + blind * r * priv_key) mod n
+    *)
+    let b = blind mask in
     let msg = padded msg in
     let e = Se.mont_from_be_octets msg in
     let g = K_gen_default.g ~key msg in
@@ -745,9 +767,18 @@ module Make_dsa (P : Parameters) (Se : Scalar_element) (Pt : Point) (H : Digesti
       | Some r ->
         let r_mon = Se.mont_from_be_octets r in
         let kmon = Se.mont_from_be_octets k' in
+        let kmon =
+          match b with None -> kmon | Some b -> Se.mul b kmon
+        in
         let kinv = Se.inv kmon in
         let dmon = Se.mont_from_be_octets (S.to_octets key) in
+        let dmon =
+          match b with None -> dmon | Some b -> Se.mul b dmon
+        in
         let rd = Se.mul r_mon dmon in
+        let e =
+          match b with None -> e | Some b -> Se.mul b e
+        in
         let cmon = Se.add e rd in
         let smon = Se.mul kinv cmon in
         let s = Se.from_montgomery smon in
@@ -1514,7 +1545,7 @@ module X25519 = struct
 
   let is_zero =
     let zero = String.make key_len '\000' in
-    fun buf -> String.equal zero buf
+    fun buf -> Eqaf.equal zero buf
 
   let key_exchange secret public =
     if String.length public = key_len then
