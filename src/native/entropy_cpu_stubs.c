@@ -178,24 +178,81 @@ static inline unsigned long get_count(void) {
 }
 #endif
 
-CAMLprim value mc_cycle_counter (value __unused(unit)) {
+static inline uint64_t mc_read_counter (void) {
 #if defined (__i386__) || defined (__x86_64__) || defined (_MSC_VER)
-  return Val_long (__rdtsc ());
+  return __rdtsc ();
 #elif defined (__arm__) || defined (__aarch64__)
-  return Val_long (read_virtual_count ());
+  return read_virtual_count ();
 #elif defined(__powerpc64__) || defined(__POWERPC__)
-  return Val_long (read_cycle_counter ());
+  return read_cycle_counter ();
 #elif defined(__riscv) && (64 == __riscv_xlen)
-  return Val_long (cycle_count ());
+  return cycle_count ();
 #elif defined (__s390x__)
-  return Val_long (getticks ());
+  return getticks ();
 #elif defined(__mips__)
-  return Val_long (get_count());
+  return get_count();
 #elif defined(__loongarch_lp64)
-  return Val_long (get_count());
+  return get_count();
 #else
 #error ("No known cycle-counting instruction.")
 #endif
+}
+
+/* MC_COUNTER_SPINS bounds the wait for the counter to advance. See
+   mc_cycle_counter below for why there is a wait at all.
+
+   It has to cover one tick of the coarsest counter we are willing to call
+   working. A read costs on the order of 20ns (an isb plus an mrs on aarch64),
+   so 1024 covers a tick of roughly 20us, i.e. a counter down to ~50kHz. Well
+   under that and the source is not a timing source; the loop gives up, returns
+   a repeated value, and rng/entropy_test.ml says so. Bounding it is the point:
+   a counter that is genuinely stuck must still terminate. */
+#define MC_COUNTER_SPINS 1024
+
+CAMLprim value mc_cycle_counter (value __unused(unit)) {
+  /* Return a value the PREVIOUS call cannot have returned.
+     
+     The contract stated at the top of this file is that every call yields a
+     different result in the low 32 bits. On x86 that is free: __rdtsc has
+     single-cycle resolution and two back-to-back reads always differ. On
+     aarch64 it is not. read_virtual_count reads CNTVCT_EL0, which is the
+     GENERIC TIMER and not a cycle counter, and on Apple silicon that counter
+     advances in steps of ~41.7ns while CNTFRQ_EL0 reports 1GHz -- a 24MHz
+     counter scaled by 1e9/24e6 = 41.67. Measured on an M-series host, three
+     reads in four return the value their predecessor did.
+
+     The visible effect was a MirageOS unikernel dying at boot, in the self-test
+     that exists to catch exactly this:
+
+         Fatal error: exception Failure("same data from timer at 3 with: ...")
+
+     at an index that moved between runs, because whether a given iteration
+     straddled a tick boundary was a race with the OCaml allocation in
+     Entropy.interrupt_hook. Common arm64 server parts run the same timer at
+     24 or 25MHz, so this is not specific to Apple or to Solo5; it is specific
+     to using the generic timer as if it were a cycle counter.
+
+     So: remember what was returned, and wait only when the counter has not
+     moved since. That distinction matters. The self-test calls this in a tight
+     loop and does need to wait; real use calls it once per entry to the event
+     loop, which on a busy unikernel is far more often than once per 41.7ns
+     tick, and there it must not. Waiting unconditionally -- two reads and a
+     spin until they differ -- is simpler and needs no state, but it costs a
+     full tick on EVERY call: measured at 46.6ns against ~20ns for a bare read,
+     which a loop entered a million times a second would feel.
+
+     mc_last is deliberately unsynchronised. It is read and written without a
+     lock, and [@@noalloc] means OCaml domains can be in here at once. An
+     aligned 64-bit load or store does not tear on any target this builds for,
+     so the worst a race costs is one spin that was not needed or one repeated
+     value in an entropy pool -- neither of which is worth an atomic on a path
+     this hot. The self-test runs at boot in one domain and is unaffected. */
+  static uint64_t mc_last;
+  uint64_t c = mc_read_counter ();
+  for (int i = 0; c == mc_last && i < MC_COUNTER_SPINS; i++)
+    c = mc_read_counter ();
+  mc_last = c;
+  return Val_long (c);
 }
 
 /* end of mc_cycle_counter */
