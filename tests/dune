@@ -111,7 +111,7 @@
  (package mirage-crypto-blockchain)
  (enabled_if (>= %{ocaml_version} 5.0))
  (libraries mirage-crypto-secp256k1 mirage-crypto-bls12-381
-   mirage-crypto-blake3 mirage-crypto-sr25519 mirage-crypto-rng))
+   mirage-crypto-blake3 mirage-crypto-sr25519 mirage-crypto-rng mirage-crypto-bip32))
 
 (test
  (name test_sr25519)

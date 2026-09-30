@@ -11,3 +11,4 @@ module Sr25519 = Sr25519
 module Stark_curve = Stark_curve
 module Poseidon = Poseidon
 module Ed25519_bip32 = Mirage_crypto_blockchain_core.Ed25519_bip32
+module Bip32 = Mirage_crypto_bip32

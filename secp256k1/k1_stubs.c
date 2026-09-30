@@ -37,6 +37,51 @@ static value serialize_pub(const secp256k1_pubkey *pk) {
 CAMLprim value mc_k1_valid(value sk) {
   length(sk,32); return Val_bool(secp256k1_ec_seckey_verify(CTX,IN(sk)));
 }
+/* Scalar-only operations need no generator context or randomization. Allocate
+ * before copying secrets to the stack, and wipe the copy on both outcomes. */
+CAMLprim value mc_k1_priv_add_tweak(value sk,value tweak) {
+  CAMLparam2(sk,tweak); CAMLlocal1(out);
+  length(sk,32); length(tweak,32); out=caml_alloc_string(32);
+  unsigned char key[32]; memcpy(key,IN(sk),32);
+  int ok=secp256k1_ec_seckey_tweak_add(CTX,key,IN(tweak));
+  if(ok) memcpy(Bytes_val(out),key,32);
+  wipe(key,sizeof key);
+  if(!ok) CAMLreturn(caml_copy_string(""));
+  CAMLreturn(out);
+}
+CAMLprim value mc_k1_priv_negate(value sk) {
+  CAMLparam1(sk); CAMLlocal1(out); length(sk,32); out=caml_alloc_string(32);
+  unsigned char key[32]; memcpy(key,IN(sk),32);
+  int ok=secp256k1_ec_seckey_negate(CTX,key);
+  if(ok) memcpy(Bytes_val(out),key,32);
+  wipe(key,sizeof key);
+  if(!ok) caml_invalid_argument("secp256k1: secret key");
+  CAMLreturn(out);
+}
+CAMLprim value mc_k1_pub_add_tweak(value input,value tweak) {
+  CAMLparam2(input,tweak); length(tweak,32); secp256k1_pubkey pk;
+  if(!secp256k1_ec_pubkey_parse(CTX,&pk,IN(input),caml_string_length(input)) ||
+     !secp256k1_ec_pubkey_tweak_add(CTX,&pk,IN(tweak)))
+    CAMLreturn(caml_copy_string(""));
+  CAMLreturn(serialize_pub(&pk));
+}
+CAMLprim value mc_k1_pub_add(value a,value b) {
+  CAMLparam2(a,b); secp256k1_pubkey pa,pb,out;
+  const secp256k1_pubkey *points[2]={&pa,&pb};
+  if(!secp256k1_ec_pubkey_parse(CTX,&pa,IN(a),caml_string_length(a)) ||
+     !secp256k1_ec_pubkey_parse(CTX,&pb,IN(b),caml_string_length(b)) ||
+     !secp256k1_ec_pubkey_combine(CTX,&out,points,2))
+    CAMLreturn(caml_copy_string(""));
+  CAMLreturn(serialize_pub(&out));
+}
+CAMLprim value mc_k1_pub_negate(value input) {
+  CAMLparam1(input); secp256k1_pubkey pk;
+  if(!secp256k1_ec_pubkey_parse(CTX,&pk,IN(input),caml_string_length(input)))
+    caml_invalid_argument("secp256k1: public key");
+  int ok=secp256k1_ec_pubkey_negate(CTX,&pk);
+  (void)ok;
+  CAMLreturn(serialize_pub(&pk));
+}
 CAMLprim value mc_k1_parse_pub(value s) {
   CAMLparam1(s); secp256k1_pubkey pk;
   if (!secp256k1_ec_pubkey_parse(CTX,&pk,IN(s),caml_string_length(s))) CAMLreturn(caml_copy_string(""));

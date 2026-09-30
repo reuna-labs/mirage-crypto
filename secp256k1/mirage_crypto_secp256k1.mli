@@ -20,9 +20,25 @@ val scalar_of_octets : string -> (scalar, error) result
 val scalar_to_octets : scalar -> string
 val priv_of_octets : string -> (priv, error) result
 val priv_to_octets : priv -> string
+val priv_add_tweak : priv -> string -> (priv, error) result
+(** Add a 32-byte big-endian tweak in [0,n). Zero is valid. Returns
+    [Invalid_range] for a tweak >= n or a zero result. Uses native secret
+    scalar arithmetic and does not require RNG initialization. *)
+
+val priv_negate : priv -> priv
+(** Scalar negation modulo n; no RNG required. *)
+
 val pub_of_octets : string -> (pub, error) result
 val pub_to_octets : ?compress:bool -> pub -> string
 (** SEC1, compressed by default. *)
+
+val pub_add_tweak : pub -> string -> (pub, error) result
+(** [P + tweak*G], with a 32-byte big-endian tweak in [0,n).
+    Zero is valid. Returns [At_infinity] for an identity result.
+    This operation is for public tweaks and may be variable-time. *)
+
+val pub_add : pub -> pub -> (pub, error) result
+val pub_negate : pub -> pub
 
 val pub_of_priv : ?g:Mirage_crypto_rng.g -> priv -> pub
 val generate : ?g:Mirage_crypto_rng.g -> unit -> priv * pub

@@ -2,7 +2,7 @@
  (name mirage_crypto_blockchain)
  (public_name mirage-crypto-blockchain)
  (libraries
-  mirage-crypto-sr25519 mirage-crypto-blockchain-core mirage-crypto-poseidon mirage-crypto-bls12-381 mirage-crypto-blake3 mirage-crypto-secp256k1
+  mirage-crypto-bip32 mirage-crypto-sr25519 mirage-crypto-blockchain-core mirage-crypto-poseidon mirage-crypto-bls12-381 mirage-crypto-blake3 mirage-crypto-secp256k1
   zarith mirage-crypto mirage-crypto-rng mirage-crypto-ec digestif eqaf)
  (private_modules
   octets hashes

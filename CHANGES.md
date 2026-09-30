@@ -1,5 +1,14 @@
 ## Unreleased (Reuna)
 
+- Add independent `mirage-crypto-bip32`: Bitcoin BIP32 master/neuter/derive,
+  fingerprints and raw extended-key serialization over native libsecp256k1
+  and Digestif, with no Zarith or generated JavaScript runtime dependency.
+- Expose native secp256k1 zero-inclusive tweak-add, key negation and point
+  addition. Preserve nonzero scalar/key constructors and reject invalid
+  BIP32 children at the requested index without retry.
+- Add official and pinned scure differential vectors, HMAC fault injection,
+  GC/domain checks and BIP32/downstream Bitcoin Solo5 smoke tooling.
+
 - Replace sr25519 Zarith arithmetic with a pinned libsodium Ristretto/scalar
   kernel and the OCaml Keccak permutation with Digestif's shared C permutation.
   Add `mirage-crypto-sr25519`; preserve Schnorrkel protocol and public API.

@@ -15,6 +15,7 @@ build: [ ["dune" "subst"] {dev}
 depends: [
   "ocaml" {>= "4.13.0"}
   "dune" {>= "2.7"}
+  "mirage-crypto-bip32" {=version}
   "mirage-crypto-sr25519" {=version}
   "mirage-crypto-secp256k1" {=version}
   "mirage-crypto-blake3" {=version}

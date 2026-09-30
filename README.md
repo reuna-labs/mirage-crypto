@@ -40,6 +40,11 @@ retains its compatibility adapters. See [BACKENDS.md](BACKENDS.md) for
 pins, timing boundaries, migration behavior, and validation results. The
 sr25519 package requires the Reuna Digestif fork with `digestif.keccak-f1600`.
 
+`mirage-crypto-bip32` adds lean Bitcoin BIP32 protocol handling over the native
+secp256k1 package and Digestif, with no Zarith dependency. Base58Check, network
+versions and textual paths remain wallet concerns. Private derivation needs
+an initialized Mirage RNG for context blinding.
+
 ## RNG seeding
 
 If RNG fails with `Fatal error: exception Unseeded_generator`, you need to

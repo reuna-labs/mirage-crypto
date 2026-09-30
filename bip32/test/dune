@@ -1,0 +1,15 @@
+(rule (targets bip32_core_test.ml) (deps ../bip32_core.ml)
+ (action (copy %{deps} %{targets})))
+(test
+ (name test_bip32)
+ (package mirage-crypto-bip32)
+ (modules test_bip32 bip32_core_test)
+ (modes byte exe)
+ (libraries mirage-crypto-bip32 mirage-crypto-secp256k1 mirage-crypto-rng digestif)
+ (deps official.tsv scure.tsv)
+ (action (run %{test} %{dep:official.tsv} %{dep:scure.tsv})))
+(test
+ (name smoke)
+ (package mirage-crypto-bip32)
+ (modules smoke)
+ (libraries mirage-crypto-bip32 mirage-crypto-secp256k1 mirage-crypto-rng))

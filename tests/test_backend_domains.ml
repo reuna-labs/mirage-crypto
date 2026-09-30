@@ -5,6 +5,8 @@ let worker i =
   let module K = Mirage_crypto_secp256k1 in
   let module B = Mirage_crypto_bls12_381 in
   let g = Mirage_crypto_rng.create ~seed:(String.make 48 (Char.chr (i+1))) (module Mirage_crypto_rng.Fortuna) in
+  let module HD = Mirage_crypto_bip32 in
+  let root = ok (HD.Secret.master (String.make 32 (Char.chr (i+1)))) in
   let sk = ok (K.priv_of_octets (String.make 31 '\000' ^ String.make 1 (Char.chr (i+1)))) in
   let pk = K.pub_of_priv ~g sk in
   let xpk = K.Bip340.xonly_pub_of_priv ~g sk in
@@ -14,6 +16,9 @@ let worker i =
   let bk = B.generate ~g () in
   let bp = B.pub_of_priv bk in
   for n=0 to 99 do
+    let child = ok (HD.Secret.derive ~g root (Int32.of_int n)) in
+    check (HD.Public.to_octets ~version:0l (HD.Secret.public ~g child) =
+      HD.Public.to_octets ~version:0l (ok (HD.Public.derive (HD.Secret.public ~g root) (Int32.of_int n))));
     let msg = String.make 32 (Char.chr n) in
     check (K.verify ~key:pk (K.sign ~g ~key:sk msg) msg);
     check (K.Bip340.verify ~key:xpk (K.Bip340.sign ~g ~key:sk msg) msg);

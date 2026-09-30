@@ -7,6 +7,11 @@ let pp_error ppf = function
   | `At_infinity -> Format.pp_print_string ppf "point at infinity"
 
 external valid : string -> bool = "mc_k1_valid"
+external priv_add_tweak_raw : string -> string -> string = "mc_k1_priv_add_tweak"
+external priv_negate : string -> string = "mc_k1_priv_negate"
+external pub_add_tweak_raw : string -> string -> string = "mc_k1_pub_add_tweak"
+external pub_add_raw : string -> string -> string = "mc_k1_pub_add"
+external pub_negate : string -> string = "mc_k1_pub_negate"
 external parse_pub : string -> string = "mc_k1_parse_pub"
 external public_key : string -> string -> string = "mc_k1_pub"
 external sign_raw : string -> string -> string -> string = "mc_k1_sign"
@@ -30,6 +35,18 @@ let scalar_of_octets s =
 let scalar_to_octets s = s
 let priv_of_octets = scalar_of_octets
 let priv_to_octets = scalar_to_octets
+let priv_add_tweak key tweak =
+  if String.length tweak <> 32 then Error `Invalid_length
+  else let result = priv_add_tweak_raw key tweak in
+    if result = "" then Error `Invalid_range else Ok result
+let pub_add_tweak key tweak =
+  if String.length tweak <> 32 then Error `Invalid_length
+  else if tweak >= n then Error `Invalid_range
+  else let result = pub_add_tweak_raw key tweak in
+    if result = "" then Error `At_infinity else Ok result
+let pub_add a b =
+  let result = pub_add_raw a b in
+  if result = "" then Error `At_infinity else Ok result
 let pub_of_octets s =
   let len = String.length s in
   if len <> 33 && len <> 65 then Error `Invalid_length

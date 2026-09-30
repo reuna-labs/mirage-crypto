@@ -44,7 +44,7 @@ Behavior worth checking at migration boundaries:
   Verification accepts high-S by normalizing a temporary; compact parsing
   preserves S and recovery parity. DER parsing is strict, including trailing
   bytes and integer encodings. Digests must be 32 bytes.
-* Every secp256k1 private operation creates and randomizes its own context,
+* Secp256k1 signing and public-key derivation create and randomize their own context,
   wipes it, and frees it before returning. Even deterministic signing and
   public-key derivation need an initialized RNG. Optional `g` parameters on
   the standalone API permit a separate generator per domain.
@@ -263,3 +263,82 @@ Both field backends and the actual Digestif permutation pass ASan/UBSan and
 Linux ARM64 Valgrind taint checks. Native/bytecode and four-domain tests pass;
 ARM64 SPT and x86_64 virtio Solo5 smoke applications boot successfully without
 Zarith, GMP, ctypes or Unix symbols.
+
+## Bitcoin BIP32 without bignums
+
+`mirage-crypto-bip32` provides `Mirage_crypto_bip32` and is also re-exported
+as `Mirage_crypto_blockchain.Bip32`. Consumers seeking the lean dependency
+closure should use the independent package. Its production closure is the
+native secp256k1 package, portable Mirage RNG, Digestif and their portable
+prerequisites. It adds no generated code, ScriptC runtime, JavaScript, ctypes,
+Zarith, GMP, system crypto library or Unix provider.
+
+The implementation handles BIP32 sequencing in OCaml and delegates all
+secret scalar addition/negation to libsecp256k1. This avoids compiling
+scure's JavaScript BigInt secret arithmetic into ScriptC's heap-allocated,
+value-dependent bignum runtime. scure-bip32 remains an independent development
+oracle. This is a new Bitcoin API, separate from Ed25519-BIP32.
+
+The API covers master keys, neutering, fingerprints, index/index-list
+children, and raw 78-byte extended keys. Node records are private. Versions
+are explicit and returned verbatim; network policy, Base58Check and textual
+paths remain in the wallet. Root metadata must be zero, seed lengths are
+16..64 bytes, keys use compressed SEC1, and depth cannot exceed 255.
+`I_L = 0` is valid. `I_L >= n`, a zero secret result or an identity public
+result returns `Invalid_range`, with no retry or automatic index increment.
+This last policy deliberately differs from scure's retry behavior.
+
+Master creation and parsing do not need RNG initialization. Private child
+derivation, public-key derivation and private-node fingerprints need an
+initialized RNG for context blinding. A caller can pass `~g` explicitly.
+The scalar-only tweak and negate primitives use the static context and need
+no randomness. Public tweaks may be variable-time. The OCaml protocol and
+runtime integration have not independently been verified constant-time;
+GC-managed secret copies cannot be guaranteed erased. Base58 secret-key
+formatting in downstream libraries is outside the native arithmetic claim.
+
+### BIP32 checks
+
+* `dune runtest bip32/test`: 17 derivations from official vectors 1-4 and
+  64 locked scure-bip32 2.4.0 cases; public/private child agreement; metadata,
+  version preservation, seed and depth limits; malformed encodings.
+* The private HMAC test functor exercises zero and out-of-range tweaks,
+  zero/identity child results, invalid masters and no-retry behavior.
+* Native and bytecode execution, repeated major GC, and four OCaml 5 domains.
+* ASan/UBSan on the same vector and boundary tests. Disable leak detection
+  during both build and execution: the OCaml runtime retains allocations.
+* `tools/check-backend-ct.sh` includes upstream libsecp256k1's secret-taint
+  tests for seckey tweak-add and negate; these are not a whole-protocol proof.
+* `tools/check-backend-solo5.sh` includes BIP32. To check the downstream
+  Bitcoin library in the same workspace, run:
+
+```sh
+STAGE=/path/to/completed/solo5-stage BITCOIN_SOURCE=/path/to/ocaml-bitcoin \
+  tools/check-bip32-solo5.sh
+```
+
+Both scripts inspect linked images for Zarith/GMP/ctypes/Unix symbols.
+The standalone smoke images use fixed **test-only** RNG entropy. Real
+Mirage applications use `default_random` and target entropy.
+
+The scure fixtures are checked in, so normal tests need no Node or network.
+To regenerate them:
+
+```sh
+cd tests/scure-bip32
+npm ci --ignore-scripts
+node vectors.mjs > ../../bip32/test/scure.tsv
+```
+
+`package-lock.json` locks the oracle and its transitive dependencies. The
+fixtures contain only public, deterministic test seeds. Official source:
+<https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>.
+
+Validation on 2026-09-30: OCaml 5.2 macOS ARM64 native/bytecode and four-domain
+checks; OCaml 5.5.1 Linux ARM64 native, independent package builds and
+ASan/UBSan; upstream secret-taint checks under Valgrind; BIP32 and downstream
+Bitcoin smoke images booted on ARM64 Solo5 SPT and x86_64 Solo5 virtio/QEMU.
+Downstream Bitcoin passed 116 tests including BIP32 invalid vectors,
+ECDSA high-S verification, BIP340, Taproot and PSBT, plus its Unix PSBT example.
+The standalone BIP32 images contain about 1.91 MB (ARM64) and 1.96 MB (x86_64)
+of text/data/BSS; Bitcoin images about 2.06 MB and 2.09 MB respectively.

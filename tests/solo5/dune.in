@@ -47,3 +47,12 @@
  (libraries backend_startup mirage-crypto-sr25519)
  (link_flags :standard -cclib "-z solo5-abi=%{env:MODE=spt}"
    -cclib "-u __solo5_mft1_note"))
+
+(rule (targets smoke_bip32.ml) (deps ../../bip32/test/smoke.ml)
+ (action (copy %{deps} %{targets})))
+(executable
+ (name smoke_bip32) (modules smoke_bip32) (modes native)
+ (enabled_if (= %{context_name} solo5))
+ (libraries backend_startup mirage-crypto-bip32 mirage-crypto-secp256k1 mirage-crypto-rng)
+ (link_flags :standard -cclib "-z solo5-abi=%{env:MODE=spt}"
+   -cclib "-u __solo5_mft1_note"))

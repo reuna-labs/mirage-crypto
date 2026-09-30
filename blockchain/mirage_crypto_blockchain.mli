@@ -572,3 +572,6 @@ module Ed25519_bip32 = Mirage_crypto_blockchain_core.Ed25519_bip32
 (** {b BIP32-Ed25519} hierarchical deterministic keys, DerivationScheme V2 --
     the scheme Cardano uses. Re-exported from {!Mirage_crypto_blockchain_core};
     see there for the constant-time caveat. *)
+
+(** Bitcoin BIP32. Depend directly on [mirage-crypto-bip32] for a bignum-free closure. *)
+module Bip32 = Mirage_crypto_bip32

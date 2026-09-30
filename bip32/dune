@@ -1,0 +1,6 @@
+(library
+ (name mirage_crypto_bip32)
+ (public_name mirage-crypto-bip32)
+ (libraries mirage-crypto-secp256k1 mirage-crypto-rng digestif)
+ (private_modules bip32_core))
+(install (package mirage-crypto-bip32) (section doc) (files ../BACKENDS.md))

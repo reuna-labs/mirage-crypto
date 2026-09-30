@@ -1,0 +1,1 @@
+{"private":true,"type":"module","dependencies":{"@scure/bip32":"2.4.0","@scure/base":"2.4.0","@noble/hashes":"2.4.0"},"scripts":{"vectors":"node vectors.mjs"}}

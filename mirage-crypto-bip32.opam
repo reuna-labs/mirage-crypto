@@ -1,0 +1,26 @@
+opam-version: "2.0"
+maintainer: "Reuna maintainers"
+authors: ["Mirage crypto contributors"]
+homepage: "https://github.com/mirage/mirage-crypto"
+bug-reports: "https://github.com/mirage/mirage-crypto/issues"
+dev-repo: "git+https://github.com/mirage/mirage-crypto.git"
+license: "ISC"
+synopsis: "Bignum-free Bitcoin BIP32 over native libsecp256k1"
+build: [["dune" "subst"] {dev}
+        ["dune" "build" "-p" name "-j" jobs]
+        ["dune" "runtest" "-p" name "-j" jobs] {with-test}]
+depends: [
+  "ocaml" {>= "4.13.0"}
+  "dune" {>= "2.7"}
+  "mirage-crypto-secp256k1" {=version}
+  "mirage-crypto-rng" {=version}
+  "digestif" {>= "1.2.0"}
+]
+description: """
+Bitcoin BIP32 master keys, private/public derivation and 78-byte extended-key
+serialization. Protocol handling is OCaml; arithmetic uses libsecp256k1 and
+hashing uses Digestif. No Zarith, GMP, JavaScript runtime or Unix dependency.
+Base58Check, network versions and textual paths belong to wallet libraries.
+An initialized Mirage RNG is required for private-key public derivation and
+child derivation, to blind the native context; outputs remain deterministic.
+"""
