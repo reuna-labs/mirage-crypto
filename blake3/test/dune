@@ -1,0 +1,1 @@
+(test (name smoke) (package mirage-crypto-blake3) (libraries mirage-crypto-blake3))

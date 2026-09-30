@@ -1,0 +1,19 @@
+(library
+ (name mirage_crypto_bls12_381)
+ (public_name mirage-crypto-bls12-381)
+ (libraries mirage-crypto-rng)
+ (foreign_stubs
+  (language c)
+  (names blst_kernel blst_stubs)
+  (extra_deps (source_tree vendor))
+  (flags (:standard -O2 -std=c99 -D__BLST_PORTABLE__)))
+ ; Compile the assembly as a separate object in the same stubs archive.
+ ; Its hidden symbols must also be inside the bytecode shared library.
+ (foreign_stubs
+  (language c)
+  (names blst_asm)
+  (extra_deps (source_tree vendor))
+  (flags (:standard -x assembler-with-cpp -D__BLST_PORTABLE__ -fPIC))))
+
+(install (package mirage-crypto-bls12-381) (section doc)
+ (files ../BACKENDS.md vendor/manifest.json (vendor/LICENSE as LICENSE.blst)))

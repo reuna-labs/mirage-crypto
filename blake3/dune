@@ -1,0 +1,12 @@
+(library
+ (name mirage_crypto_blake3)
+ (public_name mirage-crypto-blake3)
+ (foreign_stubs
+  (language c)
+  (names b3_kernel b3_dispatch b3_portable b3_stubs)
+  (extra_deps (source_tree vendor))
+  (flags (:standard -O2 -std=c99 -DBLAKE3_NO_SSE2 -DBLAKE3_NO_SSE41
+    -DBLAKE3_NO_AVX2 -DBLAKE3_NO_AVX512 -DBLAKE3_USE_NEON=0))))
+
+(install (package mirage-crypto-blake3) (section doc)
+ (files ../BACKENDS.md vendor/manifest.json vendor/LICENSE_A2 vendor/LICENSE_A2LLVM vendor/LICENSE_CC0))

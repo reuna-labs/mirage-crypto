@@ -1,0 +1,2 @@
+(test (name smoke) (package mirage-crypto-sr25519)
+ (libraries mirage-crypto-sr25519))

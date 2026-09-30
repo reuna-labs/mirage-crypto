@@ -1,0 +1,14 @@
+{
+  "upstream": "https://github.com/CryptoExperts/poseidon",
+  "ref": "68a88df9cb894fe1e0ee8b1b1b5825602c83635a",
+  "commit": "68a88df9cb894fe1e0ee8b1b1b5825602c83635a",
+  "sha256": {
+    "LICENSE.txt": "75b64162eb1733cad70510aa209925a759caddfdd3b036c0f5a5f6ac627d1350",
+    "sources/poseidon_rc.c": "cc80c26cde20e6acf5e48deadd1e60c6e883ab523c6ab35d3811cd9eba481b17",
+    "sources/f251.c": "9adce034742c42a833d892e8f6022e6021e02a2bea6bafcd177dc94f591691b6",
+    "sources/poseidon.h": "645727e8508faeb57065b64df8ab084b9084f99f7e3577f13d8d205af5d9f404",
+    "sources/poseidon_rc.h": "b09b456ebe4c805cb18aa84f57f188f6c48110dc1006b9608d8c8e439e6d6de4",
+    "sources/f251.h": "2f82e9294da4c2fb3a834f5850727c9b5f0ce161bc77a187d098198ced1108a3",
+    "sources/poseidon.c": "00f6e9c6af605c96483c4a7553d9eadd5aa4858ce4ebb007a2557d0f36bf8ee6"
+  }
+}

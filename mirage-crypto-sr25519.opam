@@ -1,0 +1,25 @@
+opam-version: "2.0"
+maintainer: "Reuna maintainers"
+authors: ["Mirage crypto contributors"]
+homepage: "https://github.com/mirage/mirage-crypto"
+bug-reports: "https://github.com/mirage/mirage-crypto/issues"
+dev-repo: "git+https://github.com/mirage/mirage-crypto.git"
+license: ["ISC"]
+synopsis: "Bignum-free Schnorrkel sr25519 over vendored libsodium Ristretto"
+build: [["dune" "subst"] {dev}
+        ["dune" "build" "-p" name "-j" jobs]
+        ["dune" "runtest" "-p" name "-j" jobs] {with-test}]
+depends: [
+  "ocaml" {>= "4.13.0"}
+  "dune" {>= "2.7"}
+  "mirage-crypto-rng" {=version}
+  "digestif" {>= "1.4.0"}
+  "eqaf" {>= "0.8"}
+]
+description: """
+Schnorrkel protocol and Merlin/STROBE in OCaml, with secret scalar and
+Ristretto arithmetic delegated to a pinned libsodium source subset. Uses
+the Reuna Digestif fork's digestif.keccak-f1600 sublibrary. The complete
+protocol/transcript integration is not independently verified constant-time.
+No system libsodium, ctypes, Rust, Zarith or Unix RNG dependency.
+"""

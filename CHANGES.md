@@ -1,3 +1,21 @@
+## Unreleased (Reuna)
+
+- Replace sr25519 Zarith arithmetic with a pinned libsodium Ristretto/scalar
+  kernel and the OCaml Keccak permutation with Digestif's shared C permutation.
+  Add `mirage-crypto-sr25519`; preserve Schnorrkel protocol and public API.
+- Check sr25519 against Rust Schnorrkel/Dalek, including fixed-entropy signatures,
+  VRF pre-outputs, zero/identity handling, malformed inputs and STROBE boundaries.
+  Protocol/Merlin constant-time assurance remains qualified.
+
+- Add independent native backend packages for libsecp256k1 ECDSA/BIP340,
+  BLST BLS12-381, official portable BLAKE3 C, and CryptoExperts Poseidon ISO C.
+- Route blockchain compatibility modules through these backends while
+  preserving the EC group API and its production dependency closure.
+- Add pinned-source manifests, independent reference/vector tests, domain
+  and sanitizer checks, secret-taint tooling, and Solo5 smoke builds.
+- Document compatibility and assurance boundaries in BACKENDS.md, including
+  secp256k1 context-blinding RNG requirements and remaining Zarith conversions.
+
 ## v2.4.1 (2026-08-26)
 
 - mirage-crypto: CCM avoid padding of already aligned associated data

@@ -8,11 +8,11 @@
     and VRF pre-output), {!Stark_curve}, {!Poseidon}, and
     {!Ed25519_bip32}.
 
-    {b Non-constant-time warning}: {!Secp256k1}, {!Bip340}, {!Bls12_381},
-    {!Stark_curve}, {!Sr25519}, and {!Ed25519_bip32} use plain,
-    non-constant-time scalar multiplication (and, for {!Sr25519},
-    branch-on-value Ristretto255 field operations). See their module doc
-    comments below before using them with secret key material. *)
+    Signing uses libsecp256k1 and BLST; BLAKE3 and Poseidon use vendored C
+    backends. {!Secp256k1}, {!Bip340}, and {!Poseidon} retain variable-time
+    Zarith compatibility conversions. Use the separate bignum-free packages
+    for secret inputs. {!Stark_curve}, {!Sr25519}, and {!Ed25519_bip32}
+    retain their existing timing caveats. *)
 
 (** {b SHA-256 helpers}. Thin wrappers over [Digestif.SHA256] shared by
     the blockchain codecs: raw SHA-256, Bitcoin's double-SHA256, and the
@@ -89,10 +89,8 @@ module Keccak256 : sig
   (** [digest msg] is the 32-byte Keccak-256 digest of [msg]. *)
 end
 
-(** {b BLAKE3}. From-scratch implementation ported from the official
-    reference implementation
-    (https://github.com/BLAKE3-team/BLAKE3-specs/blob/master/blake3.pdf),
-    since no existing dependency of this repo provides it. *)
+(** {b BLAKE3}. Re-export of the official portable C implementation in
+    [mirage-crypto-blake3]. *)
 module Blake3 : sig
   val digest : ?digest_size:int -> string -> string
   (** [digest ?digest_size msg] is the BLAKE3 hash of [msg], extendable
@@ -113,12 +111,10 @@ end
     [F_p], [p = 2^256 - 2^32 - 977], used by Bitcoin, Ethereum, and most
     other blockchains.
 
-    {b NOT CONSTANT TIME.} Plain double-and-add scalar multiplication in
-    Jacobian coordinates; timing leaks scalar bit patterns. Suitable for
-    verification of public data or as a stepping stone toward a
-    hardened implementation; not suitable for signing with secret keys
-    in adversarial/timing-observable environments. This is a quick
-    reference implementation pending a future constant-time revamp. *)
+    ECDSA and recovery use libsecp256k1; group operations use the existing
+    EC primitives. {b The Zarith compatibility boundary remains variable-time.}
+    Use [Mirage_crypto_secp256k1] directly for secret keys. Private operations
+    require an initialized Mirage RNG for context blinding. *)
 module Secp256k1 : sig
   type error =
     [ `Invalid_range | `Invalid_format | `Invalid_length | `Not_on_curve | `At_infinity ]
@@ -162,7 +158,7 @@ module Secp256k1 : sig
   val scalar_mult : scalar -> point -> (point, error) result
 
   type signature
-  (** [(r, s)] pair, with [s] low-S normalized per Bitcoin's
+  (** Signing produces [(r, s)] with [s] low-S normalized per Bitcoin's
       malleability convention (BIP62/BIP146): [s <= n/2]. *)
 
   val signature_of_octets : string -> (signature, error) result
@@ -208,8 +204,10 @@ end
 (** {b BIP340} Schnorr signatures over secp256k1
     (https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki).
 
-    {b NOT CONSTANT TIME.} Built directly on {!Secp256k1}; inherits its
-    timing-leak caveats -- see there for details. *)
+    Uses libsecp256k1 Schnorr signing. {b Secret Zarith conversion is
+    variable-time.} Use [Mirage_crypto_secp256k1.Bip340] directly for secret
+    keys. Context blinding requires an initialized Mirage RNG even when
+    [aux_rand] is explicitly supplied. *)
 module Bip340 : sig
   type error = Secp256k1.error
 
@@ -258,26 +256,13 @@ end
     messages as its rogue-key defense; this does not implement
     proof-of-possession or message augmentation).
 
-    {b NOT CONSTANT TIME.} Scalar multiplication is plain
-    double-and-add and the hash-to-curve mapping branches on the
-    square-ness of field elements; both leak information about their
-    inputs through timing. This is a quick reference implementation
-    pending a future hardening pass -- do not use it to sign with
-    secret keys in adversarial/timing-observable environments. See the
-    top of [bls12_381.ml] for the primary sources (RFC 9380, the
-    pairing-friendly-curves and bls-signature IETF drafts, and the
-    py_ecc reference implementation) each constant and algorithm here
-    was cross-checked against.
-
-    {b Performance.} Final exponentiation is done as a single, literal
-    exponentiation by [(p^12-1)/r] rather than the optimized
-    easy/hard-part split most production implementations use; a single
-    {!pairing} call, and hence {!verify}, may take a few seconds.
-
-    {b Scope.} Hash-to-curve is implemented only for G2, which is all
-    this signature scheme needs (messages hash into G2; public keys are
-    plain scalar multiples of the G1 generator). G1 hash-to-curve is not
-    implemented. *)
+    Backed by BLST, including optimized pairing/final exponentiation.
+    Scalars and group values are opaque and contain no Zarith values; only
+    the public constants below retain [Z.t] types. Zero is accepted for scalar
+    arithmetic but rejected as a private key by signing and public derivation.
+    Identity keys/signatures are rejected by verification. Hash-to-curve is
+    exposed only for G2. BLST's formal proofs cover selected routines and
+    revisions; they do not certify this whole binding. *)
 module Bls12_381 : sig
   type error = [ `Invalid_format | `Invalid_length | `Invalid_range | `Not_on_curve ]
 
@@ -377,29 +362,18 @@ end
     Keccak-f[1600]) for Fiat-Shamir challenges and randomized,
     transcript-bound nonces.
 
-    {b NOT CONSTANT TIME.} See {!Secp256k1}'s banner for the general
-    caveat; here it also applies to the Ristretto255 field/point
-    operations (branch-on-value square-root and sign selection), not
-    just scalar multiplication.
+    Secret scalar and Ristretto arithmetic is delegated to vendored libsodium.
+    Keccak-f[1600] uses Digestif's C implementation. The sr25519 protocol and
+    Merlin/STROBE integration have not independently been verified
+    constant-time. Secret copies in the OCaml heap cannot be guaranteed erased.
 
-    Parameters and algorithms were cross-checked against RFC 9496
-    (ristretto255), the "keccak", "merlin", and "schnorrkel" Rust
-    crates, and polkadot-sdk's own sr25519 wrapper (to confirm which
-    [MiniSecretKey] expansion mode Substrate actually uses -- it is
-    [ExpansionMode::Ed25519], not the library's own slightly-preferred
-    [Uniform] mode), not reconstructed from memory; see the top of
-    [sr25519.ml] for details and the specific fixed test vectors this
-    package checks against.
+    [MiniSecretKey] expansion uses [ExpansionMode::Ed25519], matching
+    Substrate. Signing folds fresh Mirage RNG entropy into the witness
+    transcript. Compatibility tests compare exact signatures against Rust
+    Schnorrkel with controlled entropy.
 
-    {b Randomized signing.} Unlike this package's other signature
-    schemes, Schnorrkel deliberately folds fresh randomness into every
-    signature's nonce (bound to the message transcript and the secret
-    key's nonce seed), so {!sign} is not deterministic and has no fixed
-    known-answer test vectors of its own -- this is also how
-    schnorrkel's own upstream test suite tests it (sign, then verify).
-
-    {b Scope.} {!vrf_output} provides the deterministic VRF pre-output;
-    the randomized DLEQ proof is not implemented. *)
+    {b Scope.} {!vrf_output} preserves the malleable deterministic VRF
+    pre-output. Full proofs, output expansion and HDKD are not implemented. *)
 module Sr25519 : sig
   type error = [ `Invalid_format | `Invalid_length | `Invalid_range | `Not_on_curve ]
 
@@ -460,7 +434,7 @@ end
     [y^2 = x^3 + alpha*x + beta] over the STARK-friendly prime field
     [p = 2^251 + 17*2^192 + 1], and its ECDSA-variant signature scheme.
 
-    {b NOT CONSTANT TIME.} See {!Secp256k1}'s banner — same caveat.
+    {b NOT CONSTANT TIME.} Secret scalar multiplication and Zarith arithmetic remain variable-time.
 
     Parameters and algorithm are ported directly from StarkWare's own
     reference implementation
@@ -561,6 +535,8 @@ end
     each byte-string input as a single big-endian integer, which would
     be a surprising default to bake into a general "hash these bytes"
     function; build that explicitly from {!hash_pair} if you need it. *)
+(* CryptoExperts ISO C backend. The [Z.t] input/output adapter is variable-time;
+    use [Mirage_crypto_poseidon] directly for fixed-width field elements. *)
 module Poseidon : sig
   type field_element = Z.t
 

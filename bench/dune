@@ -10,3 +10,9 @@
 ; (names miou)
 ; (modules miou)
 ; (libraries mirage-crypto-rng-mkernel miou.unix))
+
+(executable
+ (name bench_backends)
+ (modules bench_backends)
+ (libraries mirage-crypto-secp256k1 mirage-crypto-bls12-381
+   mirage-crypto-blake3 mirage-crypto-poseidon mirage-crypto-rng unix))

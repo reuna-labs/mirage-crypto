@@ -1,0 +1,4 @@
+(env
+ (backend-sanitize
+  (c_flags (:standard -fsanitize=address,undefined -fno-omit-frame-pointer))
+  (ocamlopt_flags (:standard -ccopt -fsanitize=address,undefined))))

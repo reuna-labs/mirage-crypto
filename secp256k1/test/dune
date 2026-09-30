@@ -1,0 +1,1 @@
+(test (name smoke) (package mirage-crypto-secp256k1) (libraries mirage-crypto-secp256k1 mirage-crypto-rng))

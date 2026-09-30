@@ -1,0 +1,49 @@
+(library
+ (name backend_startup)
+ (modules)
+ (enabled_if (= %{context_name} solo5))
+ (foreign_stubs (language c) (names startup manifest)))
+(rule
+ (targets manifest.c)
+ (deps manifest.json)
+ (action (run solo5-elftool gen-manifest manifest.json manifest.c)))
+(rule (targets smoke_secp256k1.ml) (deps ../../secp256k1/test/smoke.ml)
+ (action (copy %{deps} %{targets})))
+(executable
+ (name smoke_secp256k1) (modules smoke_secp256k1) (modes native)
+ (enabled_if (= %{context_name} solo5))
+ (libraries backend_startup mirage-crypto-secp256k1)
+ (link_flags :standard -cclib "-z solo5-abi=%{env:MODE=spt}"
+   -cclib "-u __solo5_mft1_note"))
+(rule (targets smoke_bls12_381.ml) (deps ../../bls12-381/test/smoke.ml)
+ (action (copy %{deps} %{targets})))
+(executable
+ (name smoke_bls12_381) (modules smoke_bls12_381) (modes native)
+ (enabled_if (= %{context_name} solo5))
+ (libraries backend_startup mirage-crypto-bls12-381)
+ (link_flags :standard -cclib "-z solo5-abi=%{env:MODE=spt}"
+   -cclib "-u __solo5_mft1_note"))
+(rule (targets smoke_blake3.ml) (deps ../../blake3/test/smoke.ml)
+ (action (copy %{deps} %{targets})))
+(executable
+ (name smoke_blake3) (modules smoke_blake3) (modes native)
+ (enabled_if (= %{context_name} solo5))
+ (libraries backend_startup mirage-crypto-blake3)
+ (link_flags :standard -cclib "-z solo5-abi=%{env:MODE=spt}"
+   -cclib "-u __solo5_mft1_note"))
+(rule (targets smoke_poseidon.ml) (deps ../../poseidon/test/smoke.ml)
+ (action (copy %{deps} %{targets})))
+(executable
+ (name smoke_poseidon) (modules smoke_poseidon) (modes native)
+ (enabled_if (= %{context_name} solo5))
+ (libraries backend_startup mirage-crypto-poseidon)
+ (link_flags :standard -cclib "-z solo5-abi=%{env:MODE=spt}"
+   -cclib "-u __solo5_mft1_note"))
+(rule (targets smoke_sr25519.ml) (deps ../../sr25519/test/smoke.ml)
+ (action (copy %{deps} %{targets})))
+(executable
+ (name smoke_sr25519) (modules smoke_sr25519) (modes native)
+ (enabled_if (= %{context_name} solo5))
+ (libraries backend_startup mirage-crypto-sr25519)
+ (link_flags :standard -cclib "-z solo5-abi=%{env:MODE=spt}"
+   -cclib "-u __solo5_mft1_note"))

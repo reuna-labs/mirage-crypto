@@ -1,0 +1,13 @@
+(library
+ (name mirage_crypto_sr25519)
+ (public_name mirage-crypto-sr25519)
+ (libraries mirage-crypto-rng digestif digestif.keccak-f1600 eqaf)
+ (foreign_stubs
+  (language c)
+  (names sodium_kernel ristretto_adapter sr_stubs)
+  (include_dirs vendor/src/libsodium/include/sodium)
+  (extra_deps (source_tree vendor) sodium_api.inc sodium_namespace.h)
+  (flags (:standard -O2 -std=c99))))
+
+(install (package mirage-crypto-sr25519) (section doc)
+ (files ../BACKENDS.md vendor/manifest.json (vendor/LICENSE as LICENSE.libsodium)))

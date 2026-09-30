@@ -1,0 +1,15 @@
+opam-version: "2.0"
+maintainer: "Reuna maintainers"
+authors: ["Mirage crypto contributors"]
+homepage: "https://github.com/mirage/mirage-crypto"
+bug-reports: "https://github.com/mirage/mirage-crypto/issues"
+dev-repo: "git+https://github.com/mirage/mirage-crypto.git"
+license: ["ISC" "CC0-1.0"]
+synopsis: "Bignum-free blake3 with a vendored upstream C backend"
+build: [["dune" "subst"] {dev}
+        ["dune" "build" "-p" name "-j" jobs]
+        ["dune" "runtest" "-p" name "-j" jobs] {with-test}]
+depends: [
+  "ocaml" {>= "4.13.0"}
+  "dune" {>= "2.7"}
+]

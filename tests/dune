@@ -47,10 +47,10 @@
 (test
  (name test_ec)
  (modules test_ec)
- ; mirage-crypto-blockchain and zarith are used to cross-check the
- ; P256k1.Primitive results against an independent implementation
+ ; Test-only Zarith references keep EC differential checks independent
+ ; of the production backend adapters.
  (libraries test_common alcotest mirage-crypto-ec mirage-crypto-rng.unix
-   mirage-crypto-blockchain zarith)
+   blockchain_reference zarith)
  (package mirage-crypto-ec))
 
 (test
@@ -97,3 +97,26 @@
  (libraries test_common mirage-crypto mirage-crypto-kw ounit2)
  (package mirage-crypto-kw)
  (modules test_kw test_kw_runner))
+
+(test
+ (name test_native_backends)
+ (modules test_native_backends native_vectors)
+ (package mirage-crypto-blockchain)
+ (libraries blockchain_reference mirage-crypto-blockchain mirage-crypto-secp256k1 mirage-crypto-bls12-381
+   mirage-crypto-blake3 mirage-crypto-poseidon mirage-crypto-rng mirage-crypto-ec zarith))
+
+(test
+ (name test_backend_domains)
+ (modules test_backend_domains)
+ (package mirage-crypto-blockchain)
+ (enabled_if (>= %{ocaml_version} 5.0))
+ (libraries mirage-crypto-secp256k1 mirage-crypto-bls12-381
+   mirage-crypto-blake3 mirage-crypto-sr25519 mirage-crypto-rng))
+
+(test
+ (name test_sr25519)
+ (modules test_sr25519)
+ (package mirage-crypto-blockchain)
+ (libraries mirage-crypto-sr25519 blockchain_reference ohex digestif.keccak-f1600)
+ (deps sr25519_vectors.tsv)
+ (action (run %{test} %{dep:sr25519_vectors.tsv})))

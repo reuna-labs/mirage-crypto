@@ -1,0 +1,8 @@
+#include "sodium_config.h"
+#include "crypto_core_ed25519.h"
+#include "crypto_core_ristretto255.h"
+#include "crypto_scalarmult_ristretto255.h"
+#include "vendor/src/libsodium/crypto_core/ed25519/ref10/ed25519_ref10.c"
+#include "vendor/src/libsodium/crypto_verify/verify.c"
+#include "sodium_api.inc"
+#include "vendor/src/libsodium/crypto_scalarmult/ristretto255/ref10/scalarmult_ristretto255_ref10.c"

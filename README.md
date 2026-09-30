@@ -30,6 +30,16 @@ non-deterministic execution time ([whirlwind RNG](https://www.ieee-security.org/
 and hooks into the main event loop to get some bits of the timestamp of each event,
 `rdrand` and `rdseed` CPU instructions if available.
 
+## Reuna blockchain backends
+
+Separate `mirage-crypto-secp256k1`, `mirage-crypto-bls12-381`,
+`mirage-crypto-blake3`, `mirage-crypto-poseidon`, and
+`mirage-crypto-sr25519` packages vendor small
+upstream C kernels behind fixed-width OCaml APIs. The blockchain package
+retains its compatibility adapters. See [BACKENDS.md](BACKENDS.md) for
+pins, timing boundaries, migration behavior, and validation results. The
+sr25519 package requires the Reuna Digestif fork with `digestif.keccak-f1600`.
+
 ## RNG seeding
 
 If RNG fails with `Fatal error: exception Unseeded_generator`, you need to

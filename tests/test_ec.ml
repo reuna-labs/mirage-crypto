@@ -1580,7 +1580,7 @@ let ed25519_primitive_into =
    Mirage_crypto_blockchain.Secp256k1, an independent zarith
    implementation of the same curve in this repository. *)
 module K = P256k1.Primitive
-module B = Mirage_crypto_blockchain.Secp256k1
+module B = Blockchain_reference.Secp256k1
 
 let rev_string s = String.init (String.length s) (fun i ->
     s.[String.length s - 1 - i])

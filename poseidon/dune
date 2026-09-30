@@ -1,0 +1,11 @@
+(library
+ (name mirage_crypto_poseidon)
+ (public_name mirage-crypto-poseidon)
+ (foreign_stubs
+  (language c)
+  (names poseidon_field poseidon_kernel poseidon_constants poseidon_stubs)
+  (extra_deps (source_tree vendor))
+  (flags (:standard -O2 -std=c99 -DISO_C))))
+
+(install (package mirage-crypto-poseidon) (section doc)
+ (files ../BACKENDS.md vendor/manifest.json vendor/LICENSE.txt))

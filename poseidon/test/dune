@@ -1,0 +1,1 @@
+(test (name smoke) (package mirage-crypto-poseidon) (libraries mirage-crypto-poseidon))

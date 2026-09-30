@@ -39,6 +39,7 @@ depends: [
   "asn1-combinators" {with-test & >= "0.3.1"}
   "ohex" {with-test & >= "0.2.0"}
   "ounit2" {with-test}
+  "zarith" {with-test}
 ]
 conflicts: [
   "ocaml-freestanding"
