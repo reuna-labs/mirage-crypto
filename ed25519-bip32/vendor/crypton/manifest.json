@@ -1,0 +1,10 @@
+{
+  "commit": "bb8a805ced29a935103a9e121ddb9d9fd0d732bf",
+  "sha256": {
+    "cbits/crypton_pbkdf2.c": "5f10ba0ac238c7313b23c024a6d494f2c94247ca7a35c9d33ebb5e8bec83fb0c",
+    "cbits/crypton_pbkdf2.h": "8ded119b6808fe59ae30b2c8d391b051c1c19cc2c50bbe2218503dc85dc62ff1",
+    "cbits/crypton_bitfn.h": "e24439482653534352906cf76d6b8828e8e7b19ce6e32b558178af3574642e3a",
+    "cbits/crypton_align.h": "fddfc6354a4110ae04fc863f07fa209368db0ff7587f2164d14598366970e526",
+    "LICENSE": "a9554df9870ec3e4c0bdd98013c93d54c9159b250aeae43b0c26033a4c7fac0a"
+  }
+}

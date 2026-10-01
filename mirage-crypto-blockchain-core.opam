@@ -15,7 +15,7 @@ build: [ ["dune" "subst"] {dev}
 depends: [
   "ocaml" {>= "4.13.0"}
   "dune" {>= "2.7"}
-  "mirage-crypto-ec" {=version}
+  "mirage-crypto-ed25519-bip32" {=version}
   "digestif" {>= "1.2.0"}
   "eqaf" {>= "0.8"}
   "ounit2" {with-test}
@@ -25,10 +25,9 @@ description: """
 BLAKE2b at any digest width, and BIP32-Ed25519 hierarchical deterministic keys
 (Khovratovich & Law, DerivationScheme V2 -- the scheme Cardano uses).
 
-Split out of mirage-crypto-blockchain because these two need only digestif and
-the ec Ed25519 primitives, while the rest of that library needs zarith and
-therefore GMP. A consumer that uses no curve but Ed25519 can depend on this and
-cross-compile to a MirageOS/Solo5 unikernel without a vendored GMP build.
+The Ed25519-BIP32 implementation uses selected Cardano reference C and native
+PBKDF2, sharing Digestif hashes. Its dependency closure has no RNG, Unix,
+Zarith or GMP. Strict wallet imports reject malformed or weak keys.
 
 mirage-crypto-blockchain depends on this package and re-exports both modules
 unchanged."""

@@ -2,6 +2,8 @@
 """Check every vendored source against its pinned import manifest."""
 import hashlib
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 root = Path(__file__).resolve().parent.parent
@@ -17,3 +19,5 @@ for name in ("secp256k1", "bls12-381", "blake3", "poseidon", "sr25519"):
         if actual != expected:
             raise SystemExit(f"vendor mismatch: {name}/{filename}")
     print(f"{name}: {manifest['commit']} ({len(manifest['sha256'])} files)")
+
+subprocess.run([sys.executable, str(root / "tools/select-ed25519-bip32.py"), "--check"], check=True)

@@ -1,0 +1,7 @@
+[package]
+name = "mc-ed25519-bip32-oracle"
+version = "0.1.0"
+edition = "2024"
+publish = false
+[dependencies]
+ed25519-bip32 = { git = "https://github.com/typed-io/rust-ed25519-bip32", rev = "2066bbfa011d26a5ea18cf4558240e9299bd0668" }

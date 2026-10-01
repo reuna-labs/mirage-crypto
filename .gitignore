@@ -21,3 +21,5 @@ _opam
 /tests/rust-sr25519/target/
 
 /tests/scure-bip32/node_modules/
+
+/tests/rust-ed25519-bip32/target/

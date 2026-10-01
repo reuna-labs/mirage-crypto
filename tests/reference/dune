@@ -1,1 +1,1 @@
-(library (name blockchain_reference) (libraries zarith mirage-crypto-rng digestif))
+(library (name blockchain_reference) (libraries zarith mirage-crypto-rng mirage-crypto-ec digestif))

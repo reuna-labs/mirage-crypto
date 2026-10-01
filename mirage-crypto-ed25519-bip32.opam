@@ -1,0 +1,24 @@
+opam-version: "2.0"
+maintainer: "Reuna maintainers"
+authors: ["Mirage crypto contributors"]
+homepage: "https://github.com/mirage/mirage-crypto"
+bug-reports: "https://github.com/mirage/mirage-crypto/issues"
+dev-repo: "git+https://github.com/mirage/mirage-crypto.git"
+license: ["ISC" "MIT" "BSD-3-Clause" "BSD-2-Clause" "CC0-1.0"]
+synopsis: "Native Cardano Ed25519-BIP32 V2 and Icarus keys"
+build: [["dune" "subst"] {dev}
+        ["dune" "build" "-p" name "-j" jobs]
+        ["dune" "runtest" "-p" name "-j" jobs] {with-test}]
+depends: ["ocaml" {>= "4.13.0"} "dune" {>= "2.7"} "digestif" {>= "1.4.0"}]
+description: """
+Selected Cardano reference C for V2 derivation and extended Ed25519 signing;
+selected native PBKDF2 for Icarus, reusing Digestif's SHA512 C kernel.
+Requires the Reuna Digestif release installing digestif_sha512.h.
+Strict wallet-key imports, legacy-compatible raw signature verification.
+No RNG, Unix, Zarith, GMP, Haskell, ctypes or system crypto dependency.
+"""
+# Development pin: this source revision installs the matching C header.
+pin-depends: [
+  ["digestif.1.4.0"
+   "git+https://github.com/reuna-labs/digestif.git#4c33049713a1449ab5066ebe286a9c6f763d32b6"]
+]

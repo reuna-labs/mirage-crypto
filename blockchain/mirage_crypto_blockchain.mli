@@ -11,8 +11,9 @@
     Signing uses libsecp256k1 and BLST; BLAKE3 and Poseidon use vendored C
     backends. {!Secp256k1}, {!Bip340}, and {!Poseidon} retain variable-time
     Zarith compatibility conversions. Use the separate bignum-free packages
-    for secret inputs. {!Stark_curve}, {!Sr25519}, and {!Ed25519_bip32}
-    retain their existing timing caveats. *)
+    for secret inputs. {!Stark_curve} retains its timing caveats; the complete
+    {!Sr25519} and {!Ed25519_bip32} integrations are not independently
+    verified constant-time. *)
 
 (** {b SHA-256 helpers}. Thin wrappers over [Digestif.SHA256] shared by
     the blockchain codecs: raw SHA-256, Bitcoin's double-SHA256, and the
@@ -554,24 +555,10 @@ module Poseidon : sig
       [0]s to a multiple of the rate (2 field elements). *)
 end
 
-(** {b Ed25519-BIP32} (a.k.a. ed25519e), hierarchical deterministic key
-    derivation extending Ed25519, per Cardano's "BIP32-Ed25519:
-    Hierarchical Deterministic Keys over a Non-linear Keyspace"
-    (Khovratovich & Law, 2017); child derivation follows Cardano's
-    DerivationScheme V2.
-
-    {b NOT CONSTANT TIME.} Built on
-    {!Mirage_crypto_ec.Ed25519.Primitive}; inherits its variable-time
-    point decoding and does plain byte arithmetic over secret scalars.
-
-    Master key generation uses the paper's SHA-512 scheme (k =
-    SHA512(seed), clamp [kL], chain code = SHA256(0x01 || seed)); the
-    3rd-highest bit of [kL]'s last byte must be clear, otherwise
-    {!master_key_of_seed} returns [Error `Invalid_derivation]. *)
+(** Cardano V2/Icarus keys backed by selected reference C. Wallet imports are
+    strict. Whole-protocol constant-time behavior and OCaml heap erasure are
+    not guaranteed; see {!Mirage_crypto_ed25519_bip32}. *)
 module Ed25519_bip32 = Mirage_crypto_blockchain_core.Ed25519_bip32
-(** {b BIP32-Ed25519} hierarchical deterministic keys, DerivationScheme V2 --
-    the scheme Cardano uses. Re-exported from {!Mirage_crypto_blockchain_core};
-    see there for the constant-time caveat. *)
 
 (** Bitcoin BIP32. Depend directly on [mirage-crypto-bip32] for a bignum-free closure. *)
 module Bip32 = Mirage_crypto_bip32

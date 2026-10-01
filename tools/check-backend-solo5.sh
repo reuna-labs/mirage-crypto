@@ -45,8 +45,9 @@ dune build --profile release --workspace tests/solo5/workspace \
   _build/solo5/tests/solo5/smoke_blake3.exe \
   _build/solo5/tests/solo5/smoke_poseidon.exe \
   _build/solo5/tests/solo5/smoke_sr25519.exe \
-  _build/solo5/tests/solo5/smoke_bip32.exe
-for backend in secp256k1 bls12_381 blake3 poseidon sr25519 bip32; do
+  _build/solo5/tests/solo5/smoke_bip32.exe \
+  _build/solo5/tests/solo5/smoke_ed25519_bip32.exe
+for backend in secp256k1 bls12_381 blake3 poseidon sr25519 bip32 ed25519_bip32; do
   image="_build/solo5/tests/solo5/smoke_$backend.exe"
   if nm "$image" | grep -E '(camlZ__|__gmp|ctypes|camlUnix__)'; then
     echo "Unexpected dependency in $image" >&2; exit 1

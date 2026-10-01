@@ -31,12 +31,11 @@ now use native representations; its public `p` and `r` constants remain `Z.t`
 in the compatibility module. Serialized wire formats are preserved; marshaled
 internal values are not a persistence format.
 
-The existing `mirage-crypto-ec` and `mirage-crypto-blockchain-core` production
-dependency closures are unchanged. In particular, the EC secp256k1 group and
-scalar primitives used by FROST remain available and independent. The legacy
-blockchain secp256k1 group adapter uses those primitives. Stark ECDSA,
-Ed25519-BIP32, and unrelated primitives retain their existing implementations
-and timing caveats.
+The EC secp256k1 group/scalar primitives used by FROST remain independent.
+The legacy blockchain secp256k1 adapter still uses those primitives. Stark
+ECDSA and unrelated primitives retain their existing implementations and timing
+caveats. `mirage-crypto-blockchain-core` now delegates Ed25519-BIP32 to the
+independent native package described below, removing its EC/RNG dependency.
 
 Behavior worth checking at migration boundaries:
 
@@ -342,3 +341,75 @@ Downstream Bitcoin passed 116 tests including BIP32 invalid vectors,
 ECDSA high-S verification, BIP340, Taproot and PSBT, plus its Unix PSBT example.
 The standalone BIP32 images contain about 1.91 MB (ARM64) and 1.96 MB (x86_64)
 of text/data/BSS; Bitcoin images about 2.06 MB and 2.09 MB respectively.
+
+## Cardano Ed25519-BIP32 and Icarus
+
+`mirage-crypto-ed25519-bip32` is independent of EC, the Mirage RNG and the
+blockchain umbrella. Its runtime closure is Digestif C plus Eqaf. The core and
+full blockchain packages re-export the native API for source compatibility.
+The OCaml implementation formerly in blockchain-core is retained only under
+`tests/reference` for migration comparisons.
+
+Sources:
+
+- [Cardano reference C](https://github.com/IntersectMBO/cardano-crypto/tree/ac2e12a471b735ad80949bcbf0f6f634e5dbef77)
+  for Donna curve/scalar code, V2 arithmetic and derivation framing.
+- [Crypton PBKDF2](https://github.com/kazu-yamamoto/crypton/tree/bb8a805ced29a935103a9e121ddb9d9fd0d732bf)
+  for its SHA512-only fast-PBKDF2 selection (CC0; supporting headers retain
+  their BSD notices). Digestif supplies the SHA512 kernel through its matching
+  installed `digestif_sha512.h`; no second SHA512 implementation is compiled.
+
+`tools/select-ed25519-bip32.py --check` checks the original file inventories,
+hashes and reproducibility of every selected `.inc`. Original vendored files
+are unmodified. The selection removes the randombytes stub and SHA1/SHA256
+PBKDF2 instantiations, replaces a carry ternary with an equivalent unsigned
+shift, replaces unaligned 32/64-bit curve input loads with `memcpy`, and wipes native key/nonce/HMAC/PBKDF2 temporaries. The small C adapter
+checks point-addition failures, serializes unsigned indices explicitly, marshals
+SHA512 inputs/outputs through aligned blocks with bounded length conversions and provides a bounded public
+`abs` helper for Solo5. V1 derivation, encrypted-wallet storage, cached public
+keys, Haskell bindings, batch verification and RNG initialization are excluded.
+
+Formats remain 96-byte xprv and 64-byte xpub. Private imports require kL's low
+three bits clear, bit 255 clear and bit 254 set; bit 253 is allowed in derived
+keys. Public wallet imports require canonical, nonidentity, prime-subgroup
+points, including rejection of mixed-order points. Imports never reclamp.
+Invalid imports return `Invalid_format`; an invalid derived key returns
+`Invalid_derivation`, without retry. Raw transaction verification retains the
+previous Mirage policy, including S < L, without the wallet subgroup gate.
+
+The existing paper-style master API remains separate from Icarus. Icarus uses
+entropy of 16..32 bytes, the passphrase as password, entropy as salt, 4096
+PBKDF2-HMAC-SHA512 rounds, 96 output bytes and the Icarus clamp.
+
+### Assurance and reproduction
+
+This is selected reference C, **not a formally verified kernel**. Whole-protocol
+constant-time behavior has not independently been verified. Public point
+decoding and verification are variable-time; key/entropy/passphrase/message
+lengths and error outcomes are observable. Native buffer wiping does not erase
+all compiler temporaries, curve helper stack copies or OCaml heap copies.
+
+Checks run for this migration:
+
+- 128 derivation/signing records from pinned Rust `ed25519-bip32`, five Cardano
+  reference V2/PBKDF golden records, 85 independent Python PBKDF2 records
+  (including passphrases beyond the HMAC block size) and 256 paper masters.
+- Strict imports, malformed encodings, mixed order/torsion, S=L and S+L,
+  index boundaries, invalid child overflow, raw-verifier compatibility,
+  native/bytecode GC stress and four concurrent OCaml domains.
+- ARM64 Linux Valgrind secret-taint and ASan/UBSan checks of both Donna
+  arithmetic variants and deliberately unaligned native buffers;
+  `sh tools/check-ed25519-bip32-native.sh`. The taint build declassifies only the
+  explicitly returned child-validity bit, never a secret scalar.
+- Fixed-versus-random timing populations for public keys, signatures, soft/hard
+  children and Icarus: `sh tools/check-ed25519-bip32-timing.sh`. These empirical
+  measurements are a regression aid, not proof of constant-time behavior.
+- ARM64 Solo5 SPT and x86-64 Solo5 virtio/QEMU boot with Icarus, derivation and
+  signing, without RNG initialization or forbidden dependencies. Downstream
+  Cardano also boots its public Key API (Icarus, CIP-1852, signatures, raw
+  verification, key hashing and public child derivation) on both targets.
+
+Run `dune runtest ed25519-bip32/test` for the standalone suite, and
+`dune exec tests/test_ed25519_bip32_compat.exe` for the legacy verifier matrix.
+The Cargo oracle is development-only; its lockfile and git revision are pinned
+under `tests/rust-ed25519-bip32`. See the fixture README for regeneration.

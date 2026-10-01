@@ -120,3 +120,7 @@
  (libraries mirage-crypto-sr25519 blockchain_reference ohex digestif.keccak-f1600)
  (deps sr25519_vectors.tsv)
  (action (run %{test} %{dep:sr25519_vectors.tsv})))
+
+(test (name test_ed25519_bip32_compat) (modules test_ed25519_bip32_compat)
+ (package mirage-crypto-blockchain)
+ (libraries mirage-crypto-ed25519-bip32 blockchain_reference))
