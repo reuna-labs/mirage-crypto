@@ -10,5 +10,5 @@
   (flags (:standard -O2 -std=c99 -I.))))
 (install (package mirage-crypto-pbkdf2) (section lib) (files mc_pbkdf2.h))
 (install (package mirage-crypto-pbkdf2) (section doc)
- (files README.md vendor/manifest.json vendor/LICENSE
+ (files (README.md as PBKDF2.md) vendor/manifest.json vendor/LICENSE
         vendor/cbits/crypton_bitfn.h))
