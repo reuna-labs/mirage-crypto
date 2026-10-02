@@ -21,3 +21,5 @@ for name in ("secp256k1", "bls12-381", "blake3", "poseidon", "sr25519"):
     print(f"{name}: {manifest['commit']} ({len(manifest['sha256'])} files)")
 
 subprocess.run([sys.executable, str(root / "tools/select-ed25519-bip32.py"), "--check"], check=True)
+subprocess.run([sys.executable, str(root / "tools/select-portable-crypto.py"), "--check"], check=True)
+subprocess.run([sys.executable, str(root / "tools/select-pbkdf2.py"), "--check"], check=True)

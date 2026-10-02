@@ -1,17 +1,15 @@
 (library
  (name mirage_crypto_ed25519_bip32)
  (public_name mirage-crypto-ed25519-bip32)
- (libraries digestif digestif.c)
+ (libraries digestif digestif.c mirage-crypto-pbkdf2)
  (foreign_stubs
   (language c)
   (names cardano_kernel pbkdf2_kernel edb32_stubs)
-  (include_dirs (lib digestif) vendor/cardano/cbits/ed25519 vendor/crypton/cbits)
+  (include_dirs (lib digestif) (lib mirage-crypto-pbkdf2) vendor/cardano/cbits/ed25519)
   (extra_deps (source_tree vendor) cardano_curve.inc cardano_arithmetic.inc
-   cardano_hmac.inc cardano_donna.inc cardano_curve32.inc cardano_curve64.inc pbkdf2_sha512.inc crypton_sha512.h edb32.h wipe.h)
+   cardano_hmac.inc cardano_donna.inc cardano_curve32.inc cardano_curve64.inc crypton_sha512.h edb32.h wipe.h)
   (flags (:standard -O2 -std=c99 -I. -Wno-unused-function))))
 (install (package mirage-crypto-ed25519-bip32) (section doc)
  (files ../BACKENDS.md VALIDATION.md
   (vendor/cardano/manifest.json as cardano-manifest.json)
-  (vendor/crypton/manifest.json as crypton-manifest.json)
-  (vendor/cardano/LICENSE as LICENSE.cardano)
-  (vendor/crypton/LICENSE as LICENSE.crypton)))
+  (vendor/cardano/LICENSE as LICENSE.cardano)))

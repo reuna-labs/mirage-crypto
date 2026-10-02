@@ -7,14 +7,16 @@
  (foreign_stubs
   (language c)
   (names detect_cpu_features misc misc_sse aes_generic aes_aesni ghash_generic
-    ghash_pclmul ghash_ctmul des_generic chacha poly1305-donna
+    ghash_pclmul des_generic chacha poly1305-donna
     entropy_cpu_stubs)
   (flags
    (:standard)
    (:include cflags_optimized.sexp)))
  (foreign_stubs
   (language c)
-  (names chacha_generic)
+  (names chacha_generic portable_crypto bear_aes_ct bear_aes_ct_enc
+    bear_aes_ct_dec bear_ghash)
+  (include_dirs native/portable)
   (flags
    (:standard)
    (:include cflags.sexp))))
@@ -28,4 +30,9 @@
 (rule
  (targets cflags.sexp cflags_optimized.sexp cflags_warn.sexp)
  (action
-  (run ../config/cfg.exe)))
+  (run ../config/cfg.exe %{env:MIRAGE_CRYPTO_ACCELERATE=auto})))
+
+(install (package mirage-crypto) (section doc)
+ (files ../PORTABLE-CRYPTO.md
+   (native/portable/vendor/LICENSE.txt as portable-crypto-LICENSE.txt)
+   (native/portable/vendor/manifest.json as portable-crypto-manifest.json)))

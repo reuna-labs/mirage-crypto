@@ -106,6 +106,28 @@ CAMLprim value mc_k1_sign(value sk,value msg,value seed) {
   out[64]=(unsigned char)recid;
   CAMLreturn(caml_alloc_initialized_string(65,(const char *)out));
 }
+/* Explicit nonces preserve APIs which already expose nonce selection. Never
+ * retry with the same nonce if the resulting signature is invalid. */
+static int fixed_nonce(unsigned char *out,const unsigned char *msg,
+                       const unsigned char *key,const unsigned char *algo,
+                       void *data,unsigned int attempt) {
+  (void)msg; (void)key; (void)algo;
+  if(attempt != 0) return 0;
+  memcpy(out,data,32);
+  return 1;
+}
+CAMLprim value mc_k1_sign_nonce(value sk,value msg,value nonce,value seed) {
+  CAMLparam4(sk,msg,nonce,seed);
+  length(sk,32); length(msg,32); length(nonce,32);
+  secp256k1_ecdsa_recoverable_signature sig; unsigned char out[65]; int recid=0;
+  void *mem; size_t n; secp256k1_context *ctx=context(seed,&mem,&n);
+  int ok=secp256k1_ecdsa_sign_recoverable(ctx,&sig,IN(msg),IN(sk),fixed_nonce,(void *)IN(nonce));
+  if(ok) secp256k1_ecdsa_recoverable_signature_serialize_compact(ctx,out,&recid,&sig);
+  destroy(ctx,mem,n); wipe(&sig,sizeof sig);
+  if(!ok) caml_invalid_argument("secp256k1: invalid signing nonce");
+  out[64]=(unsigned char)recid;
+  CAMLreturn(caml_alloc_initialized_string(65,(const char *)out));
+}
 CAMLprim value mc_k1_parse_sig(value input,value compact) {
   CAMLparam2(input,compact); secp256k1_ecdsa_signature sig; unsigned char out[64];
   int ok;

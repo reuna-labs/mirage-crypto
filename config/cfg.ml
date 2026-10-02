@@ -32,9 +32,14 @@ let () =
     | _ -> `unknown
   in
   let accelerate_flags =
-    match arch, ccomp_type_opt with
-    | `x86_64, Some "msvc" -> [ "-DACCELERATE" ]
-    | `x86_64, _ -> [ "-DACCELERATE"; "-mssse3"; "-maes"; "-mpclmul" ]
+    let enabled = match Sys.argv with
+      | [| _ |] | [| _; "auto" |] -> true
+      | [| _; "false" |] -> false
+      | _ -> failwith "MIRAGE_CRYPTO_ACCELERATE must be auto or false"
+    in
+    match enabled, arch, ccomp_type_opt with
+    | true, `x86_64, Some "msvc" -> [ "-DACCELERATE" ]
+    | true, `x86_64, _ -> [ "-DACCELERATE"; "-mssse3"; "-maes"; "-mpclmul" ]
     | _ -> []
   in
   let ent_flags =

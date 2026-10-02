@@ -46,9 +46,14 @@ val signature_of_octets : string -> (signature, error) result
 (** 64-byte compact or strict DER; r and s must be in [1,n). *)
 
 val signature_to_octets : ?compact:bool -> signature -> string
-val sign : ?g:Mirage_crypto_rng.g -> key:priv -> string -> signature
-val sign_recoverable : ?g:Mirage_crypto_rng.g -> key:priv -> string -> signature * int
-(** RFC6979, low-S, 32-byte digest; recovery ID in [0,3]. *)
+val sign : ?g:Mirage_crypto_rng.g -> ?nonce:string -> key:priv -> string -> signature
+val sign_recoverable : ?g:Mirage_crypto_rng.g -> ?nonce:string -> key:priv -> string -> signature * int
+(** RFC6979 by default, low-S, 32-byte digest; recovery ID in [0,3].
+    [nonce] is an advanced compatibility option: exactly 32 big-endian bytes
+    in [1,n). It must be secret, unbiased and never reused across messages.
+    Prefer the default RFC6979 mode. Invalid nonces/signatures raise
+    [Invalid_argument]; a supplied nonce is never silently replaced or retried.
+    Context randomization requires the Mirage RNG in either mode. *)
 
 val verify : key:pub -> signature -> string -> bool
 (** Accepts both high and low S. Protocols requiring low-S must enforce it. *)

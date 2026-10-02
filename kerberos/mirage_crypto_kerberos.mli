@@ -46,7 +46,11 @@ module type ENCRYPTION_TYPE = sig
 
       [params] is an optional encoding of iteration count or similar
       algorithm-specific parameters. If omitted, the default for the etype
-      is used. *)
+      is used. For AES suites, an empty string selects the default; otherwise
+      [params] must contain exactly four bytes encoding an unsigned count.
+      The 2^32 count encoded by all-zero bytes is unsupported, as are counts
+      above OCaml [max_int]. These and malformed parameters raise
+      [Invalid_argument]. Callers must bound untrusted iteration counts. *)
 
   val encrypt :
     ?g:Mirage_crypto_rng.g -> key:key -> key_usage:int -> string -> string

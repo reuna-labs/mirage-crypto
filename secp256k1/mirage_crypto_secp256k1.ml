@@ -15,6 +15,7 @@ external pub_negate : string -> string = "mc_k1_pub_negate"
 external parse_pub : string -> string = "mc_k1_parse_pub"
 external public_key : string -> string -> string = "mc_k1_pub"
 external sign_raw : string -> string -> string -> string = "mc_k1_sign"
+external sign_nonce_raw : string -> string -> string -> string -> string = "mc_k1_sign_nonce"
 external parse_sig : string -> bool -> string = "mc_k1_parse_sig"
 external der : string -> string = "mc_k1_der"
 external verify_raw : string -> string -> string -> bool = "mc_k1_verify"
@@ -67,11 +68,17 @@ let signature_of_octets s =
   else if not (valid (String.sub sg 0 32) && valid (String.sub sg 32 32)) then Error `Invalid_range
   else Ok sg
 let signature_to_octets ?(compact=true) s = if compact then s else der s
-let sign_recoverable ?g ~key msg =
+let sign_recoverable ?g ?nonce ~key msg =
   if String.length msg <> 32 then invalid_arg "Secp256k1.sign: digest must be 32 bytes";
-  let s = sign_raw key msg (Mirage_crypto_rng.generate ?g 32) in
+  let s = match nonce with
+    | None -> sign_raw key msg (Mirage_crypto_rng.generate ?g 32)
+    | Some k ->
+      if String.length k <> 32 || not (valid k) then
+        invalid_arg "Secp256k1.sign: nonce must be in [1,n)";
+      sign_nonce_raw key msg k (Mirage_crypto_rng.generate ?g 32)
+  in
   String.sub s 0 64, Char.code s.[64]
-let sign ?g ~key msg = fst (sign_recoverable ?g ~key msg)
+let sign ?g ?nonce ~key msg = fst (sign_recoverable ?g ?nonce ~key msg)
 let verify ~key sig_ msg = String.length msg = 32 && verify_raw key sig_ msg
 let recover ~msg sig_ ~recid =
   if String.length msg <> 32 then Error `Invalid_length

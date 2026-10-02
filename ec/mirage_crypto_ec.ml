@@ -853,127 +853,35 @@ module Make_scalar_element_bip340 (P : Parameters)(F : Foreign_n_bip340) : Scala
 end
 
 module Make_dsa_bip340 (P : Parameters) (Se : Scalar_element_bip340) (Pt : Point) = struct
-  module H = Digestif.SHA256
-  include Make_dsa (P) (Se) (Pt) (H)
+  include Make_dsa (P) (Se) (Pt) (Digestif.SHA256)
+  module K = Mirage_crypto_secp256k1
+  module B = K.Bip340
 
-  (* Tagged hash function *)
-  let tagged_hash tag =
-    let tag_hash = H.digest_string tag |> H.to_raw_string in
-    let ctx = H.feed_string H.empty (tag_hash ^ tag_hash) in
-    fun msg ->
-      H.feed_string ctx msg |> H.get |> H.to_raw_string
+  let native_priv key = K.priv_of_octets (priv_to_octets key) |> Result.get_ok
+  let negate_scalar key =
+    native_priv key |> K.priv_negate |> K.priv_to_octets
+    |> priv_of_octets |> Result.get_ok
 
-  let tagged_hash_aux = tagged_hash "BIP0340/aux"
-  let tagged_hash_nonce = tagged_hash "BIP0340/nonce"
-  let tagged_hash_challenge = tagged_hash "BIP0340/challenge"
+  let get_x point = String.sub (pub_to_octets ~compress:false point) 1 32
 
-  (* Check if a point has even Y coordinate *)
-  let has_even_y point =
-    match Pt.to_affine point with
-    | None -> false (* Point at infinity *)
-    | Some (_, y) ->
-      (* Check if first byte is even in little-endian *)
-      ((String.get_uint8 y 0) land 1) = 0
+  let generate ?g () =
+    let key, pub = K.generate ?g () in
+    (* Preserve the existing even-Y key-pair convention. Y parity is public. *)
+    let key, pub = if (K.pub_to_octets pub).[0] = '\002' then key, pub
+      else K.priv_negate key, K.pub_negate pub in
+    (K.priv_to_octets key |> priv_of_octets |> Result.get_ok),
+    (K.pub_to_octets pub |> pub_of_octets |> Result.get_ok)
 
-  (* Extract X coordinate from a point *)
-  let get_x =
-    let zero = String.make P.byte_length '\000' in
-    fun point ->
-      match Pt.to_affine point with
-      | None -> zero (* Return zero bytes for infinity *)
-      | Some (x, _) -> rev_string x (* Reverse to get big-endian format *)
-
-  (* [n - d]. For d in [1, n) the result is also in [1, n), so of_octets
-     cannot fail here. Constant time. *)
-  let negate_scalar d =
-    S.to_octets d |> Se.mont_from_be_octets |> Se.opp |> Se.from_montgomery
-    |> Se.to_be_octets |> S.of_octets |> Result.get_ok
-
-  (* Generate key pair with even public y *)
-  let generate ?g () : priv * pub =
-    let neg = negate_scalar in
-    let key, pubkey = generate ?g () in
-    let key, pubkey =
-      if has_even_y pubkey then key, pubkey else
-        let d = neg key in
-        d, pub_of_priv d
-    in
-    (key, pubkey)
-
-  (* Sign a message *)
   let sign_bip340 ~key ?aux_rand msg =
-    (* Calculate P = key*G *)
-    let p_point = Pt.scalar_mult_base key in
-    (* Determine if d needs to be negated based on Y coordinate *)
-    let d =
-      let se = Se.mont_from_be_octets (S.to_octets key) in
-      if has_even_y p_point then se else Se.opp se
-    in
-    (* Generate aux_rand if not provided *)
-    let a = match aux_rand with
-      | Some a -> a
-      | None -> Mirage_crypto_rng.generate P.byte_length
-    in
-    (* Compute t = bytes(d) XOR hash_aux(a) *)
-    let d_be = Se.from_montgomery d |> Se.to_be_octets in
-    let t = Mirage_crypto.Uncommon.xor d_be (tagged_hash_aux a) in
-    (* Compute rand *)
-    let p_be = get_x p_point in
-    let nonce_input = t ^ p_be ^ msg in
-    let rand_be = tagged_hash_nonce nonce_input in
-    (* Convert to field element, mont_from_be_octets implies (mod n) because of to_montgomery *)
-    let k' = Se.mont_from_be_octets rand_be in
-    (* Convert k' to scalar, fails if k' == 0 *)
-    let k_sc' = Se.from_montgomery k' |> Se.to_be_octets |> S.of_octets |> Result.get_ok in
-    (* Compute R = k'*G *)
-    let r_point = Pt.scalar_mult_base k_sc' in
-    (* Determine k based on Y coordinate of R *)
-    let k = if has_even_y r_point
-      then k'
-      else Se.opp k'
-    in
-    (* Extract r from R *)
-    let r_be = get_x r_point in
-    (* Compute challenge e *)
-    let challenge_input = r_be ^ p_be ^ msg in
-    let e_be = tagged_hash_challenge challenge_input in
-    (* Convert to field element, from_be_octets implies (mod n) because of to_montgomery *)
-    let e = Se.mont_from_be_octets e_be in
-    (* Compute e*d *)
-    let ed = Se.mul e d in
-    (* s = k + e*d *)
-    let s = Se.add k ed in
-    let s_be = Se.from_montgomery s |> Se.to_be_octets in
-    (r_be, s_be)
+    let signature = B.sign ?aux_rand ~key:(native_priv key) msg
+      |> B.signature_to_octets in
+    String.sub signature 0 32, String.sub signature 32 32
 
-  (* Verify a signature *)
-  let verify_bip340 ~key:p_point (r, s) msg =
+  let verify_bip340 ~key (r, s) msg =
     let r = padded r and s = padded s in
-    if not (S.is_in_range r && S.is_in_range s) then false else
-    match S.of_octets s with Error _ -> false | Ok s_sc ->
-    let x = get_x p_point in
-    (* Compute challenge e *)
-    let challenge_input = r ^ x ^ msg in
-    let e_be = tagged_hash_challenge challenge_input in
-    (* Convert to field element, from_be_octets implies (mod n) because of to_montgomery *)
-    let e = Se.mont_from_be_octets e_be in
-    (* negate e if y(P) is even *)
-    let e = if has_even_y p_point
-      then Se.opp e
-      else e
-    in
-    match Se.from_montgomery e |> Se.to_be_octets |> S.of_octets with
-    | Error _ -> false
-    | Ok e_sc ->
-    (* Compute R = s*G + e*P *)
-    let r_point = Pt.scalar_mult_add s_sc e_sc p_point in
-    let r' = get_x r_point in
-    (* Check R is not infinity *)
-    not (Pt.is_infinity r_point) &&
-    (* Check appropriate Y coordinate parity *)
-    has_even_y r_point &&
-    (* Check x(R) = r *)
-    r' = r
+    match B.xonly_pub_of_octets (get_x key), B.signature_of_octets (r ^ s) with
+    | Ok key, Ok signature -> B.verify ~key signature msg
+    | _ -> false
 end
 
 module P256 : Dh_dsa  = struct

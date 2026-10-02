@@ -7,6 +7,12 @@
  (targets manifest.c)
  (deps manifest.json)
  (action (run solo5-elftool gen-manifest manifest.json manifest.c)))
+(executable
+ (name smoke_portable_crypto) (modules smoke_portable_crypto) (modes native)
+ (enabled_if (= %{context_name} solo5))
+ (libraries backend_startup mirage-crypto)
+ (link_flags :standard -cclib "-z solo5-abi=%{env:MODE=spt}"
+   -cclib "-u __solo5_mft1_note"))
 (rule (targets smoke_secp256k1.ml) (deps ../../secp256k1/test/smoke.ml)
  (action (copy %{deps} %{targets})))
 (executable
@@ -63,5 +69,14 @@
  (name smoke_ed25519_bip32) (modules smoke_ed25519_bip32) (modes native)
  (enabled_if (= %{context_name} solo5))
  (libraries backend_startup mirage-crypto-ed25519-bip32)
+ (link_flags :standard -cclib "-z solo5-abi=%{env:MODE=spt}"
+   -cclib "-u __solo5_mft1_note"))
+
+(rule (targets smoke_pbkdf2.ml) (deps ../../pbkdf2/test/smoke.ml)
+ (action (copy %{deps} %{targets})))
+(executable
+ (name smoke_pbkdf2) (modules smoke_pbkdf2) (modes native)
+ (enabled_if (= %{context_name} solo5))
+ (libraries backend_startup mirage-crypto-pbkdf2)
  (link_flags :standard -cclib "-z solo5-abi=%{env:MODE=spt}"
    -cclib "-u __solo5_mft1_note"))

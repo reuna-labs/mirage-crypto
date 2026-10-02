@@ -4,6 +4,22 @@ Validated on macOS ARM64 (OCaml 5.2) and isolated Linux ARM64 (OCaml 5.5).
 Digestif C code/header: `4c33049713a1449ab5066ebe286a9c6f763d32b6`.
 Source provenance and limitations are in `../BACKENDS.md` and vendor manifests.
 
+## Shared PBKDF2 follow-up (2026-10-02)
+
+Icarus now calls `mirage-crypto-pbkdf2`; its derivation parameters and clamp
+are unchanged. The coordinated Digestif header revision is
+`770f9c355bd5fd60ebf63027b66a51920906519f`, exporting SHA1/SHA256/SHA512 headers
+for both installed and duniverse builds. The earlier SHA512 validation below
+is historical evidence, not the new package pin.
+
+The shared integration passed native taint and ASan/UBSan checks for both
+Donna variants, the 134 blockchain tests, and standalone Icarus smoke boots
+on ARM64 SPT and x86-64 virtio/QEMU without RNG initialization. Shared PBKDF2
+additionally passed 156 independent OpenSSL cases and native taint/sanitizer
+checks; see `../pbkdf2/README.md`.
+
+## Original Cardano migration
+
 - Standalone package build and tests with `dune -p mirage-crypto-ed25519-bip32`.
 - Native/bytecode vectors and GC stress; four concurrent OCaml domains.
 - 128 pinned Rust records, 5 Cardano C goldens, 85 independent PBKDF2 records,

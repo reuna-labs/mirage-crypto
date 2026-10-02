@@ -1,0 +1,1 @@
+(test (name smoke) (package mirage-crypto-pbkdf2) (libraries mirage-crypto-pbkdf2))

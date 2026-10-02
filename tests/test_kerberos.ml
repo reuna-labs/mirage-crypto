@@ -434,11 +434,27 @@ let of_etype_cases =
   in
   known_cases @ unknown_cases @ [dispatch_roundtrip]
 
+let s2k_parameter_cases =
+  List.map (fun (module M : ENCRYPTION_TYPE) ->
+    test_case @@ fun _ ->
+      List.iter (fun params ->
+        assert_raises
+          (Invalid_argument "Kerberos.string_to_key: params must be four bytes")
+          (fun () -> ignore (M.string_to_key ~password:"p" ~salt:"s" ~params ())))
+        ["x"; "xx"; "xxx"; "xxxxx"];
+      assert_raises
+        (Invalid_argument "Kerberos.string_to_key: unsupported iteration count")
+        (fun () -> ignore (M.string_to_key ~password:"p" ~salt:"s"
+                            ~params:(String.make 4 '\000') ())))
+    [(module Aes128_cts_hmac_sha1_96); (module Aes256_cts_hmac_sha1_96);
+     (module Aes128_cts_hmac_sha256_128); (module Aes256_cts_hmac_sha384_192)]
+
 let suite =
   "kerberos" >::: [
     "n_fold"       >::: n_fold_cases;
     "des3_dk"      >::: des3_dk_cases;
     "sha1_s2k"     >::: sha1_s2k_cases;
+    "s2k_parameters" >::: s2k_parameter_cases;
     "arcfour_s2k"  >::: arcfour_s2k_cases;
     "aes_cts_raw"  >::: cts_raw_cases;
     "round_trips"  >::: round_trip_cases;

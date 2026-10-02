@@ -56,41 +56,24 @@ let n_fold s out_len =
 
 (* ===== Miscellaneous helpers ===== *)
 
-let xor_strings a b =
-  let n = String.length a in
-  assert (String.length b = n);
-  let buf = Bytes.create n in
-  for i = 0 to n - 1 do
-    Bytes.set buf i (Char.chr (Char.code a.[i] lxor Char.code b.[i]))
-  done;
-  Bytes.unsafe_to_string buf
-
 let usage_constant key_usage suffix =
   let b = Bytes.create 5 in
   Bytes.set_int32_be b 0 (Int32.of_int key_usage);
   Bytes.set b 4 (Char.chr suffix);
   Bytes.unsafe_to_string b
 
-(* ===== PBKDF2 ===== *)
-
-let pbkdf2 (module H : Digestif.S) ~password ~salt ~iterations ~key_len =
-  let h_len    = H.digest_size in
-  let n_blocks = (key_len + h_len - 1) / h_len in
-  let dk = Buffer.create key_len in
-  for i = 1 to n_blocks do
-    let i_be = Bytes.create 4 in
-    Bytes.set_int32_be i_be 0 (Int32.of_int i);
-    let u1 = H.hmac_string ~key:password (salt ^ Bytes.unsafe_to_string i_be)
-             |> H.to_raw_string in
-    let u   = ref u1 in
-    let acc = ref u1 in
-    for _ = 2 to iterations do
-      u := H.hmac_string ~key:password !u |> H.to_raw_string;
-      acc := xor_strings !acc !u
-    done;
-    Buffer.add_string dk !acc
-  done;
-  String.sub (Buffer.contents dk) 0 key_len
+(* RFC 3962/8009 parameters encode an unsigned count. Zero denotes 2^32,
+   which the selected PBKDF2 interface cannot represent: reject it rather
+   than silently deriving a different key. *)
+let pbkdf2_iterations ~default params =
+  if params = "" then default
+  else if String.length params <> 4 then
+    invalid_arg "Kerberos.string_to_key: params must be four bytes"
+  else
+    let n = Int64.logand (Int64.of_int32 (String.get_int32_be params 0)) 0xffffffffL in
+    if n = 0L || n > Int64.of_int max_int then
+      invalid_arg "Kerberos.string_to_key: unsupported iteration count";
+    Int64.to_int n
 
 (* ===== RFC 3962 key derivation (etypes 17/18): AES-CBC as PRF ===== *)
 
@@ -192,13 +175,9 @@ end) : ENCRYPTION_TYPE = struct
   let to_secret k = k
 
   let string_to_key ~password ~salt ?(params = "") () =
-    let iterations =
-      if String.length params = 4
-      then Int32.to_int (String.get_int32_be params 0) |> abs
-      else P.string_to_key_iters
-    in
+    let iterations = pbkdf2_iterations ~default:P.string_to_key_iters params in
     (* RFC 3962 §4: tkey = PBKDF2-SHA1, then base_key = DK(tkey, "kerberos") *)
-    let tkey = pbkdf2 (module Digestif.SHA1) ~password ~salt ~iterations ~key_len:key_bytes in
+    let tkey = Mirage_crypto_pbkdf2.sha1 ~password ~salt ~iterations ~length:key_bytes in
     dr_aes tkey key_bytes "kerberos"
 
   let derive_ke key usage = dk_aes key key_bytes usage 0xAA
@@ -256,12 +235,8 @@ end) : ENCRYPTION_TYPE = struct
   let to_secret k = k
 
   let string_to_key ~password ~salt ?(params = "") () =
-    let iterations =
-      if String.length params = 4
-      then Int32.to_int (String.get_int32_be params 0) |> abs
-      else P.string_to_key_iters
-    in
-    let tkey = pbkdf2 (module Digestif.SHA256) ~password ~salt ~iterations ~key_len:key_bytes in
+    let iterations = pbkdf2_iterations ~default:P.string_to_key_iters params in
+    let tkey = Mirage_crypto_pbkdf2.sha256 ~password ~salt ~iterations ~length:key_bytes in
     kdf_hmac_sha2 (module P.H) tkey "" key_bytes
 
   let derive_ke key usage = kdf_hmac_sha2 (module P.H) key (usage_constant usage 0xAA) key_bytes

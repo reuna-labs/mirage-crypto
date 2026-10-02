@@ -1,0 +1,14 @@
+(library
+ (name mirage_crypto_pbkdf2)
+ (public_name mirage-crypto-pbkdf2)
+ (libraries digestif.c)
+ (foreign_stubs
+  (language c)
+  (names pbkdf2_kernel pbkdf2_stubs)
+  (include_dirs (lib digestif) vendor/cbits)
+  (extra_deps (source_tree vendor) pbkdf2.inc crypton_sha1.h crypton_sha256.h crypton_sha512.h wipe.h)
+  (flags (:standard -O2 -std=c99 -I.))))
+(install (package mirage-crypto-pbkdf2) (section lib) (files mc_pbkdf2.h))
+(install (package mirage-crypto-pbkdf2) (section doc)
+ (files README.md vendor/manifest.json vendor/LICENSE
+        vendor/cbits/crypton_bitfn.h))

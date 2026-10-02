@@ -17,6 +17,7 @@ depends: [
   "dune" {>= "2.7"}
   "mirage-crypto" {=version}
   "mirage-crypto-rng" {=version}
+  "mirage-crypto-pbkdf2" {=version}
   "digestif" {>= "1.1.4"}
   "eqaf" {>= "0.8"}
   "ounit2" {with-test}

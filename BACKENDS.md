@@ -345,7 +345,8 @@ of text/data/BSS; Bitcoin images about 2.06 MB and 2.09 MB respectively.
 ## Cardano Ed25519-BIP32 and Icarus
 
 `mirage-crypto-ed25519-bip32` is independent of EC, the Mirage RNG and the
-blockchain umbrella. Its runtime closure is Digestif C plus Eqaf. The core and
+blockchain umbrella. Its runtime closure uses the shared `mirage-crypto-pbkdf2`
+package, Digestif C and Eqaf. The core and
 full blockchain packages re-export the native API for source compatibility.
 The OCaml implementation formerly in blockchain-core is retained only under
 `tests/reference` for migration comparisons.
@@ -355,19 +356,22 @@ Sources:
 - [Cardano reference C](https://github.com/IntersectMBO/cardano-crypto/tree/ac2e12a471b735ad80949bcbf0f6f634e5dbef77)
   for Donna curve/scalar code, V2 arithmetic and derivation framing.
 - [Crypton PBKDF2](https://github.com/kazu-yamamoto/crypton/tree/bb8a805ced29a935103a9e121ddb9d9fd0d732bf)
-  for its SHA512-only fast-PBKDF2 selection (CC0; supporting headers retain
-  their BSD notices). Digestif supplies the SHA512 kernel through its matching
-  installed `digestif_sha512.h`; no second SHA512 implementation is compiled.
+  for the shared SHA1/SHA256/SHA512 fast-PBKDF2 selection in `pbkdf2/` (CC0;
+  supporting headers retain their BSD notices). Cardano uses its SHA512 entry
+  point. Digestif supplies the hash kernels through matching installed C
+  headers; no second SHA implementation is compiled.
 
 `tools/select-ed25519-bip32.py --check` checks the original file inventories,
 hashes and reproducibility of every selected `.inc`. Original vendored files
-are unmodified. The selection removes the randombytes stub and SHA1/SHA256
-PBKDF2 instantiations, replaces a carry ternary with an equivalent unsigned
+are unmodified. The Cardano selection removes the randombytes stub,
+replaces a carry ternary with an equivalent unsigned
 shift, replaces unaligned 32/64-bit curve input loads with `memcpy`, and wipes native key/nonce/HMAC/PBKDF2 temporaries. The small C adapter
 checks point-addition failures, serializes unsigned indices explicitly, marshals
 SHA512 inputs/outputs through aligned blocks with bounded length conversions and provides a bounded public
 `abs` helper for Solo5. V1 derivation, encrypted-wallet storage, cached public
 keys, Haskell bindings, batch verification and RNG initialization are excluded.
+`tools/select-pbkdf2.py --check` separately verifies the shared PBKDF2 source
+inventory and reproducible selection, including temporary-buffer wiping.
 
 Formats remain 96-byte xprv and 64-byte xpub. Private imports require kL's low
 three bits clear, bit 255 clear and bit 254 set; bit 253 is allowed in derived
