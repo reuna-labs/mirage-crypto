@@ -42,7 +42,7 @@
    output.
 */
 
-#if defined (_MSC_VER)
+#if defined (_MSC_VER) && (defined (_M_X64) || defined (_M_IX86))
 #include <immintrin.h>
 #include <memory.h>
 
@@ -179,7 +179,8 @@ static inline unsigned long get_count(void) {
 #endif
 
 static inline uint64_t mc_read_counter (void) {
-#if defined (__i386__) || defined (__x86_64__) || defined (_MSC_VER)
+#if defined (__i386__) || defined (__x86_64__) || \
+    (defined (_MSC_VER) && (defined (_M_X64) || defined (_M_IX86)))
   return __rdtsc ();
 #elif defined (__arm__) || defined (__aarch64__)
   return read_virtual_count ();
