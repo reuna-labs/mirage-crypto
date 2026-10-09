@@ -4,7 +4,7 @@ maintainer: "Reuna"
 authors: ["Reuna" "Joseph Birr-Pixton" "Nicolas Di Prima" "Vincent Hanquez"]
 license: ["ISC" "CC0-1.0" "BSD-2-Clause" "BSD-3-Clause"]
 homepage: "https://github.com/reuna-labs/mirage-crypto"
-dev-repo: "git+https://github.com/reuna-labs/mirage-crypto.git"
+dev-repo: "git+https://github.com/mirage/mirage-crypto.git"
 bug-reports: "https://github.com/reuna-labs/mirage-crypto/issues"
 depends: [
  "ocaml" {>= "4.13.0"}
