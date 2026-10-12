@@ -1,0 +1,25 @@
+{
+  "platform": "Linux ARM64",
+  "ocaml": "5.3.0",
+  "mpc_review_baseline": "7b78792ce64f9190b67491230931761af71cf737",
+  "mpc_rechecked_head": "5d76e81078da816bfed8c133b489961d8726966e",
+  "compile_argv": [
+    "ocamlfind",
+    "ocamlopt",
+    "-package",
+    "eqaf",
+    "-linkpkg",
+    "mpc_nonce_race.ml",
+    "-o",
+    "mpc_nonce_race"
+  ],
+  "trials": 100000,
+  "both_domains_received_original_nonce": 11536,
+  "process_exit": 0,
+  "scope": "Embedded reviewed Secret implementation and get/wipe sequence, before scalar parsing; not an end-to-end attack. Counts depend on scheduling.",
+  "files": {
+    "tests/review/mpc_nonce_race.ml": "355c58392a25cdf4186f7e27b583028be5e0ff480ea16ed19540a74c94f2f15c",
+    "tests/review/mpc-nonce-race-20261011.log": "f52678ab7c27f84af3e3a721714092d1b1cd00ace9b3188d341e58f483ff1f59",
+    "tests/review/LICENSE-MPC.md": "b2de2d73fa03c2d091d0a9fb7101fc7fdae9a87241531575e8fe8b372c186eae"
+  }
+}
