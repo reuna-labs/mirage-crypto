@@ -1,0 +1,72 @@
+{
+  "octez_commit": "d6601b2f79039d46cf493da5fd9ba9eb8fcad4b9",
+  "branch": "reuna@native-crypto-signers",
+  "source_comparison": "source-comparison-final.json",
+  "gates": [
+    {
+      "log": "repository-build.log",
+      "sha256": "d29a01f5b7507ffa349d84f3823f24da086eb3e1fc7647719486615c6d644368",
+      "bytes": 213896,
+      "exit_code": 0
+    },
+    {
+      "log": "final-format.log",
+      "sha256": "d11fb56732d7c633aac152b5991f62355824e7abf918f11871a715d1c230a416",
+      "bytes": 405,
+      "exit_code": 0
+    },
+    {
+      "log": "final-lint.log",
+      "sha256": "bc03cbfec10c3974b6dc3694e7fd30f6da5e477697a09a82fe778c2ace04a7b6",
+      "bytes": 309,
+      "exit_code": 0
+    },
+    {
+      "log": "final-manifest.log",
+      "sha256": "2198fce0b75e007e0da802cf75d4afb5a670c842c984497d6502775a4d30f13a",
+      "bytes": 5396,
+      "exit_code": 0
+    },
+    {
+      "log": "final-protocol-compile.log",
+      "sha256": "95ea0b1b3d7feb8c38357e79df77b1755ffe66214cd77499d053114a6872bb50",
+      "bytes": 8250,
+      "exit_code": 0
+    },
+    {
+      "log": "final-protocol-out-of-opam.log",
+      "sha256": "7a04ecc1378c00fd049a8689e5c90b963952ccdd7528d8ddab870693009342f7",
+      "bytes": 3101,
+      "exit_code": 0
+    },
+    {
+      "log": "final-signer-timing.log",
+      "sha256": "c16e12651e18e6ecff72d1a5cac8da9e42efab0c43954532ad474ed17791d0b1",
+      "bytes": 881,
+      "exit_code": 0
+    },
+    {
+      "log": "final-unit-ram-r2.log",
+      "sha256": "0fb73ab96e1cd3db401d29cb417aa00d830c10637c086a44086889f3845baea4",
+      "bytes": 917992,
+      "exit_code": 0
+    }
+  ],
+  "unit_stages": [
+    "test-nonproto-unit",
+    "test-proto-unit",
+    "test-other-unit"
+  ],
+  "unit_stage_runtime": [
+    "00:01:31.1944",
+    "01:08:12.5967",
+    "00:00:14.1636"
+  ],
+  "configuration": {
+    "CI": "true (existing repository exclusions)",
+    "DUNE_ARGS": "-j 1",
+    "build_and_logs": "external drive",
+    "temporary_storage": "4 GiB tmpfs, noswap"
+  },
+  "publication": "pending intended fork URL"
+}

@@ -1,0 +1,7 @@
+2026-10-13T08:49:07Z START final-protocol-compile.log ['dune', 'build', '-j', '4', '--profile=dev', '@runtest_compile_protocol']
+2026-10-13T08:55:18Z END final-protocol-compile.log exit=0
+2026-10-13T08:55:19Z START final-protocol-out-of-opam.log ['dune', 'build', '-j', '4', '--profile=dev', '@runtest_out_of_opam']
+2026-10-13T08:56:24Z END final-protocol-out-of-opam.log exit=0
+2026-10-13T08:56:25Z START final-signer-timing.log ['sh', 'scripts/crypto/check-signer-timing.sh', '50000']
+2026-10-13T08:57:35Z END final-signer-timing.log exit=0
+2026-10-13T08:57:35Z START final-unit-ext4-r2.log ['make', 'test-unit']

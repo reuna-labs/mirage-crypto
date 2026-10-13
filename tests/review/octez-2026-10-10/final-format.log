@@ -1,0 +1,11 @@
+External workspace: /work/src
+Command: ['opam', 'exec', '--switch=octez-5.3', '--', 'make', 'fmt', 'BLACK=/work/formatter/bin/black']
+make[1]: Entering directory '/work/src/docs'
+Running black formatter
+/work/formatter/bin/black conf.py _extensions/*.py scripts/*.py
+All done! ✨ 🍰 ✨
+8 files left unchanged.
+make[1]: Leaving directory '/work/src/docs'
+scripts/lint.sh --format-scripts
+
+GATE EXIT: 0

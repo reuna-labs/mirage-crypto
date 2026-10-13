@@ -1,0 +1,9 @@
+External workspace: /work/src
+Command: ['opam', 'exec', '--switch=octez-5.3', '--', './_build/default/src/lib_connpool/test/main.exe', '/flaky', '/ci_disabled']
+[04:28:24.813] [warn] Unknown tag: ci_disabled
+[04:28:24.814] [warn] Unknown tag: flaky
+[04:28:24.843] [SUCCESS] (1/3) warm established reusable connections
+[04:28:24.845] [SUCCESS] (2/3) connection_close_prevents_reuse
+[04:28:24.847] [SUCCESS] (3/3) server restarts are gracefully handled by the pool
+
+GATE EXIT: 0

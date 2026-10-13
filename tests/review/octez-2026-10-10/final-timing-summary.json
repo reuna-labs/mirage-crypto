@@ -1,0 +1,65 @@
+{
+  "source": "final public-key heap-layout correction, validation snapshot f621620",
+  "scope": "Eight complete HACL/secp adapter operations; Linux ARM64, OCaml 5.3.0, virtualized; excludes production entropy acquisition.",
+  "limitations": "Timing evidence, not constant-time proof. This does not cover remaining variable-time prover operations or independently validate BLST keygen.",
+  "max_absolute_welch_t": 1.9575,
+  "populations": [
+    {
+      "operation": "ed25519/public",
+      "samples_per_class": 50000,
+      "fixed_ns": 20208.95,
+      "random_ns": 20240.5,
+      "welch_t": -1.1397
+    },
+    {
+      "operation": "ed25519/sign",
+      "samples_per_class": 50000,
+      "fixed_ns": 42736.89,
+      "random_ns": 42671.18,
+      "welch_t": 0.838
+    },
+    {
+      "operation": "p256/public",
+      "samples_per_class": 50000,
+      "fixed_ns": 108031.79,
+      "random_ns": 108140.41,
+      "welch_t": -0.1326
+    },
+    {
+      "operation": "p256/sign",
+      "samples_per_class": 50000,
+      "fixed_ns": 116701.28,
+      "random_ns": 117154.74,
+      "welch_t": -1.9575
+    },
+    {
+      "operation": "p256/sign-nonce",
+      "samples_per_class": 50000,
+      "fixed_ns": 128803.75,
+      "random_ns": 128070.86,
+      "welch_t": 0.6503
+    },
+    {
+      "operation": "secp256k1/public",
+      "samples_per_class": 50000,
+      "fixed_ns": 38996.86,
+      "random_ns": 38951.89,
+      "welch_t": 0.3275
+    },
+    {
+      "operation": "secp256k1/sign",
+      "samples_per_class": 50000,
+      "fixed_ns": 41264.84,
+      "random_ns": 41031.05,
+      "welch_t": 0.882
+    },
+    {
+      "operation": "secp256k1/recoverable",
+      "samples_per_class": 50000,
+      "fixed_ns": 41902.73,
+      "random_ns": 41836.86,
+      "welch_t": 1.4031
+    }
+  ],
+  "log_sha256": "c16e12651e18e6ecff72d1a5cac8da9e42efab0c43954532ad474ed17791d0b1"
+}

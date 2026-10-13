@@ -1,0 +1,953 @@
+External source/build/cache/logs; temporary RAM capped at 4 GiB, noswap.
+Reserves: external 20 GiB; internal metadata 2 GiB; available RAM 1.5 GiB.
+Command: ['opam', 'exec', '--switch=octez-5.3', '--', 'make', 'test-unit']
+Mount: 10521 10200 0:2446 / / ro,relatime - overlay overlay rw,lowerdir=/var/lib/docker/overlay2/l/WCY4UKUBMSJ4QGBMNPBULUF7TA:/var/lib/docker/overlay2/l/R7RGNB3YC5POPPC75KP6YH4RHG:/var/lib/docker/overlay2/l/XDP7A3ZA4OXTLUXIMO76EOSYMK,upperdir=/var/lib/docker/overlay2/1cdff106b9a081b5cbf9addc7e00d460da13d6045dbabb2f3153ac3cf10858fb/diff,workdir=/var/lib/docker/overlay2/1cdff106b9a081b5cbf9addc7e00d460da13d6045dbabb2f3153ac3cf10858fb/work
+Mount: 10532 10521 0:36 /Volumes/Seagate\040Expansion\040Drive/reuna/builds/octez-native-signers-20261010 /work rw,relatime - virtiofs mac rw
+Mount: 943 936 0:896 / /work/tmp rw,relatime - tmpfs tmpfs rw,size=4194304k,noswap
+Mount: 944 938 0:896 / /tmp rw,relatime - tmpfs tmpfs rw,size=4194304k,noswap
+Mount: 991 941 0:896 /var-tmp /var/tmp rw,relatime - tmpfs tmpfs rw,size=4194304k,noswap
+DUNE_PROFILE=dev \
+	COVERAGE_OPTIONS="" \
+	scripts/test_wrapper.sh test-nonproto-unit \
+	@src/bin_agnostic_accuser/runtest @src/bin_agnostic_baker/runtest @src/bin_client/runtest @src/bin_codec/runtest @src/bin_dal_node/runtest @src/bin_node/runtest @src/bin_octogram/runtest @src/bin_openapi/runtest @src/bin_p2p_node/runtest @src/bin_signer/runtest @src/bin_smart_rollup_node/runtest @src/bin_snoop/runtest @src/bin_tps_evaluation/runtest @src/bin_wasm_debugger/runtest @src/kernel_dal_echo/runtest @src/kernel_sdk/runtest @src/kernel_tx_demo/runtest @src/lib_agnostic_baker/runtest @src/lib_aplonk/runtest @src/lib_baking_common/runtest @src/lib_base/runtest @src/lib_bees/runtest @src/lib_benchmark/runtest @src/lib_bls12_381/runtest @src/lib_bls12_381_hash/runtest @src/lib_bls12_381_polynomial/runtest @src/lib_bls12_381_signature/runtest @src/lib_clic/runtest @src/lib_client_base/runtest @src/lib_client_base_unix/runtest @src/lib_client_commands/runtest @src/lib_connpool/runtest @src/lib_context/runtest @src/lib_context_brassaia/runtest @src/lib_context_tezedge/runtest @src/lib_crawler/runtest @src/lib_crypto/runtest @src/lib_crypto_dal/runtest @src/lib_dal_node/runtest @src/lib_dal_node_services/runtest @src/lib_distributed_internal/runtest @src/lib_distributed_plonk/runtest @src/lib_epoxy_tx/runtest @src/lib_error_monad/runtest @src/lib_error_monad_legacy/runtest @src/lib_event_logging/runtest @src/lib_expect_helper/runtest @src/lib_gossipsub/runtest @src/lib_hacl/runtest @src/lib_injector/runtest @src/lib_kzg/runtest @src/lib_layer2_irmin_context/runtest @src/lib_layer2_riscv_context/runtest @src/lib_layer2_shell/runtest @src/lib_layer2_store/runtest @src/lib_lazy_containers/runtest @src/lib_lwt_result_stdlib/runtest @src/lib_mec/runtest @src/lib_micheline/runtest @src/lib_ml_dsa/runtest @src/lib_mockup/runtest @src/lib_mockup_proxy/runtest @src/lib_node_config/runtest @src/lib_octogram/runtest @src/lib_openapi/runtest @src/lib_p2p/runtest @src/lib_p2p_services/runtest @src/lib_performance_metrics/runtest @src/lib_plompiler/runtest @src/lib_plonk/runtest @src/lib_polynomial/runtest @src/lib_ppx_profiler/runtest @src/lib_profiler/runtest @src/lib_protocol_compiler/runtest @src/lib_protocol_environment/runtest @src/lib_protocol_updater/runtest @src/lib_proxy/runtest @src/lib_requester/runtest @src/lib_riscv/runtest @src/lib_riscv_nds/runtest @src/lib_rpc/runtest @src/lib_rpc_http/runtest @src/lib_rpc_process/runtest @src/lib_sapling/runtest @src/lib_scoru_wasm/runtest @src/lib_shell/runtest @src/lib_shell_benchmarks/runtest @src/lib_shell_services/runtest @src/lib_signer_backends/runtest @src/lib_signer_services/runtest @src/lib_smart_rollup/runtest @src/lib_smart_rollup_nds_on_disk/runtest @src/lib_smart_rollup_node/runtest @src/lib_smart_rollup_wasm_dual_state/runtest @src/lib_smart_rollup_wasm_in_memory/runtest @src/lib_smart_rollup_wasm_in_memory_dual/runtest @src/lib_sqlite/runtest @src/lib_sqlite_zstd/runtest @src/lib_srs_extraction/runtest @src/lib_stdlib/runtest @src/lib_stdlib_unix/runtest @src/lib_store/runtest @src/lib_tar/runtest @src/lib_telemetry/runtest @src/lib_test/runtest @src/lib_time_measurement/runtest @src/lib_tree_encoding/runtest @src/lib_upnp/runtest @src/lib_validation/runtest @src/lib_version/runtest @src/lib_wasm_debugger/runtest @src/lib_wasmer/runtest @src/lib_webassembly/runtest @src/lib_workers/runtest @src/riscv/runtest @src/rollup_node_rust_deps/runtest @src/rust_deps/runtest @src/rust_libcrux/runtest @src/rustzcash_deps/runtest @src/tooling/runtest
+Running test "dune build -j 1  @src/bin_agnostic_accuser/runtest @src/bin_agnostic_baker/runtest @src/bin_client/runtest @src/bin_codec/runtest @src/bin_dal_node/runtest @src/bin_node/runtest @src/bin_octogram/runtest @src/bin_openapi/runtest @src/bin_p2p_node/runtest @src/bin_signer/runtest @src/bin_smart_rollup_node/runtest @src/bin_snoop/runtest @src/bin_tps_evaluation/runtest @src/bin_wasm_debugger/runtest @src/kernel_dal_echo/runtest @src/kernel_sdk/runtest @src/kernel_tx_demo/runtest @src/lib_agnostic_baker/runtest @src/lib_aplonk/runtest @src/lib_baking_common/runtest @src/lib_base/runtest @src/lib_bees/runtest @src/lib_benchmark/runtest @src/lib_bls12_381/runtest @src/lib_bls12_381_hash/runtest @src/lib_bls12_381_polynomial/runtest @src/lib_bls12_381_signature/runtest @src/lib_clic/runtest @src/lib_client_base/runtest @src/lib_client_base_unix/runtest @src/lib_client_commands/runtest @src/lib_connpool/runtest @src/lib_context/runtest @src/lib_context_brassaia/runtest @src/lib_context_tezedge/runtest @src/lib_crawler/runtest @src/lib_crypto/runtest @src/lib_crypto_dal/runtest @src/lib_dal_node/runtest @src/lib_dal_node_services/runtest @src/lib_distributed_internal/runtest @src/lib_distributed_plonk/runtest @src/lib_epoxy_tx/runtest @src/lib_error_monad/runtest @src/lib_error_monad_legacy/runtest @src/lib_event_logging/runtest @src/lib_expect_helper/runtest @src/lib_gossipsub/runtest @src/lib_hacl/runtest @src/lib_injector/runtest @src/lib_kzg/runtest @src/lib_layer2_irmin_context/runtest @src/lib_layer2_riscv_context/runtest @src/lib_layer2_shell/runtest @src/lib_layer2_store/runtest @src/lib_lazy_containers/runtest @src/lib_lwt_result_stdlib/runtest @src/lib_mec/runtest @src/lib_micheline/runtest @src/lib_ml_dsa/runtest @src/lib_mockup/runtest @src/lib_mockup_proxy/runtest @src/lib_node_config/runtest @src/lib_octogram/runtest @src/lib_openapi/runtest @src/lib_p2p/runtest @src/lib_p2p_services/runtest @src/lib_performance_metrics/runtest @src/lib_plompiler/runtest @src/lib_plonk/runtest @src/lib_polynomial/runtest @src/lib_ppx_profiler/runtest @src/lib_profiler/runtest @src/lib_protocol_compiler/runtest @src/lib_protocol_environment/runtest @src/lib_protocol_updater/runtest @src/lib_proxy/runtest @src/lib_requester/runtest @src/lib_riscv/runtest @src/lib_riscv_nds/runtest @src/lib_rpc/runtest @src/lib_rpc_http/runtest @src/lib_rpc_process/runtest @src/lib_sapling/runtest @src/lib_scoru_wasm/runtest @src/lib_shell/runtest @src/lib_shell_benchmarks/runtest @src/lib_shell_services/runtest @src/lib_signer_backends/runtest @src/lib_signer_services/runtest @src/lib_smart_rollup/runtest @src/lib_smart_rollup_nds_on_disk/runtest @src/lib_smart_rollup_node/runtest @src/lib_smart_rollup_wasm_dual_state/runtest @src/lib_smart_rollup_wasm_in_memory/runtest @src/lib_smart_rollup_wasm_in_memory_dual/runtest @src/lib_sqlite/runtest @src/lib_sqlite_zstd/runtest @src/lib_srs_extraction/runtest @src/lib_stdlib/runtest @src/lib_stdlib_unix/runtest @src/lib_store/runtest @src/lib_tar/runtest @src/lib_telemetry/runtest @src/lib_test/runtest @src/lib_time_measurement/runtest @src/lib_tree_encoding/runtest @src/lib_upnp/runtest @src/lib_validation/runtest @src/lib_version/runtest @src/lib_wasm_debugger/runtest @src/lib_wasmer/runtest @src/lib_webassembly/runtest @src/lib_workers/runtest @src/riscv/runtest @src/rollup_node_rust_deps/runtest @src/rust_deps/runtest @src/rust_libcrux/runtest @src/rustzcash_deps/runtest @src/tooling/runtest" ...
+(cd _build/default/src/lib_riscv_nds/test && ./main.exe /flaky /ci_disabled)
+[17:16:02.853] [warn] Unknown tag: ci_disabled
+[17:16:02.854] [warn] Unknown tag: flaky
+[17:16:02.875] [SUCCESS] (1/139) memory: fresh registry has size 0
+[17:16:02.904] [SUCCESS] (2/139) memory: resize by 1 succeeds
+[17:16:02.904] [SUCCESS] (3/139) memory: resize by more than 1 fails
+[17:16:02.904] [SUCCESS] (4/139) memory: key too long errors
+[17:16:02.904] [SUCCESS] (5/139) memory: database index out of bounds
+[17:16:02.904] [SUCCESS] (6/139) memory: registry ops with OOB index error
+[17:16:02.904] [SUCCESS] (7/139) memory: shrink makes removed index out of bounds
+[17:16:02.913] [SUCCESS] (8/139) memory: delete non-existent key preserves hash
+[17:16:02.914] [SUCCESS] (9/139) memory: write after copy_database returns wrong error
+[17:16:02.938] [SUCCESS] (10/139) memory: hash determinism
+[17:16:02.948] [SUCCESS] (11/139) memory: hash changes when value changes
+[17:16:02.955] [SUCCESS] (12/139) memory: isolation between databases
+[17:16:02.966] [SUCCESS] (13/139) memory: registry hash determinism
+[17:16:02.975] [SUCCESS] (14/139) memory: hash reverts when value is restored
+[17:16:03.045] [SUCCESS] (15/139) memory: same ops produce same hash
+[17:16:03.132] [SUCCESS] (16/139) memory: ops on different databases commute
+[17:16:03.134] [SUCCESS] (17/139) memory_prove: fresh registry has size 0
+[17:16:03.134] [SUCCESS] (18/139) memory_prove: resize by 1 succeeds
+[17:16:03.134] [SUCCESS] (19/139) memory_prove: resize by more than 1 fails
+[17:16:03.134] [SUCCESS] (20/139) memory_prove: key too long errors
+[17:16:03.134] [SUCCESS] (21/139) memory_prove: database index out of bounds
+[17:16:03.134] [SUCCESS] (22/139) memory_prove: registry ops with OOB index error
+[17:16:03.134] [SUCCESS] (23/139) memory_prove: shrink makes removed index out of bounds
+[17:16:03.135] [SUCCESS] (24/139) memory_prove: delete non-existent key preserves hash
+[17:16:03.136] [SUCCESS] (25/139) memory_prove: write after copy_database returns wrong error
+[17:16:03.169] [SUCCESS] (26/139) memory_prove: hash determinism
+[17:16:03.182] [SUCCESS] (27/139) memory_prove: hash changes when value changes
+[17:16:03.199] [SUCCESS] (28/139) memory_prove: isolation between databases
+[17:16:03.225] [SUCCESS] (29/139) memory_prove: registry hash determinism
+[17:16:03.237] [SUCCESS] (30/139) memory_prove: hash reverts when value is restored
+[17:16:03.425] [SUCCESS] (31/139) memory_prove: same ops produce same hash
+[17:16:03.579] [SUCCESS] (32/139) memory_prove: ops on different databases commute
+[17:16:03.595] [SUCCESS] (33/139) disk: fresh registry has size 0
+[17:16:03.681] [SUCCESS] (34/139) disk: resize by 1 succeeds
+[17:16:03.682] [SUCCESS] (35/139) disk: resize by more than 1 fails
+[17:16:03.686] [SUCCESS] (36/139) disk: key too long errors
+[17:16:03.690] [SUCCESS] (37/139) disk: database index out of bounds
+[17:16:03.693] [SUCCESS] (38/139) disk: registry ops with OOB index error
+[17:16:03.699] [SUCCESS] (39/139) disk: shrink makes removed index out of bounds
+[17:16:03.702] [SUCCESS] (40/139) disk: delete non-existent key preserves hash
+[17:16:03.716] [SUCCESS] (41/139) disk: write after copy_database returns wrong error
+[17:16:04.276] [SUCCESS] (42/139) disk: hash determinism
+[17:16:04.734] [SUCCESS] (43/139) disk: hash changes when value changes
+[17:16:05.400] [SUCCESS] (44/139) disk: isolation between databases
+[17:16:05.979] [SUCCESS] (45/139) disk: registry hash determinism
+[17:16:06.354] [SUCCESS] (46/139) disk: hash reverts when value is restored
+[17:16:10.917] [SUCCESS] (47/139) disk: same ops produce same hash
+[17:16:15.207] [SUCCESS] (48/139) disk: ops on different databases commute
+[17:16:15.247] [SUCCESS] (49/139) disk_prove: fresh registry has size 0
+[17:16:15.254] [SUCCESS] (50/139) disk_prove: resize by 1 succeeds
+[17:16:15.254] [SUCCESS] (51/139) disk_prove: resize by more than 1 fails
+[17:16:15.257] [SUCCESS] (52/139) disk_prove: key too long errors
+[17:16:15.260] [SUCCESS] (53/139) disk_prove: database index out of bounds
+[17:16:15.263] [SUCCESS] (54/139) disk_prove: registry ops with OOB index error
+[17:16:15.277] [SUCCESS] (55/139) disk_prove: shrink makes removed index out of bounds
+[17:16:15.280] [SUCCESS] (56/139) disk_prove: delete non-existent key preserves hash
+[17:16:15.286] [SUCCESS] (57/139) disk_prove: write after copy_database returns wrong error
+[17:16:16.296] [SUCCESS] (58/139) disk_prove: hash determinism
+[17:16:17.017] [SUCCESS] (59/139) disk_prove: hash changes when value changes
+[17:16:17.989] [SUCCESS] (60/139) disk_prove: isolation between databases
+[17:16:18.875] [SUCCESS] (61/139) disk_prove: registry hash determinism
+[17:16:19.496] [SUCCESS] (62/139) disk_prove: hash reverts when value is restored
+[17:16:25.989] [SUCCESS] (63/139) disk_prove: same ops produce same hash
+[17:16:34.655] [SUCCESS] (64/139) disk_prove: ops on different databases commute
+[17:16:34.657] [SUCCESS] (65/139) memory_verify: fresh registry has size 0
+[17:16:34.657] [SUCCESS] (66/139) memory_verify: resize by 1 succeeds
+[17:16:34.658] [SUCCESS] (67/139) memory_verify: resize by more than 1 fails
+[17:16:34.658] [SUCCESS] (68/139) memory_verify: key too long errors
+[17:16:34.658] [SUCCESS] (69/139) memory_verify: database index out of bounds
+[17:16:34.661] [SUCCESS] (70/139) memory_verify: registry ops with OOB index error
+[17:16:34.661] [SUCCESS] (71/139) memory_verify: shrink makes removed index out of bounds
+[17:16:34.661] [SUCCESS] (72/139) memory_verify: delete non-existent key preserves hash
+[17:16:34.661] [SUCCESS] (73/139) memory_verify: write after copy_database returns wrong error
+[17:16:34.702] [SUCCESS] (74/139) memory_verify: hash determinism
+[17:16:34.746] [SUCCESS] (75/139) memory_verify: hash changes when value changes
+[17:16:34.765] [SUCCESS] (76/139) memory_verify: isolation between databases
+[17:16:34.800] [SUCCESS] (77/139) memory_verify: registry hash determinism
+[17:16:34.826] [SUCCESS] (78/139) memory_verify: hash reverts when value is restored
+[17:16:35.052] [SUCCESS] (79/139) memory_verify: same ops produce same hash
+[17:16:35.264] [SUCCESS] (80/139) memory_verify: ops on different databases commute
+[17:16:35.265] [SUCCESS] (81/139) disk_verify: fresh registry has size 0
+[17:16:35.265] [SUCCESS] (82/139) disk_verify: resize by 1 succeeds
+[17:16:35.265] [SUCCESS] (83/139) disk_verify: resize by more than 1 fails
+[17:16:35.266] [SUCCESS] (84/139) disk_verify: key too long errors
+[17:16:35.266] [SUCCESS] (85/139) disk_verify: database index out of bounds
+[17:16:35.266] [SUCCESS] (86/139) disk_verify: registry ops with OOB index error
+[17:16:35.267] [SUCCESS] (87/139) disk_verify: shrink makes removed index out of bounds
+[17:16:35.267] [SUCCESS] (88/139) disk_verify: delete non-existent key preserves hash
+[17:16:35.267] [SUCCESS] (89/139) disk_verify: write after copy_database returns wrong error
+[17:16:35.581] [SUCCESS] (90/139) disk_verify: hash determinism
+[17:16:35.782] [SUCCESS] (91/139) disk_verify: hash changes when value changes
+[17:16:35.996] [SUCCESS] (92/139) disk_verify: isolation between databases
+[17:16:36.271] [SUCCESS] (93/139) disk_verify: registry hash determinism
+[17:16:36.529] [SUCCESS] (94/139) disk_verify: hash reverts when value is restored
+[17:16:38.031] [SUCCESS] (95/139) disk_verify: same ops produce same hash
+[17:16:39.293] [SUCCESS] (96/139) disk_verify: ops on different databases commute
+[17:16:39.295] [SUCCESS] (97/139) disk: disk: checkout unknown commit fails
+[17:16:39.297] [SUCCESS] (98/139) disk: empty registry hash agrees between memory and disk
+[17:16:39.303] [SUCCESS] (99/139) disk: commit returns the registry content hash
+[17:16:39.304] [SUCCESS] (100/139) memory: duplicate yields an independent registry
+[17:16:39.304] [SUCCESS] (101/139) memory: to_imm snapshot is unaffected by later mutations
+[17:16:39.313] [SUCCESS] (102/139) disk: duplicate yields an independent registry
+[17:16:39.319] [SUCCESS] (103/139) disk: to_imm snapshot is unaffected by later mutations
+[17:16:39.328] [SUCCESS] (104/139) disk: duplicate shares the repo and captures uncommitted state
+[17:16:39.344] [SUCCESS] (105/139) disk: divergent duplicates commit and check out independently
+[17:16:39.358] [SUCCESS] (106/139) memory: from_imm (to_imm r) has r's registry hash
+[17:16:39.371] [SUCCESS] (107/139) memory: snapshot is immune to source mutations
+[17:16:39.390] [SUCCESS] (108/139) memory: source is immune to duplicate mutations
+[17:16:39.404] [SUCCESS] (109/139) memory: two from_imm of one snapshot are independent
+[17:16:39.422] [SUCCESS] (110/139) memory: duplicate bisimulates the source
+[17:16:39.439] [SUCCESS] (111/139) memory: interleaved snapshots each recover their capture
+[17:16:40.556] [SUCCESS] (112/139) disk: from_imm (to_imm r) has r's registry hash
+[17:16:41.411] [SUCCESS] (113/139) disk: snapshot is immune to source mutations
+[17:16:42.826] [SUCCESS] (114/139) disk: source is immune to duplicate mutations
+[17:16:43.901] [SUCCESS] (115/139) disk: two from_imm of one snapshot are independent
+[17:16:44.970] [SUCCESS] (116/139) disk: duplicate bisimulates the source
+[17:16:46.040] [SUCCESS] (117/139) disk: interleaved snapshots each recover their capture
+[17:16:46.110] [SUCCESS] (118/139) disk: commit/checkout roundtrip
+[17:16:46.184] [SUCCESS] (119/139) disk: multiple commits are independent
+[17:16:46.521] [SUCCESS] (120/139) disk: commit/checkout preserves snapshot across further mutations
+[17:16:49.736] [SUCCESS] (121/139) memory: bisimulation on random op sequences
+[17:17:00.554] [SUCCESS] (122/139) memory_prove: bisimulation on random op sequences
+[17:17:09.351] [SUCCESS] (123/139) disk: bisimulation on random op sequences
+[17:17:19.665] [SUCCESS] (124/139) disk_prove: bisimulation on random op sequences
+[17:17:21.383] [SUCCESS] (125/139) memory_verify: bisimulation on random op sequences
+[17:17:24.313] [SUCCESS] (126/139) disk_verify: bisimulation on random op sequences
+[17:17:27.416] [SUCCESS] (127/139) cross-backend: memory and disk agree at every step
+[17:17:27.417] [SUCCESS] (128/139) memory_proof_lifecycle: proof has correct start/stop state hashes
+[17:17:27.426] [SUCCESS] (129/139) disk_proof_lifecycle: proof has correct start/stop state hashes
+[17:17:27.426] [SUCCESS] (130/139) memory: verify replays a proof
+[17:17:27.653] [SUCCESS] (131/139) memory: verify rejects a read absent from the proof
+[17:17:27.653] [SUCCESS] (132/139) memory: verify hashes a fully-blinded registry
+[17:17:27.662] [SUCCESS] (133/139) memory: verify works over a partially-blinded registry
+[17:17:27.673] [SUCCESS] (134/139) disk: verify replays a proof
+[17:17:27.684] [SUCCESS] (135/139) disk: verify rejects a read absent from the proof
+[17:17:27.706] [SUCCESS] (136/139) disk: verify hashes a fully-blinded registry
+[17:17:28.235] [SUCCESS] (137/139) disk: verify works over a partially-blinded registry
+[17:17:29.745] [SUCCESS] (138/139) memory: one prove-mode op verifies after arbitrary state
+[17:17:40.889] [SUCCESS] (139/139) disk: one prove-mode op verifies after arbitrary state
+(cd _build/default/src/lib_connpool/test && ./main.exe /flaky /ci_disabled)
+[17:17:42.228] [warn] Unknown tag: ci_disabled
+[17:17:42.230] [warn] Unknown tag: flaky
+[17:17:42.299] [SUCCESS] (1/3) warm established reusable connections
+[17:17:42.300] [SUCCESS] (2/3) connection_close_prevents_reuse
+[17:17:42.301] [SUCCESS] (3/3) server restarts are gracefully handled by the pool
+(cd _build/.sandbox/4d0d624dbe33da5c53374d6575c2c8ec/default/src/lib_micheline/test && .test_diff.inline-tests/inline-test-runner.exe inline-test-runner test_diff -partition test_diff.ml -source-tree-root ../../.. -diff-cmd - -verbose)
+File "src/lib_micheline/test/test_diff.ml", line 47, characters 0-386: For identical expressions, the diff is None. (0.000 sec)
+File "src/lib_micheline/test/test_diff.ml", line 57, characters 0-163: For ints the comment contains changed value. (0.001 sec)
+File "src/lib_micheline/test/test_diff.ml", line 63, characters 0-186: For strings the comment contains changed value. (0.000 sec)
+File "src/lib_micheline/test/test_diff.ml", line 69, characters 0-178: For prims the comment contains changed prim name. (0.000 sec)
+File "src/lib_micheline/test/test_diff.ml", line 75, characters 0-174: Changed Seq elements are put in comments. (0.000 sec)
+File "src/lib_micheline/test/test_diff.ml", line 79, characters 0-282: Elements added in current are marked with '+'. (0.000 sec)
+File "src/lib_micheline/test/test_diff.ml", line 87, characters 0-284: Elements removed in current are marked with '-'. (0.000 sec)
+File "src/lib_micheline/test/test_diff.ml", line 95, characters 0-330: Reordered elements appear as just changed. (0.000 sec)
+File "src/lib_micheline/test/test_diff.ml", line 104, characters 0-307: Changed values are marked with '->'. (0.000 sec)
+File "src/lib_micheline/test/test_diff.ml", line 113, characters 0-205: Prim arguments removed in current are marked with '-'. (0.000 sec)
+File "src/lib_micheline/test/test_diff.ml", line 118, characters 0-264: Prim arguments added in current are marked with '+'. (0.000 sec)
+File "src/lib_micheline/test/test_diff.ml", line 126, characters 0-256: Annotations should be preserved as in previous version. (0.000 sec)
+File "src/lib_micheline/test/test_diff.ml", line 136, characters 0-165: Differences in annotations are ignored. (0.000 sec)
+(cd _build/.sandbox/77c57d8dca2dd3196d90ce189f54fc09/default/src/lib_micheline/test && .test_parser.inline-tests/inline-test-runner.exe inline-test-runner test_parser -partition test_parser.ml -source-tree-root ../../.. -diff-cmd - -verbose)
+File "src/lib_micheline/test/test_parser.ml", line 77, characters 0-5913: Basic tokenizing (0.003 sec)
+File "src/lib_micheline/test/test_parser.ml", line 297, characters 0-1000: test_one_line_contract (0.000 sec)
+File "src/lib_micheline/test/test_parser.ml", line 329, characters 0-1633: test_condition_contract (0.000 sec)
+File "src/lib_micheline/test/test_parser.ml", line 437, characters 0-1600: test_basic_parsing (0.000 sec)
+File "src/lib_micheline/test/test_parser.ml", line 479, characters 0-319: test_condition_contract_parsing (0.000 sec)
+File "src/lib_micheline/test/test_parser.ml", line 487, characters 0-841: test_list_append_parsing (0.000 sec)
+File "src/lib_micheline/test/test_parser.ml", line 528, characters 0-283: test_parses_expression (0.000 sec)
+(cd _build/.sandbox/135dc358e1a1cc64d4a01203dec39e04/default/src/lib_expect_helper/test && .tezos_expect_helper_test.inline-tests/inline-test-runner.exe inline-test-runner tezos_expect_helper_test -partition test.ml -source-tree-root ../../.. -diff-cmd - -verbose)
+File "src/lib_expect_helper/test/test.ml", line 28, characters 0-328: require_does_not_raise_err (0.001 sec)
+File "src/lib_expect_helper/test/test.ml", line 35, characters 0-155: require_does_not_raise_ok (0.000 sec)
+File "src/lib_expect_helper/test/test.ml", line 39, characters 0-119: require_does_raise_ok (0.000 sec)
+File "src/lib_expect_helper/test/test.ml", line 43, characters 0-259: require_does_raise_err (0.000 sec)
+(cd _build/.sandbox/ea28191d6dd44d3de3a73b49f2d3ac1b/default/src/lib_micheline && .tezos_micheline.inline-tests/inline-test-runner.exe inline-test-runner tezos_micheline -partition micheline.ml -source-tree-root ../.. -diff-cmd - -verbose)
+File "src/lib_micheline/micheline.ml", line 426, characters 4-140: strip_locations (0.012 sec)
+File "src/lib_micheline/micheline.ml", line 430, characters 4-170: extract_locations (0.019 sec)
+File "src/lib_micheline/micheline.ml", line 437, characters 4-203: inject_locations (0.013 sec)
+File "src/lib_micheline/micheline.ml", line 444, characters 4-168: map (0.012 sec)
+File "src/lib_micheline/micheline.ml", line 451, characters 4-207: map_node (0.010 sec)
+(cd _build/.sandbox/513f669605a931a3112ad4bfe4cd3ce1/default/src/lib_base/unix && .tezos_base_unix.inline-tests/inline-test-runner.exe inline-test-runner tezos_base_unix -partition daily_file_rotation.ml -source-tree-root ../../.. -diff-cmd - -verbose)
+File "src/lib_base/unix/daily_file_rotation.ml", line 30, characters 0-339 (0.017 sec)
+File "src/lib_base/unix/daily_file_rotation.ml", line 48, characters 0-759 (0.000 sec)
+(cd _build/.sandbox/513f669605a931a3112ad4bfe4cd3ce1/default/src/lib_base/unix && .tezos_base_unix.inline-tests/inline-test-runner.exe inline-test-runner tezos_base_unix -partition file_descriptor_sink.ml -source-tree-root ../../.. -diff-cmd - -verbose)
+File "src/lib_base/unix/file_descriptor_sink.ml", line 288, characters 0-2004 (0.001 sec)
+(cd _build/.sandbox/d4fc919cb89c82c58e9874d0ef34a1b7/default/src/lib_benchmark && .tezos_benchmark.inline-tests/inline-test-runner.exe inline-test-runner tezos_benchmark -partition codegen.ml -source-tree-root ../.. -diff-cmd - -verbose)
+File "src/lib_benchmark/codegen.ml", line 497, characters 0-578: basic_printing (0.007 sec)
+File "src/lib_benchmark/codegen.ml", line 515, characters 0-452: anonymous_int_literals (0.000 sec)
+File "src/lib_benchmark/codegen.ml", line 529, characters 0-539: let_bound_lambda (0.000 sec)
+File "src/lib_benchmark/codegen.ml", line 546, characters 0-497: ill_typed_higher_order (0.000 sec)
+File "src/lib_benchmark/codegen.ml", line 561, characters 0-417: if_conditional_operator (0.000 sec)
+File "src/lib_benchmark/codegen.ml", line 574, characters 0-936: module_generation (0.721 sec)
+File "src/lib_benchmark/codegen.ml", line 613, characters 0-559: takes_saturation_reprs (0.000 sec)
+(cd _build/.sandbox/d4fc919cb89c82c58e9874d0ef34a1b7/default/src/lib_benchmark && .tezos_benchmark.inline-tests/inline-test-runner.exe inline-test-runner tezos_benchmark -partition pyinit.ml -source-tree-root ../.. -diff-cmd - -verbose)
+File "src/lib_benchmark/pyinit.ml", line 71, characters 0-520: pyinit can be called twice without failing (0.054 sec)
+(cd _build/.sandbox/f44603db0982cc0f230ee1f2cdec130c/default/src/lib_stdlib && .tezos_stdlib.inline-tests/inline-test-runner.exe inline-test-runner tezos_stdlib -partition bloomer.ml -source-tree-root ../.. -diff-cmd - -verbose)
+File "src/lib_stdlib/bloomer.ml", line 97, characters 0-817: random_read_writes (0.004 sec)
+File "src/lib_stdlib/bloomer.ml", line 123, characters 0-1339: peek and poke work with bits = [1 .. Sys.int_size - 7] (0.005 sec)
+File "src/lib_stdlib/bloomer.ml", line 163, characters 0-739: sequential_read_writes (0.014 sec)
+File "src/lib_stdlib/bloomer.ml", line 182, characters 0-705: read_over_write (0.000 sec)
+File "src/lib_stdlib/bloomer.ml", line 282, characters 0-835: consistent_add_mem_countdown (0.227 sec)
+File "src/lib_stdlib/bloomer.ml", line 309, characters 0-1531: consistent_add_countdown_count (1.472 sec)
+File "src/lib_stdlib/bloomer.ml", line 456, characters 4-137 (9.177 sec)
+File "src/lib_stdlib/bloomer.ml", line 461, characters 4-1695: <<match Sys.getenv_opt "BLOOMER_TEST_GNUPLOT_PA[...]>> (0.000 sec)
+Set the BLOOMER_TEST_GNUPLOT_PATH to a directory to get some human readable test results.
+(cd _build/default/src/lib_p2p/test && ./test_p2p_broadcast.exe)
+[17:18:00.897] [SUCCESS] (1/1) tezos-p2p-broadcast: p2p-broadcast (simple)
+(cd _build/default/src/lib_store/unix/test && ./main.exe /flaky /ci_disabled)
+[17:18:05.136] [warn] Unknown tag: ci_disabled
+[17:18:05.136] [warn] Unknown tag: flaky
+[17:18:05.190] [SUCCESS] (1/178) tezos-store: test chain (forking a test chain)
+[17:18:05.251] [SUCCESS] (2/178) tezos-store: test chain (spawning a test chain)
+[17:18:05.308] [SUCCESS] (3/178) tezos-store: test chain (shutdown test chain then load it)
+[17:18:05.483] [SUCCESS] (4/178) tezos-store: store (store cycles)
+[17:18:05.515] [SUCCESS] (5/178) tezos-store: store (path between blocks)
+[17:18:05.544] [SUCCESS] (6/178) tezos-store: store (common ancestor)
+[17:18:05.568] [SUCCESS] (7/178) tezos-store: store (block locators)
+[17:18:05.599] [SUCCESS] (8/178) tezos-store: store (set head)
+[17:18:05.625] [SUCCESS] (9/178) tezos-store: store (blocks in chain)
+[17:18:05.648] [SUCCESS] (10/178) tezos-store: store (new blocks)
+[17:18:05.676] [SUCCESS] (11/178) tezos-store: store (basic checkpoint)
+[17:18:05.719] [SUCCESS] (12/178) tezos-store: store (is valid target)
+[17:18:05.741] [SUCCESS] (13/178) tezos-store: store (acceptable block)
+[17:18:05.771] [SUCCESS] (14/178) tezos-store: store (future target)
+[17:18:05.798] [SUCCESS] (15/178) tezos-store: store (reach target)
+[17:18:05.824] [SUCCESS] (16/178) tezos-store: store (update target in node)
+[17:18:05.853] [SUCCESS] (17/178) tezos-store: store (block_of_identifier should succeed to retrieve block from level)
+[17:18:05.879] [SUCCESS] (18/178) tezos-store: store (block_of_identifier should succeed to retrieve block from hash)
+[17:18:05.900] [SUCCESS] (19/178) tezos-store: store (block_of_identifier should succeed to retrieve block from hash predecessor)
+[17:18:05.926] [SUCCESS] (20/178) tezos-store: store (block_of_identifier should succeed to retrieve block from hash successor)
+[17:18:05.951] [SUCCESS] (21/178) tezos-store: store (block_of_identifier should succeed to retrieve the caboose)
+[17:18:05.974] [SUCCESS] (22/178) tezos-store: store (block_of_identifier should succeed to retrieve caboose successor)
+[17:18:06.002] [SUCCESS] (23/178) tezos-store: store (block_of_identifier should fail to retrieve caboose predecessor)
+[17:18:06.030] [SUCCESS] (24/178) tezos-store: store (block_of_identifier should succeed to retrieve the checkpoint)
+[17:18:06.056] [SUCCESS] (25/178) tezos-store: store (block_of_identifier should succeed to retrieve checkpoint predecessor)
+[17:18:06.082] [SUCCESS] (26/178) tezos-store: store (block_of_identifier should succeed to retrieve the checkpoint successor)
+[17:18:06.112] [SUCCESS] (27/178) tezos-store: store (block_of_identifier should fail to retrieve the checkpoint successor after the head)
+[17:18:06.138] [SUCCESS] (28/178) tezos-store: store (block_of_identifier should succeed to retrieve the savepoint)
+[17:18:06.211] [SUCCESS] (29/178) tezos-store: store (live_blocks)
+[17:18:06.332] [SUCCESS] (30/178) tezos-store: protocol store (generic protocol storing)
+[17:18:06.440] [SUCCESS] (31/178) tezos-store: locator (test pred)
+[17:18:06.625] [SUCCESS] (32/178) tezos-store: locator (test protocol locator)
+[17:18:06.782] [SUCCESS] (33/178) tezos-store: consistency (protocol level consistency (Archive mode): drop protocol #1)
+[17:18:06.934] [SUCCESS] (34/178) tezos-store: consistency (protocol level consistency (Archive mode): drop protocol #2)
+[17:18:07.094] [SUCCESS] (35/178) tezos-store: consistency (protocol level consistency (Archive mode): drop protocol #3)
+[17:18:07.248] [SUCCESS] (36/178) tezos-store: consistency (protocol level consistency (Archive mode): drop protocol #4)
+[17:18:07.392] [SUCCESS] (37/178) tezos-store: consistency (protocol level consistency (Archive mode): drop protocol #5)
+[17:18:07.539] [SUCCESS] (38/178) tezos-store: consistency (protocol level consistency (Archive mode): remove file)
+[17:18:07.709] [SUCCESS] (39/178) tezos-store: consistency (protocol level consistency (Full mode + 1 extra cycles): drop protocol #1)
+[17:18:07.874] [SUCCESS] (40/178) tezos-store: consistency (protocol level consistency (Full mode + 1 extra cycles): drop protocol #2)
+[17:18:08.029] [SUCCESS] (41/178) tezos-store: consistency (protocol level consistency (Full mode + 1 extra cycles): drop protocol #3)
+[17:18:08.226] [SUCCESS] (42/178) tezos-store: consistency (protocol level consistency (Full mode + 1 extra cycles): drop protocol #4)
+[17:18:08.433] [SUCCESS] (43/178) tezos-store: consistency (protocol level consistency (Full mode + 1 extra cycles): drop protocol #5)
+[17:18:08.637] [SUCCESS] (44/178) tezos-store: consistency (protocol level consistency (Full mode + 1 extra cycles): remove file)
+[17:18:08.833] [SUCCESS] (45/178) tezos-store: consistency (protocol level consistency (Rolling mode + 1 extra cycles): drop protocol #1)
+[17:18:09.034] [SUCCESS] (46/178) tezos-store: consistency (protocol level consistency (Rolling mode + 1 extra cycles): drop protocol #2)
+[17:18:09.214] [SUCCESS] (47/178) tezos-store: consistency (protocol level consistency (Rolling mode + 1 extra cycles): drop protocol #3)
+[17:18:09.451] [SUCCESS] (48/178) tezos-store: consistency (protocol level consistency (Rolling mode + 1 extra cycles): drop protocol #4)
+[17:18:09.681] [SUCCESS] (49/178) tezos-store: consistency (protocol level consistency (Rolling mode + 1 extra cycles): drop protocol #5)
+[17:18:09.870] [SUCCESS] (50/178) tezos-store: consistency (protocol level consistency (Rolling mode + 1 extra cycles): remove file)
+[17:18:11.054] [SUCCESS] (51/178) tezos-store: cemented store (cementing pruned blocks)
+[17:18:12.119] [SUCCESS] (52/178) tezos-store: cemented store (cementing full blocks)
+[17:18:12.166] [SUCCESS] (53/178) tezos-store: cemented store (retrieve cemented metadata)
+[17:18:12.188] [SUCCESS] (54/178) tezos-store: block store (block storing and access predecessors (hash only))
+[17:18:12.213] [SUCCESS] (55/178) tezos-store: block store (simple merge)
+[17:18:12.264] [SUCCESS] (56/178) tezos-store: block store (consecutive & concurrent merge)
+[17:18:12.603] [SUCCESS] (57/178) tezos-store: block store (10 cycles merge)
+[17:18:12.794] [SUCCESS] (58/178) tezos-store: block store (merge with branches)
+[17:18:12.871] [SUCCESS] (59/178) tezos-store: block store (consecutive merge (Archive))
+[17:18:13.050] [SUCCESS] (60/178) tezos-store: block store (consecutive merge (Full + 0 cycles))
+[17:18:13.243] [SUCCESS] (61/178) tezos-store: block store (consecutive merge (Full + 2 cycles))
+[17:18:13.308] [SUCCESS] (62/178) tezos-store: block store (consecutive merge (Rolling + 0 cycles))
+[17:18:13.412] [SUCCESS] (63/178) tezos-store: block store (consecutive merge (Rolling + 2 cycles))
+[17:18:13.629] [SUCCESS] (64/178) tezos-store: snapshots (tar snapshot import rejects members with non-canonical paths)
+[17:18:14.392] [SUCCESS] (65/178) tezos-store: snapshots (genesis consistency after rolling import (blocks per cycle = 8) using tar (single file) format)
+[17:18:15.025] [SUCCESS] (66/178) tezos-store: snapshots (genesis consistency after rolling import (blocks per cycle = 8) using directory format)
+[17:18:23.215] [SUCCESS] (67/178) tezos-store: snapshots (check caboose and savepoint drag after rolling import (blocks per cycle = 256) using tar (single file) format)
+[17:18:31.651] [SUCCESS] (68/178) tezos-store: snapshots (check caboose and savepoint drag after rolling import (blocks per cycle = 256) using directory format)
+[17:18:32.555] [SUCCESS] (69/178) tezos-store: snapshots (export => import with 24 initial blocks from Rolling mode + 1 extra cycles to rolling (exported block at checkpoint) using tar (single file) format)
+[17:18:33.263] [SUCCESS] (70/178) tezos-store: snapshots (export => import with 24 initial blocks from Rolling mode + 1 extra cycles to rolling (exported block at checkpoint) using directory format)
+[17:18:34.123] [SUCCESS] (71/178) tezos-store: snapshots (export => import with 24 initial blocks from Rolling mode to rolling (exported block at checkpoint) using tar (single file) format)
+[17:18:35.068] [SUCCESS] (72/178) tezos-store: snapshots (export => import with 24 initial blocks from Rolling mode to rolling (exported block at checkpoint) using directory format)
+[17:18:35.990] [SUCCESS] (73/178) tezos-store: snapshots (export => import with 24 initial blocks from Full mode + 1 extra cycles to rolling (exported block at checkpoint) using tar (single file) format)
+[17:18:36.763] [SUCCESS] (74/178) tezos-store: snapshots (export => import with 24 initial blocks from Full mode + 1 extra cycles to rolling (exported block at checkpoint) using directory format)
+[17:18:37.806] [SUCCESS] (75/178) tezos-store: snapshots (export => import with 24 initial blocks from Full mode + 1 extra cycles to full (exported block at checkpoint) using tar (single file) format)
+[17:18:38.587] [SUCCESS] (76/178) tezos-store: snapshots (export => import with 24 initial blocks from Full mode + 1 extra cycles to full (exported block at checkpoint) using directory format)
+[17:18:39.273] [SUCCESS] (77/178) tezos-store: snapshots (export => import with 77 initial blocks from Rolling mode + 1 extra cycles to rolling (exported block at level 24) using tar (single file) format)
+[17:18:40.006] [SUCCESS] (78/178) tezos-store: snapshots (export => import with 77 initial blocks from Rolling mode + 1 extra cycles to rolling (exported block at level 24) using directory format)
+[17:18:40.643] [SUCCESS] (79/178) tezos-store: snapshots (export => import with 77 initial blocks from Rolling mode to rolling (exported block at level 24) using tar (single file) format)
+[17:18:41.295] [SUCCESS] (80/178) tezos-store: snapshots (export => import with 77 initial blocks from Rolling mode to rolling (exported block at level 24) using directory format)
+[17:18:42.358] [SUCCESS] (81/178) tezos-store: snapshots (export => import with 77 initial blocks from Full mode + 1 extra cycles to rolling (exported block at level 24) using tar (single file) format)
+[17:18:43.154] [SUCCESS] (82/178) tezos-store: snapshots (export => import with 77 initial blocks from Full mode + 1 extra cycles to rolling (exported block at level 24) using directory format)
+[17:18:43.811] [SUCCESS] (83/178) tezos-store: snapshots (export => import with 77 initial blocks from Full mode + 1 extra cycles to full (exported block at level 24) using tar (single file) format)
+[17:18:44.467] [SUCCESS] (84/178) tezos-store: snapshots (export => import with 77 initial blocks from Full mode + 1 extra cycles to full (exported block at level 24) using directory format)
+[17:18:45.829] [SUCCESS] (85/178) tezos-store: snapshots (export => import with 77 initial blocks from Rolling mode + 1 extra cycles to rolling (exported block at checkpoint) using tar (single file) format)
+[17:18:47.193] [SUCCESS] (86/178) tezos-store: snapshots (export => import with 77 initial blocks from Rolling mode + 1 extra cycles to rolling (exported block at checkpoint) using directory format)
+[17:18:48.544] [SUCCESS] (87/178) tezos-store: snapshots (export => import with 77 initial blocks from Rolling mode to rolling (exported block at checkpoint) using tar (single file) format)
+[17:18:49.754] [SUCCESS] (88/178) tezos-store: snapshots (export => import with 77 initial blocks from Rolling mode to rolling (exported block at checkpoint) using directory format)
+[17:18:51.147] [SUCCESS] (89/178) tezos-store: snapshots (export => import with 77 initial blocks from Full mode + 1 extra cycles to rolling (exported block at checkpoint) using tar (single file) format)
+[17:18:52.409] [SUCCESS] (90/178) tezos-store: snapshots (export => import with 77 initial blocks from Full mode + 1 extra cycles to rolling (exported block at checkpoint) using directory format)
+[17:18:53.827] [SUCCESS] (91/178) tezos-store: snapshots (export => import with 77 initial blocks from Full mode + 1 extra cycles to full (exported block at checkpoint) using tar (single file) format)
+[17:18:55.015] [SUCCESS] (92/178) tezos-store: snapshots (export => import with 77 initial blocks from Full mode + 1 extra cycles to full (exported block at checkpoint) using directory format)
+[17:18:56.397] [SUCCESS] (93/178) tezos-store: reconstruct (Reconstructing on a bootstrapped Full mode node with 101 blocks.)
+[17:18:57.760] [SUCCESS] (94/178) tezos-store: reconstruct (Reconstructing on a bootstrapped Full mode + 1 extra cycles node with 101 blocks.)
+[17:18:58.965] [SUCCESS] (95/178) tezos-store: reconstruct (Reconstructing on a bootstrapped Full mode node with 92 blocks.)
+[17:19:00.221] [SUCCESS] (96/178) tezos-store: reconstruct (Reconstructing on a bootstrapped Full mode + 1 extra cycles node with 92 blocks.)
+[17:19:01.430] [SUCCESS] (97/178) tezos-store: reconstruct (Reconstructing on a bootstrapped Full mode node with 89 blocks.)
+[17:19:02.726] [SUCCESS] (98/178) tezos-store: reconstruct (Reconstructing on a bootstrapped Full mode + 1 extra cycles node with 89 blocks.)
+[17:19:03.534] [SUCCESS] (99/178) tezos-store: reconstruct (Reconstructing on a bootstrapped Full mode node with 57 blocks.)
+[17:19:04.239] [SUCCESS] (100/178) tezos-store: reconstruct (Reconstructing on a bootstrapped Full mode + 1 extra cycles node with 57 blocks.)
+[17:19:04.755] [SUCCESS] (101/178) tezos-store: reconstruct (Reconstructing on a bootstrapped Full mode node with 42 blocks.)
+[17:19:05.260] [SUCCESS] (102/178) tezos-store: reconstruct (Reconstructing on a bootstrapped Full mode + 1 extra cycles node with 42 blocks.)
+[17:19:05.385] [SUCCESS] (103/178) tezos-store: reconstruct (Reconstructing on a bootstrapped Full mode node with 21 blocks.)
+[17:19:05.503] [SUCCESS] (104/178) tezos-store: reconstruct (Reconstructing on a bootstrapped Full mode + 1 extra cycles node with 21 blocks.)
+[17:19:05.565] [SUCCESS] (105/178) tezos-store: reconstruct (Reconstructing on a bootstrapped Full mode node with 8 blocks.)
+[17:19:05.616] [SUCCESS] (106/178) tezos-store: reconstruct (Reconstructing on a bootstrapped Full mode + 1 extra cycles node with 8 blocks.)
+[17:19:05.644] [SUCCESS] (107/178) tezos-store: reconstruct (Reconstructing on a bootstrapped Full mode node with 3 blocks.)
+[17:19:05.680] [SUCCESS] (108/178) tezos-store: reconstruct (Reconstructing on a bootstrapped Full mode + 1 extra cycles node with 3 blocks.)
+[17:19:05.699] [SUCCESS] (109/178) tezos-store: reconstruct (Reconstructing on a bootstrapped Full mode node with 0 blocks.)
+[17:19:05.714] [SUCCESS] (110/178) tezos-store: reconstruct (Reconstructing on a bootstrapped Full mode + 1 extra cycles node with 0 blocks.)
+[17:19:07.253] [SUCCESS] (111/178) tezos-store: reconstruct (Reconstructing from snapshots on a Full mode node with 101 blocks.)
+[17:19:08.877] [SUCCESS] (112/178) tezos-store: reconstruct (Reconstructing from snapshots on a Full mode + 1 extra cycles node with 101 blocks.)
+[17:19:10.286] [SUCCESS] (113/178) tezos-store: reconstruct (Reconstructing from snapshots on a Full mode node with 92 blocks.)
+[17:19:11.712] [SUCCESS] (114/178) tezos-store: reconstruct (Reconstructing from snapshots on a Full mode + 1 extra cycles node with 92 blocks.)
+[17:19:13.195] [SUCCESS] (115/178) tezos-store: reconstruct (Reconstructing from snapshots on a Full mode node with 89 blocks.)
+[17:19:14.580] [SUCCESS] (116/178) tezos-store: reconstruct (Reconstructing from snapshots on a Full mode + 1 extra cycles node with 89 blocks.)
+[17:19:15.518] [SUCCESS] (117/178) tezos-store: reconstruct (Reconstructing from snapshots on a Full mode node with 57 blocks.)
+[17:19:16.421] [SUCCESS] (118/178) tezos-store: reconstruct (Reconstructing from snapshots on a Full mode + 1 extra cycles node with 57 blocks.)
+[17:19:17.170] [SUCCESS] (119/178) tezos-store: reconstruct (Reconstructing from snapshots on a Full mode node with 42 blocks.)
+[17:19:17.925] [SUCCESS] (120/178) tezos-store: reconstruct (Reconstructing from snapshots on a Full mode + 1 extra cycles node with 42 blocks.)
+[17:19:18.369] [SUCCESS] (121/178) tezos-store: reconstruct (Reconstructing from snapshots on a Full mode node with 21 blocks.)
+[17:19:18.789] [SUCCESS] (122/178) tezos-store: reconstruct (Reconstructing from snapshots on a Full mode + 1 extra cycles node with 21 blocks.)
+[17:19:19.038] [SUCCESS] (123/178) tezos-store: reconstruct (Reconstructing from snapshots on a Full mode node with 8 blocks.)
+[17:19:19.321] [SUCCESS] (124/178) tezos-store: reconstruct (Reconstructing from snapshots on a Full mode + 1 extra cycles node with 8 blocks.)
+[17:19:19.528] [SUCCESS] (125/178) tezos-store: reconstruct (Reconstructing from snapshots on a Full mode node with 3 blocks.)
+[17:19:19.742] [SUCCESS] (126/178) tezos-store: reconstruct (Reconstructing from snapshots on a Full mode + 1 extra cycles node with 3 blocks.)
+[17:19:19.768] [SUCCESS] (127/178) tezos-store: reconstruct (Reconstructing from snapshots on a Full mode node with 0 blocks.)
+[17:19:19.799] [SUCCESS] (128/178) tezos-store: reconstruct (Reconstructing from snapshots on a Full mode + 1 extra cycles node with 0 blocks.)
+[17:19:31.599] [SUCCESS] (129/178) tezos-store: history_mode_switch (Check savepoint drag with cycles bigger that max_op_ttl)
+[17:19:32.182] [SUCCESS] (130/178) tezos-store: history_mode_switch (switching from Rolling mode + 5 extra cycles to Rolling mode + 5 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:33.398] [SUCCESS] (131/178) tezos-store: history_mode_switch (switching from Rolling mode + 5 extra cycles to Rolling mode with 72 blocks baked and cycle length 8)
+[17:19:33.939] [SUCCESS] (132/178) tezos-store: history_mode_switch (switching from Rolling mode + 5 extra cycles to Rolling mode + 1 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:34.503] [SUCCESS] (133/178) tezos-store: history_mode_switch (switching from Rolling mode + 5 extra cycles to Full mode + 5 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:35.269] [SUCCESS] (134/178) tezos-store: history_mode_switch (switching from Rolling mode + 5 extra cycles to Full mode with 72 blocks baked and cycle length 8)
+[17:19:35.904] [SUCCESS] (135/178) tezos-store: history_mode_switch (switching from Rolling mode + 5 extra cycles to Full mode + 1 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:36.427] [SUCCESS] (136/178) tezos-store: history_mode_switch (switching from Rolling mode + 5 extra cycles to Archive mode with 72 blocks baked and cycle length 8)
+[17:19:37.218] [SUCCESS] (137/178) tezos-store: history_mode_switch (switching from Rolling mode to Rolling mode + 5 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:37.899] [SUCCESS] (138/178) tezos-store: history_mode_switch (switching from Rolling mode to Rolling mode with 72 blocks baked and cycle length 8)
+[17:19:38.513] [SUCCESS] (139/178) tezos-store: history_mode_switch (switching from Rolling mode to Rolling mode + 1 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:39.096] [SUCCESS] (140/178) tezos-store: history_mode_switch (switching from Rolling mode to Full mode + 5 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:39.665] [SUCCESS] (141/178) tezos-store: history_mode_switch (switching from Rolling mode to Full mode with 72 blocks baked and cycle length 8)
+[17:19:40.263] [SUCCESS] (142/178) tezos-store: history_mode_switch (switching from Rolling mode to Full mode + 1 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:40.818] [SUCCESS] (143/178) tezos-store: history_mode_switch (switching from Rolling mode to Archive mode with 72 blocks baked and cycle length 8)
+[17:19:41.433] [SUCCESS] (144/178) tezos-store: history_mode_switch (switching from Rolling mode + 1 extra cycles to Rolling mode + 5 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:42.335] [SUCCESS] (145/178) tezos-store: history_mode_switch (switching from Rolling mode + 1 extra cycles to Rolling mode with 72 blocks baked and cycle length 8)
+[17:19:42.954] [SUCCESS] (146/178) tezos-store: history_mode_switch (switching from Rolling mode + 1 extra cycles to Rolling mode + 1 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:43.611] [SUCCESS] (147/178) tezos-store: history_mode_switch (switching from Rolling mode + 1 extra cycles to Full mode + 5 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:44.249] [SUCCESS] (148/178) tezos-store: history_mode_switch (switching from Rolling mode + 1 extra cycles to Full mode with 72 blocks baked and cycle length 8)
+[17:19:45.046] [SUCCESS] (149/178) tezos-store: history_mode_switch (switching from Rolling mode + 1 extra cycles to Full mode + 1 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:45.684] [SUCCESS] (150/178) tezos-store: history_mode_switch (switching from Rolling mode + 1 extra cycles to Archive mode with 72 blocks baked and cycle length 8)
+[17:19:46.258] [SUCCESS] (151/178) tezos-store: history_mode_switch (switching from Full mode + 5 extra cycles to Rolling mode + 5 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:46.792] [SUCCESS] (152/178) tezos-store: history_mode_switch (switching from Full mode + 5 extra cycles to Rolling mode with 72 blocks baked and cycle length 8)
+[17:19:47.368] [SUCCESS] (153/178) tezos-store: history_mode_switch (switching from Full mode + 5 extra cycles to Rolling mode + 1 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:47.929] [SUCCESS] (154/178) tezos-store: history_mode_switch (switching from Full mode + 5 extra cycles to Full mode + 5 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:48.488] [SUCCESS] (155/178) tezos-store: history_mode_switch (switching from Full mode + 5 extra cycles to Full mode with 72 blocks baked and cycle length 8)
+[17:19:49.030] [SUCCESS] (156/178) tezos-store: history_mode_switch (switching from Full mode + 5 extra cycles to Full mode + 1 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:49.570] [SUCCESS] (157/178) tezos-store: history_mode_switch (switching from Full mode + 5 extra cycles to Archive mode with 72 blocks baked and cycle length 8)
+[17:19:50.280] [SUCCESS] (158/178) tezos-store: history_mode_switch (switching from Full mode to Rolling mode + 5 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:50.971] [SUCCESS] (159/178) tezos-store: history_mode_switch (switching from Full mode to Rolling mode with 72 blocks baked and cycle length 8)
+[17:19:51.592] [SUCCESS] (160/178) tezos-store: history_mode_switch (switching from Full mode to Rolling mode + 1 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:52.256] [SUCCESS] (161/178) tezos-store: history_mode_switch (switching from Full mode to Full mode + 5 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:52.868] [SUCCESS] (162/178) tezos-store: history_mode_switch (switching from Full mode to Full mode with 72 blocks baked and cycle length 8)
+[17:19:53.496] [SUCCESS] (163/178) tezos-store: history_mode_switch (switching from Full mode to Full mode + 1 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:54.096] [SUCCESS] (164/178) tezos-store: history_mode_switch (switching from Full mode to Archive mode with 72 blocks baked and cycle length 8)
+[17:19:54.791] [SUCCESS] (165/178) tezos-store: history_mode_switch (switching from Full mode + 1 extra cycles to Rolling mode + 5 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:55.461] [SUCCESS] (166/178) tezos-store: history_mode_switch (switching from Full mode + 1 extra cycles to Rolling mode with 72 blocks baked and cycle length 8)
+[17:19:56.087] [SUCCESS] (167/178) tezos-store: history_mode_switch (switching from Full mode + 1 extra cycles to Rolling mode + 1 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:56.741] [SUCCESS] (168/178) tezos-store: history_mode_switch (switching from Full mode + 1 extra cycles to Full mode + 5 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:57.381] [SUCCESS] (169/178) tezos-store: history_mode_switch (switching from Full mode + 1 extra cycles to Full mode with 72 blocks baked and cycle length 8)
+[17:19:57.982] [SUCCESS] (170/178) tezos-store: history_mode_switch (switching from Full mode + 1 extra cycles to Full mode + 1 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:58.596] [SUCCESS] (171/178) tezos-store: history_mode_switch (switching from Full mode + 1 extra cycles to Archive mode with 72 blocks baked and cycle length 8)
+[17:19:59.052] [SUCCESS] (172/178) tezos-store: history_mode_switch (switching from Archive mode to Rolling mode + 5 extra cycles with 72 blocks baked and cycle length 8)
+[17:19:59.474] [SUCCESS] (173/178) tezos-store: history_mode_switch (switching from Archive mode to Rolling mode with 72 blocks baked and cycle length 8)
+[17:19:59.942] [SUCCESS] (174/178) tezos-store: history_mode_switch (switching from Archive mode to Rolling mode + 1 extra cycles with 72 blocks baked and cycle length 8)
+[17:20:00.383] [SUCCESS] (175/178) tezos-store: history_mode_switch (switching from Archive mode to Full mode + 5 extra cycles with 72 blocks baked and cycle length 8)
+[17:20:00.852] [SUCCESS] (176/178) tezos-store: history_mode_switch (switching from Archive mode to Full mode with 72 blocks baked and cycle length 8)
+[17:20:01.277] [SUCCESS] (177/178) tezos-store: history_mode_switch (switching from Archive mode to Full mode + 1 extra cycles with 72 blocks baked and cycle length 8)
+[17:20:01.739] [SUCCESS] (178/178) tezos-store: history_mode_switch (switching from Archive mode to Archive mode with 72 blocks baked and cycle length 8)
+(cd _build/default/src/lib_shell/test && ./main.exe /flaky /ci_disabled)
+qcheck random seed: 609665306
+[17:20:04.787] [warn] Unknown tag: ci_disabled
+[17:20:04.790] [SUCCESS] (1/153) test create: simple
+[17:20:04.790] [SUCCESS] (2/153) test create: test known
+[17:20:04.790] [SUCCESS] (3/153) test create: with global_input
+[17:20:04.790] [SUCCESS] (4/153) test read: (and variations)
+[17:20:04.790] [SUCCESS] (5/153) test known: found values in disk are cached
+[17:20:04.894] [SUCCESS] (6/153) test fetch: full requester timeout
+[17:20:04.894] [SUCCESS] (7/153) test clear_or_cancel: removes
+[17:20:04.894] [SUCCESS] (8/153) test clear_or_cancel: decrements pending
+[17:20:04.894] [SUCCESS] (9/153) test clear_or_cancel: cancels
+[17:20:04.894] [SUCCESS] (10/153) test pending cancelled
+[17:20:04.894] [SUCCESS] (11/153) test watch: simple
+[17:20:04.897] [SUCCESS] (12/153) test pending notified
+[17:20:04.897] [SUCCESS] (13/153) test pending timeout
+[17:20:04.897] [SUCCESS] (14/153) test watch: non fetched
+[17:20:04.897] [SUCCESS] (15/153) test watch: double watchers
+[17:20:04.897] [SUCCESS] (16/153) test inject: already in memory
+[17:20:04.897] [SUCCESS] (17/153) test inject: already in disk
+[17:20:04.897] [SUCCESS] (18/153) test inject: already in requested
+[17:20:05.901] [SUCCESS] (19/153) test inject: request unrequested peers first
+[17:20:05.901] [SUCCESS] (20/153) test inject: otherwise
+[17:20:05.901] [SUCCESS] (21/153) test notify: invalid
+[17:20:05.901] [SUCCESS] (22/153) test notify: valid
+[17:20:05.901] [SUCCESS] (23/153) test notify: unfetched
+[17:20:05.901] [SUCCESS] (24/153) test notify: memory duplicate
+[17:20:05.901] [SUCCESS] (25/153) test notify: disk duplicate
+[17:20:06.311] [SUCCESS] (26/153) test pending_requests
+[17:20:06.311] [SUCCESS] (27/153) test memory_table_length
+[17:20:06.311] [SUCCESS] (28/153) test shutdown
+[17:20:06.447] [SUCCESS] (29/153) Requester_PBT: read (Result.is_ok (read t key) = Option.is_some (read_opt t key))
+[17:20:06.557] [SUCCESS] (30/153) Requester_PBT: read (known t key = Option.is_some (read_opt t key))
+[17:20:06.728] [SUCCESS] (31/153) Requester_PBT: inject (read_opt (inject t key value) = (Some value))
+[17:20:06.872] [SUCCESS] (32/153) Requester_PBT: inject (key <> key' ==> read_opt (inject t key' value) key = read_opt t key)
+[17:20:07.013] [SUCCESS] (33/153) Requester_PBT: inject (read_opt t key <= read_opt (inject t key' value) key)
+[17:20:07.158] [SUCCESS] (34/153) Requester_PBT: inject (memory_table_length t <= memory_table_length (inject t key value))
+[17:20:07.267] [SUCCESS] (35/153) Requester_PBT: clear_or_cancel (read_opt (clear_or_cancel t key') key <= read_opt t key)
+[17:20:07.372] [SUCCESS] (36/153) Requester_PBT: clear_or_cancel (memory_length (clear_or_cancel t key') key <= memory_length t)
+[17:20:07.472] [SUCCESS] (37/153) Requester_PBT: clear_or_cancel (pending (clear_or_cancel (fetch (fetch t key) key) key) key = true)
+[17:20:07.549] [SUCCESS] (38/153) tezos-shell: test validator (validator_events)
+[17:20:07.554] [SUCCESS] (39/153) synchronisation heuristic fuzzy: synchronisation heuristic fuzzy (Shell.synchronisation_heuristic.equivalence-with-reference-implementation (threshold 1) (latency 100))
+[17:20:08.794] [SUCCESS] (40/153) synchronisation heuristic fuzzy: synchronisation heuristic fuzzy (Shell.synchronisation_heuristic.equivalence-with-reference-implementation (threshold 2) (latency 100))
+[17:20:09.866] [SUCCESS] (41/153) synchronisation heuristic fuzzy: synchronisation heuristic fuzzy (Shell.synchronisation_heuristic.equivalence-with-reference-implementation (threshold 3) (latency 100))
+[17:20:10.966] [SUCCESS] (42/153) synchronisation heuristic fuzzy: synchronisation heuristic fuzzy (Shell.synchronisation_heuristic.equivalence-with-reference-implementation (threshold 4) (latency 100))
+[17:20:12.045] [SUCCESS] (43/153) synchronisation heuristic fuzzy: synchronisation heuristic fuzzy (Shell.synchronisation_heuristic.equivalence-with-reference-implementation (threshold 5) (latency 100))
+[17:20:13.121] [SUCCESS] (44/153) synchronisation heuristic fuzzy: synchronisation heuristic fuzzy (Shell.synchronisation_heuristic.equivalence-with-reference-implementation (threshold 6) (latency 100))
+[17:20:14.188] [SUCCESS] (45/153) synchronisation heuristic fuzzy: synchronisation heuristic fuzzy (Shell.synchronisation_heuristic.equivalence-with-reference-implementation (threshold 7) (latency 100))
+[17:20:15.346] [SUCCESS] (46/153) synchronisation heuristic fuzzy: synchronisation heuristic fuzzy (Shell.synchronisation_heuristic.equivalence-with-reference-implementation (threshold 8) (latency 100))
+[17:20:15.347] [SUCCESS] (47/153) tezos-shell: synchronisation heuristic sync (Threshold negative)
+[17:20:15.347] [SUCCESS] (48/153) tezos-shell: synchronisation heuristic sync (Threshold is zero)
+[17:20:15.347] [SUCCESS] (49/153) tezos-shell: synchronisation heuristic sync (Threshold is one, update in the present)
+[17:20:15.347] [SUCCESS] (50/153) tezos-shell: synchronisation heuristic sync (Threshold is one, update in the past)
+[17:20:15.347] [SUCCESS] (51/153) tezos-shell: synchronisation heuristic sync (Threshold is one, best timestamp in the past)
+[17:20:15.347] [SUCCESS] (52/153) tezos-shell: synchronisation heuristic sync (Threshold is one, update in the past does not erase update in the present)
+[17:20:15.347] [SUCCESS] (53/153) tezos-shell: synchronisation heuristic sync (Threshold is two)
+[17:20:15.347] [SUCCESS] (54/153) tezos-shell: synchronisation heuristic sync (Threshold is two, one peer in the past)
+[17:20:15.347] [SUCCESS] (55/153) tezos-shell: synchronisation heuristic sync (Threshold is two, one peer in the past twice)
+[17:20:15.348] [SUCCESS] (56/153) tezos-shell: synchronisation heuristic sync (test_threshold is two, two peers in the past)
+[17:20:15.348] [SUCCESS] (57/153) tezos-shell: synchronisation heuristic sync (Threshold is three)
+[17:20:15.348] [SUCCESS] (58/153) tezos-shell: synchronisation heuristic sync (Threshold is three, three in the past)
+[17:20:15.348] [SUCCESS] (59/153) tezos-shell: synchronisation heuristic sync (Crowbar counterexample 1)
+[17:20:15.348] [SUCCESS] (60/153) tezos-shell: synchronisation heuristic  (test bp create)
+[17:20:15.348] [SUCCESS] (61/153) tezos-shell: synchronisation heuristic  (test bp create 2)
+[17:20:15.348] [SUCCESS] (62/153) tezos-shell: synchronisation heuristic  (test bp activate)
+[17:20:15.348] [SUCCESS] (63/153) tezos-shell: synchronisation heuristic  (test bp activate 2)
+[17:20:15.348] [SUCCESS] (64/153) tezos-shell: synchronisation heuristic  (test force bootstrapped)
+[17:20:15.348] [SUCCESS] (65/153) tezos-shell: synchronisation heuristic  (test force bootstrapped 2)
+[17:20:15.348] [SUCCESS] (66/153) tezos-shell: synchronisation heuristic  (test force bootstrapped 3)
+[17:20:15.348] [SUCCESS] (67/153) tezos-shell: synchronisation heuristic  (test is bootstrapped)
+[17:20:15.348] [SUCCESS] (68/153) tezos-shell: synchronisation heuristic  (test is bootstrapped 2)
+[17:20:15.348] [SUCCESS] (69/153) tezos-shell: synchronisation heuristic  (test is bootstrapped 3)
+[17:20:15.348] [SUCCESS] (70/153) tezos-shell: synchronisation heuristic  (test waiting for bootstrapped)
+[17:20:15.348] [SUCCESS] (71/153) tezos-shell: synchronisation heuristic  (test waiting for bootstrapped 2)
+[17:20:15.348] [SUCCESS] (72/153) tezos-shell: synchronisation heuristic  (test when status changes)
+[17:20:15.348] [SUCCESS] (73/153) Shell_operation: Corner cases (Raising an exception in encoding doesn't break)
+[17:20:15.349] [SUCCESS] (74/153) Shell_operation: Ddb leaks (handle_branch_refused:64 calls)
+[17:20:15.349] [SUCCESS] (75/153) Shell_operation: Ddb leaks (handle_branch_refused:128 calls)
+[17:20:15.349] [SUCCESS] (76/153) Shell_operation: Ddb leaks (handle_branch_delayed:64 calls)
+[17:20:15.349] [SUCCESS] (77/153) Shell_operation: Ddb leaks (handle_branch_delayed:128 calls)
+[17:20:15.349] [SUCCESS] (78/153) Shell_operation: Ddb leaks (handle_refused:64 calls)
+[17:20:15.349] [SUCCESS] (79/153) Shell_operation: Ddb leaks (handle_refused:128 calls)
+[17:20:15.349] [SUCCESS] (80/153) Shell_operation: Ddb leaks (handle_outdated:64 calls)
+[17:20:15.349] [SUCCESS] (81/153) Shell_operation: Ddb leaks (handle_outdated:128 calls)
+[17:20:15.349] [SUCCESS] (82/153) Shell_operation: Mempool Leaks (handle_refused:64 calls)
+[17:20:15.350] [SUCCESS] (83/153) Shell_operation: Mempool Leaks (handle_refused:128 calls)
+[17:20:15.350] [SUCCESS] (84/153) Shell_operation: Mempool Leaks (handle_outdated:64 calls)
+[17:20:15.350] [SUCCESS] (85/153) Shell_operation: Mempool Leaks (handle_outdated:128 calls)
+[17:20:15.352] [SUCCESS] (86/153) Shell_operation: Ddb clearing (handle_branch_refused:64 calls)
+[17:20:15.353] [SUCCESS] (87/153) Shell_operation: Ddb clearing (handle_branch_refused:128 calls)
+[17:20:15.353] [SUCCESS] (88/153) Shell_operation: Ddb clearing (handle_branch_delayed:64 calls)
+[17:20:15.354] [SUCCESS] (89/153) Shell_operation: Ddb clearing (handle_branch_delayed:128 calls)
+[17:20:15.672] [SUCCESS] (90/153) tezos-shell: test validator (pushing_validator_protocol)
+[17:20:15.681] [SUCCESS] (91/153) tezos-shell: test validator (previously_validated_protocol)
+[17:20:15.693] [SUCCESS] (92/153) tezos-shell: test validator (fetching_protocol)
+[17:20:15.739] [SUCCESS] (93/153) Prevalidator_pending_operations: iter ordering (Ensure that iter returns operations in their status and priority ordering)
+[17:20:15.778] [SUCCESS] (94/153) Prevalidator_pending_operations: fold ordering (Ensure that fold returns operations in their status and priority ordering)
+[17:20:15.815] [SUCCESS] (95/153) Prevalidator_pending_operations: fold_es ordering (Ensure that fold_es returns operations in their status and priority ordering)
+[17:20:15.846] [SUCCESS] (96/153) Prevalidator_pending_operations: partial fold_es (Test cardinal after partial iteration with fold_es)
+[17:20:18.029] [SUCCESS] (97/153) Prevalidator: handle_operations ([handle_live_operations] is a subset of alive blocks)
+[17:20:19.792] [SUCCESS] (98/153) Prevalidator: handle_operations ([handle_live_operations] path specification)
+[17:20:21.590] [SUCCESS] (99/153) Prevalidator: handle_operations ([handle_live_operations] clear approximation)
+[17:20:23.350] [SUCCESS] (100/153) Prevalidator: handle_operations ([handle_live_operations] inject approximation)
+[17:20:25.074] [SUCCESS] (101/153) Prevalidator: recycle_operations ([recycle_operations ~live_blocks:empty] is empty)
+[17:20:26.850] [SUCCESS] (102/153) Prevalidator: recycle_operations ([recycle_operations] returned value can be approximated)
+[17:20:28.579] [SUCCESS] (103/153) Prevalidator: recycle_operations ([recycle_operations] correctly trims its input classification)
+[17:20:28.584] [SUCCESS] (104/153) Prevalidator_classification: flush ([flush ~handle_branch_refused:true] empties everything except [refused] and [outdated])
+[17:20:28.591] [SUCCESS] (105/153) Prevalidator_classification: flush ([flush ~handle_branch_refused:false] empties everything except [refused], [outdated] and [branch_refused])
+[17:20:28.599] [SUCCESS] (106/153) Prevalidator_classification: is_in_mempool ([is_in_mempool] and [remove_*] are well-behaved)
+[17:20:28.612] [SUCCESS] (107/153) Prevalidator_classification: unparsable ([is_known_unparsable oph (add_unparsable oph t)] holds)
+[17:20:28.624] [SUCCESS] (108/153) Prevalidator_classification: unparsable ([is_known_unparsable _ (flush t)] does not hold)
+[17:20:29.038] [SUCCESS] (109/153) Prevalidator_classification: invariants (invariants are preserved through any sequence of events (provided we do not [add] already present operations))
+[17:20:29.056] [SUCCESS] (110/153) Prevalidator_classification: bounded (When more error operations than the size limit are added, then the first operations are discarded)
+[17:20:29.056] [SUCCESS] (111/153) Prevalidator_classification: to_map ([to_map_all (create params)] is empty)
+[17:20:29.062] [SUCCESS] (112/153) Prevalidator_classification: to_map ([add] extends the size of [to_map] by 0 or 1)
+[17:20:29.073] [SUCCESS] (113/153) Prevalidator_classification: to_map ([remove] reduces the size of [to_map] by 0 or 1)
+[17:20:29.128] [SUCCESS] (114/153) Prevalidator_classification: to_map (Check property between map, remove and add (1))
+[17:20:29.136] [SUCCESS] (115/153) Prevalidator_classification: to_map (Check property between map, remove and add (2))
+[17:20:29.142] [SUCCESS] (116/153) Prevalidator_classification: to_map ([flush] can be emulated by [to_map ~refused:true ..])
+[17:20:29.148] [SUCCESS] (117/153) Prevalidator_classification: to_map ([is_in_mempool] can be emulated by [to_map])
+[17:20:29.153] [SUCCESS] (118/153) Prevalidator_classification: to_map ([to_map] returns an empty map if all parameters are set to [false])
+[17:20:29.153] [SUCCESS] (119/153) Prevalidator_classification: is_empty ([is_empty (create params)] holds)
+[17:20:29.159] [SUCCESS] (120/153) Prevalidator_classification: is_empty ([not (is_empty (add _ _ _ t))] holds)
+[17:20:29.159] [SUCCESS] (121/153) Shell: Mempool bounding: add/remove (empty state)
+[17:20:29.161] [SUCCESS] (122/153) Shell: Mempool bounding: add/remove (random state)
+[17:20:29.163] [SUCCESS] (123/153) Shell: Mempool bounding: add/remove (random full state)
+[17:20:29.163] [SUCCESS] (124/153) Shell: Mempool bounding: add to full state (full cardinal)
+[17:20:29.163] [SUCCESS] (125/153) Shell: Mempool bounding: add to (almost) full state (full bytes)
+[17:20:29.163] [SUCCESS] (126/153) Shell: Mempool bounding: add to full state (full cardinal and full bytes)
+[17:20:29.379] [SUCCESS] (127/153) Shell: Prevalidator: Advertisement
+[17:20:29.391] [SUCCESS] (128/153) Shell: Mempool prevalidation: create
+[17:20:29.405] [SUCCESS] (129/153) Shell: Mempool prevalidation: add_operation
+[17:20:29.419] [SUCCESS] (130/153) Shell: Mempool prevalidation: remove_operation
+[17:20:29.479] [SUCCESS] (131/153) Peer_validator: Validate_new_head (Clear the db is the fitness does not increase)
+[17:20:29.565] [SUCCESS] (132/153) tezos-shell: test node (node_sandbox_initialization_events)
+[17:20:29.626] [SUCCESS] (133/153) tezos-shell: test node (node_initialization_events)
+[17:20:29.626] [SUCCESS] (134/153) tezos-shell: consensus heuristic sync (create_state_init_1)
+[17:20:29.626] [SUCCESS] (135/153) tezos-shell: consensus heuristic sync (create_state_bad_threshold)
+[17:20:29.626] [SUCCESS] (136/153) tezos-shell: consensus heuristic sync (create_state_bad_expected)
+[17:20:29.626] [SUCCESS] (137/153) tezos-shell: consensus heuristic sync (create_consensus)
+[17:20:29.626] [SUCCESS] (138/153) tezos-shell: consensus heuristic sync (create_no_consensus)
+[17:20:29.626] [SUCCESS] (139/153) tezos-shell: consensus heuristic sync (job failed)
+[17:20:29.626] [SUCCESS] (140/153) tezos-shell: consensus heuristic sync (job canceled)
+[17:20:29.626] [SUCCESS] (141/153) tezos-shell: consensus heuristic sync (job return hash)
+[17:20:29.626] [SUCCESS] (142/153) tezos-shell: consensus heuristic sync (job sleep)
+[17:20:29.626] [SUCCESS] (143/153) tezos-shell: consensus heuristic sync (job protected)
+[17:20:29.626] [SUCCESS] (144/153) tezos-shell: consensus heuristic sync (worker canceled)
+[17:20:29.626] [SUCCESS] (145/153) tezos-shell: consensus heuristic (job return no consensus)
+[17:20:29.626] [SUCCESS] (146/153) tezos-shell: consensus heuristic (job return need more canddidates)
+[17:20:30.629] [SUCCESS] (147/153) tezos-shell: consensus heuristic (job age limit twice)
+[17:20:30.629] [SUCCESS] (148/153) tezos-shell: consensus heuristic (job on next consensus_1)
+[17:20:30.629] [SUCCESS] (149/153) tezos-shell: consensus heuristic (job on next consensus_2)
+[17:20:30.629] [SUCCESS] (150/153) tezos-shell: consensus heuristic (job on next consensus_3)
+[17:20:30.629] [SUCCESS] (151/153) tezos-shell: consensus heuristic (job on all consensus_1)
+[17:20:30.629] [SUCCESS] (152/153) tezos-shell: consensus heuristic (job on all consensus_2)
+[17:20:31.631] [SUCCESS] (153/153) tezos-shell: consensus heuristic (job on all consensus_3)
+File "src/bin_snoop/snoop-command-workload-dump-json.t", line 1, characters 0-0:
+/usr/bin/git --no-pager diff --no-index --color=always -u _build/default/src/bin_snoop/snoop-command-workload-dump-json.t _build/default/src/bin_snoop/snoop-command-workload-dump-json.t.corrected
+diff --git a/_build/default/src/bin_snoop/snoop-command-workload-dump-json.t b/_build/default/src/bin_snoop/snoop-command-workload-dump-json.t.corrected
+index ff939820..39d37d49 100644
+--- a/_build/default/src/bin_snoop/snoop-command-workload-dump-json.t
++++ b/_build/default/src/bin_snoop/snoop-command-workload-dump-json.t.corrected
+@@ -3,6 +3,7 @@ Run benchmark to dump json data later
+ 
+ Dump workload json to file
+   $ ./main_snoop.exe workload dump data.workload -o data.json 2>&1 |grep -v "already registered for code"
++  [11:57:21.089] [warn] Leftover temporary file from previous run: /work/tmp/build_a876c2_dune/tezt-675881
+   Measure.load: loaded data.workload
+   Measure.packed_measurement_save_json: saved to data.json
+ 
+(cd _build/default/src/lib_dal_node/test && ./main.exe /flaky /ci_disabled)
+[17:20:33.801] [warn] Unknown tag: ci_disabled
+[17:20:33.801] [warn] Unknown tag: flaky
+[17:20:33.801] [SUCCESS] (1/10) snapshot: is_shard_entry recognises shard tar entries
+[17:20:33.801] [SUCCESS] (2/10) snapshot: is_shard_entry rejects slot tar entries
+[17:20:33.801] [SUCCESS] (3/10) snapshot: is_shard_entry rejects skip-list tar entries
+[17:20:33.801] [SUCCESS] (4/10) snapshot: is_shard_entry rejects top-level metadata entries
+[17:20:33.801] [SUCCESS] (5/10) snapshot: is_shard_entry rejects nested paths whose final directory is not shard
+[17:20:33.801] [SUCCESS] (6/10) snapshot: is_shard_entry requires the shard filename format
+[17:20:33.801] [SUCCESS] (7/10) snapshot: is_slot_entry recognises slot tar entries
+[17:20:33.801] [SUCCESS] (8/10) snapshot: is_slot_entry requires the slot filename format
+[17:20:33.801] [SUCCESS] (9/10) committee fetch: concurrent fetches for same level share one promise
+[17:20:33.801] [SUCCESS] (10/10) committee fetch: cancelling one waiter does not cancel the shared fetch
+(cd _build/default/src/lib_smart_rollup_node/test && ./main.exe /flaky /ci_disabled)
+[17:20:40.350] [warn] Unknown tag: ci_disabled
+[17:20:40.360] [warn] Unknown tag: flaky
+[17:20:40.632] [SUCCESS] (1/45) lib_smart_rollup_node: Dual_context (Active state commit/checkout roundtrip + restart)
+[17:20:40.646] [SUCCESS] (2/45) lib_smart_rollup_node: Dual_context (Inactive lifecycle stays pre-activation)
+[17:20:40.660] [SUCCESS] (3/45) lib_smart_rollup_node: Dual_context (to_imm severs the NDS handle at the context boundary)
+[17:20:40.698] [SUCCESS] (4/45) lib_smart_rollup_node: Dual_context (PVMState.find yields independent handles)
+[17:20:40.748] [SUCCESS] (5/45) lib_smart_rollup_node: Dual_context (evaluation cycle roundtrip preserves both commits)
+[17:20:41.321] [SUCCESS] (6/45) lib_smart_rollup_node: store_gc (PtParisBxoLz wasm_2_0_0)
+[17:20:41.624] [SUCCESS] (7/45) lib_smart_rollup_node: store_gc (ProxfordYmVf wasm_2_0_0)
+[17:20:42.090] [SUCCESS] (8/45) lib_smart_rollup_node: store_gc (ProtoALphaAL wasm_2_0_0)
+[17:20:42.423] [SUCCESS] (9/45) lib_smart_rollup_node: store_gc (PsParisCZo7K wasm_2_0_0)
+[17:20:42.755] [SUCCESS] (10/45) lib_smart_rollup_node: store_gc (PsQuebecnLBy wasm_2_0_0)
+[17:20:43.060] [SUCCESS] (11/45) lib_smart_rollup_node: store_gc (PtTALLiNtPec wasm_2_0_0)
+[17:20:43.355] [SUCCESS] (12/45) lib_smart_rollup_node: store_gc (PsUshuai9Qap wasm_2_0_0)
+[17:20:43.684] [SUCCESS] (13/45) lib_smart_rollup_node: store_gc (PsRiotumaAMo wasm_2_0_0)
+[17:20:44.000] [SUCCESS] (14/45) lib_smart_rollup_node: store_gc (PtSeouLouXkx wasm_2_0_0)
+[17:20:44.337] [SUCCESS] (15/45) lib_smart_rollup_node: store_gc_reorg (PtParisBxoLz wasm_2_0_0)
+[17:20:44.678] [SUCCESS] (16/45) lib_smart_rollup_node: store_gc_reorg (ProxfordYmVf wasm_2_0_0)
+[17:20:45.060] [SUCCESS] (17/45) lib_smart_rollup_node: store_gc_reorg (ProtoALphaAL wasm_2_0_0)
+[17:20:45.402] [SUCCESS] (18/45) lib_smart_rollup_node: store_gc_reorg (PsParisCZo7K wasm_2_0_0)
+[17:20:45.753] [SUCCESS] (19/45) lib_smart_rollup_node: store_gc_reorg (PsQuebecnLBy wasm_2_0_0)
+[17:20:46.082] [SUCCESS] (20/45) lib_smart_rollup_node: store_gc_reorg (PtTALLiNtPec wasm_2_0_0)
+[17:20:46.391] [SUCCESS] (21/45) lib_smart_rollup_node: store_gc_reorg (PsUshuai9Qap wasm_2_0_0)
+[17:20:46.766] [SUCCESS] (22/45) lib_smart_rollup_node: store_gc_reorg (PsRiotumaAMo wasm_2_0_0)
+[17:20:47.121] [SUCCESS] (23/45) lib_smart_rollup_node: store_gc_reorg (PtSeouLouXkx wasm_2_0_0)
+[17:20:47.121] [SUCCESS] (24/45) lib_smart_rollup_node: Operation_priority (cement has priority over publish)
+[17:20:47.121] [SUCCESS] (25/45) lib_smart_rollup_node: Operation_priority (documented ordering chain)
+[17:20:47.121] [SUCCESS] (26/45) lib_smart_rollup_node: Operation_priority (total ordering over all kinds)
+[17:20:47.185] [SUCCESS] (27/45) lib_smart_rollup_node: Context (Garbage collection)
+[17:20:47.352] [SUCCESS] (28/45) lib_smart_rollup_node: canary (PtParisBxoLz arith)
+[17:20:47.703] [SUCCESS] (29/45) lib_smart_rollup_node: canary (PtParisBxoLz wasm_2_0_0)
+[17:20:47.893] [SUCCESS] (30/45) lib_smart_rollup_node: canary (ProxfordYmVf arith)
+[17:20:48.220] [SUCCESS] (31/45) lib_smart_rollup_node: canary (ProxfordYmVf wasm_2_0_0)
+[17:20:48.419] [SUCCESS] (32/45) lib_smart_rollup_node: canary (ProtoALphaAL arith)
+[17:20:48.752] [SUCCESS] (33/45) lib_smart_rollup_node: canary (ProtoALphaAL wasm_2_0_0)
+[17:20:48.908] [SUCCESS] (34/45) lib_smart_rollup_node: canary (PsParisCZo7K arith)
+[17:20:49.179] [SUCCESS] (35/45) lib_smart_rollup_node: canary (PsParisCZo7K wasm_2_0_0)
+[17:20:49.352] [SUCCESS] (36/45) lib_smart_rollup_node: canary (PsQuebecnLBy arith)
+[17:20:49.644] [SUCCESS] (37/45) lib_smart_rollup_node: canary (PsQuebecnLBy wasm_2_0_0)
+[17:20:49.820] [SUCCESS] (38/45) lib_smart_rollup_node: canary (PtTALLiNtPec arith)
+[17:20:50.047] [SUCCESS] (39/45) lib_smart_rollup_node: canary (PtTALLiNtPec wasm_2_0_0)
+[17:20:50.218] [SUCCESS] (40/45) lib_smart_rollup_node: canary (PsUshuai9Qap arith)
+[17:20:50.535] [SUCCESS] (41/45) lib_smart_rollup_node: canary (PsUshuai9Qap wasm_2_0_0)
+[17:20:50.723] [SUCCESS] (42/45) lib_smart_rollup_node: canary (PsRiotumaAMo arith)
+[17:20:51.007] [SUCCESS] (43/45) lib_smart_rollup_node: canary (PsRiotumaAMo wasm_2_0_0)
+[17:20:51.168] [SUCCESS] (44/45) lib_smart_rollup_node: canary (PtSeouLouXkx arith)
+[17:20:51.459] [SUCCESS] (45/45) lib_smart_rollup_node: canary (PtSeouLouXkx wasm_2_0_0)
+File "src/bin_snoop/snoop-command.t", line 1, characters 0-0:
+/usr/bin/git --no-pager diff --no-index --color=always -u _build/default/src/bin_snoop/snoop-command.t _build/default/src/bin_snoop/snoop-command.t.corrected
+diff --git a/_build/default/src/bin_snoop/snoop-command.t b/_build/default/src/bin_snoop/snoop-command.t.corrected
+index 2d18a3f1..cedfae0c 100644
+--- a/_build/default/src/bin_snoop/snoop-command.t
++++ b/_build/default/src/bin_snoop/snoop-command.t.corrected
+@@ -1,5 +1,6 @@
+ Missing config file prints
+   $ ./main_snoop.exe benchmark interpreter/N_IBlake2b and save to output.json -c __nosuchdir --bench-num 1 2>&1 | sed -E "s/seed=[0-9]+;/seed=SEED;/g" | sed s'/stats over all benchmarks:.*/stats <hidden>/'
++  [11:57:19.024] [warn] Leftover temporary file from previous run: /work/tmp/build_a876c2_dune/tezt-675881
+   Benchmarking interpreter/N_IBlake2b with the following options:
+     { options = { seed=SEED;
+                   bench #=1;
+@@ -28,6 +29,7 @@ benchmarking 1/1
+ 
+ Generate empty config
+   $ ./main_snoop.exe config generate empty in empty.json; jq . empty.json
++  [11:57:19.506] [warn] Leftover temporary file from previous run: /work/tmp/build_a876c2_dune/tezt-675881
+   {
+     "namespace": ".",
+     "config": null,
+@@ -36,6 +38,7 @@ Generate empty config
+ 
+ Generate default config
+   $ ./main_snoop.exe config generate default in dft.json for interpreter/N_IBlake2b; jq . dft.json
++  [11:57:19.767] [warn] Leftover temporary file from previous run: /work/tmp/build_a876c2_dune/tezt-675881
+   {
+     "namespace": ".",
+     "config": null,
+@@ -187,6 +190,7 @@ Generate default config
+ 
+ Modify empty config
+   $ ./main_snoop.exe config edit dft.json for interpreter -j '{"a":123}'; jq . dft.json
++  [11:57:20.014] [warn] Leftover temporary file from previous run: /work/tmp/build_a876c2_dune/tezt-675881
+   {
+     "namespace": ".",
+     "config": null,
+@@ -340,6 +344,7 @@ Modify empty config
+ 
+ Check config edition
+   $ ./main_snoop.exe config check dft.json for interpreter/N_IBlake2b
++  [11:57:20.267] [warn] Leftover temporary file from previous run: /work/tmp/build_a876c2_dune/tezt-675881
+   Looking for custom configuration for benchmark interpreter/N_IBlake2b
+   Config file successfully parsed
+   Loaded configuration from dft.json for benchmark interpreter/N_IBlake2b
+@@ -356,6 +361,7 @@ Check config edition
+ 
+ Test merge
+   $ ./main_snoop.exe config merge dft.json in empty.json; jq . empty.json
++  [11:57:20.504] [warn] Leftover temporary file from previous run: /work/tmp/build_a876c2_dune/tezt-675881
+   {
+     "namespace": ".",
+     "config": null,
+File "src/lib_benchmark/pyinit.ml", line 1, characters 0-0:
+/usr/bin/git --no-pager diff --no-index --color=always -u _build/default/src/lib_benchmark/pyinit.ml _build/.sandbox/d4fc919cb89c82c58e9874d0ef34a1b7/default/src/lib_benchmark/pyinit.ml.corrected
+diff --git a/_build/default/src/lib_benchmark/pyinit.ml b/_build/.sandbox/d4fc919cb89c82c58e9874d0ef34a1b7/default/src/lib_benchmark/pyinit.ml.corrected
+index 8e567067..50aff6e3 100644
+--- a/_build/default/src/lib_benchmark/pyinit.ml
++++ b/_build/.sandbox/d4fc919cb89c82c58e9874d0ef34a1b7/default/src/lib_benchmark/pyinit.ml.corrected
+@@ -76,10 +76,28 @@ let%expect_test "pyinit can be called twice without failing" =
+   in
+   pyinit () ;
+   [%expect.output] |> discard_python_path |> print_endline ;
+-  [%expect
+-    {|
+-      Initializing python...
+-      Python library used:REPLACED_FOR_TEST|}] ;
++  [%expect.unreachable] ;
+   (* Second run is empty, but no failure *)
+   pyinit () ;
+-  [%expect {| |}]
++  [%expect.unreachable]
++[@@expect.uncaught_exn {|
++  (* CR expect_test_collector: This test expectation appears to contain a backtrace.
++     This is strongly discouraged as backtraces are fragile.
++     Please change this test to not include a backtrace. *)
++
++  (Failure
++    "Py.find_library: unable to find the Python library [libpython3.11m.so returned libpython3.11m.so: cannot open shared object file: No such file or directory] [/usr/bin/../lib/libpython3.11m.so returned /usr/bin/../lib/libpython3.11m.so: cannot open shared object file: No such file or directory] [libpython3.11.so returned libpython3.11.so: cannot open shared object file: No such file or directory] [/usr/bin/../lib/libpython3.11.so returned /usr/bin/../lib/libpython3.11.so: cannot open shared object file: No such file or directory] [libpython3.11m.so returned libpython3.11m.so: cannot open shared object file: No such file or directory] [/usr/lib/libpython3.11m.so returned /usr/lib/libpython3.11m.so: cannot open shared object file: No such file or directory] [libpython3.11.so returned libpython3.11.so: cannot open shared object file: No such file or directory] [/usr/lib/libpython3.11.so returned /usr/lib/libpython3.11.so: cannot open shared object file: No such file or directory]")
++  Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
++  Called from Py.initialize_library in file "py.ml", lines 594-595, characters 2-20
++  Called from Py.initialize.do_initialize in file "py.ml", lines 760-761, characters 10-28
++  Re-raised at Py.initialize.do_initialize in file "py.ml", line 765, characters 10-17
++  Called from Stdlib__Fun.protect in file "fun.ml", line 34, characters 8-15
++  Re-raised at Stdlib__Fun.protect in file "fun.ml", line 39, characters 6-52
++  Called from Py.initialize in file "py.ml", line 769, characters 4-29
++  Called from Tezos_benchmark__Pyinit.pyinit in file "src/lib_benchmark/pyinit.ml", line 35, characters 4-31
++  Called from Tezos_benchmark__Pyinit.(fun) in file "src/lib_benchmark/pyinit.ml", line 77, characters 2-11
++  Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 234, characters 12-19
++
++  Trailing output
++  ---------------
++  Initializing python... |}]
+(cd _build/default/src/lib_p2p/test && ./test_p2p_io_scheduler.exe)
+[17:21:03.109] [SUCCESS] (1/1) tezos-p2p: p2p.io-scheduler (trivial-quota)
+(cd _build/default/src/lib_p2p/test && ./test_p2p_peerset.exe)
+[17:21:39.107] [SUCCESS] (1/4) tezos-p2p: p2p.peerset (empty)
+[17:21:39.118] [SUCCESS] (2/4) tezos-p2p: p2p.peerset (add)
+[17:21:39.118] [SUCCESS] (3/4) tezos-p2p: p2p.peerset (LRU overflow)
+[17:21:39.118] [SUCCESS] (4/4) tezos-p2p: p2p.peerset (remove)
+(cd _build/default/src/lib_p2p/test && ./test_p2p_buffer_reader.exe)
+qcheck random seed: 803225865
+[17:21:40.442] [SUCCESS] (1/11) P2p_buffer_reader: mk_buffer (Negative length is rejected)
+[17:21:40.442] [SUCCESS] (2/11) P2p_buffer_reader: mk_buffer (Negative position is rejected)
+[17:21:40.442] [SUCCESS] (3/11) P2p_buffer_reader: mk_buffer (Invalid length+position is rejected)
+[17:21:40.442] [SUCCESS] (4/11) P2p_buffer_reader: mk_buffer (Default values are accepted)
+[17:21:40.442] [SUCCESS] (5/11) P2p_buffer_reader: mk_buffer (Extreme valid values are accepted)
+[17:21:40.442] [SUCCESS] (6/11) P2p_buffer_reader: mk_buffer_safe (mk_buffer_safe makes valid buffers)
+[17:21:40.746] [SUCCESS] (7/11) P2p_buffer_reader: read (read hangs if there is no data to read)
+[17:21:40.751] [SUCCESS] (8/11) P2p_buffer_reader: read (read result (number of read bytes) is lower than or equal to buffer.len)
+[17:21:40.769] [SUCCESS] (9/11) P2p_buffer_reader: read (When reading less data than available, [read] reads partially and reads the remaining data on second [read])
+[17:21:40.773] [SUCCESS] (10/11) P2p_buffer_reader: read_full (read_full fills the buffer)
+[17:21:41.961] [SUCCESS] (11/11) P2p_buffer_reader: read_full (read_full fills the buffer and waits for enough data to be available if needed)
+(cd _build/.sandbox/0e8d9bb53e29990a4977219b86bd6a76/default/src/lib_shell && .tezos_shell.inline-tests/inline-test-runner.exe inline-test-runner tezos_shell -partition distributed_db_message.ml -source-tree-root ../.. -diff-cmd - -verbose)
+File "src/lib_shell/distributed_db_message.ml", line 92, characters 4-498 (0.000 sec)
+(cd _build/default/src/lib_p2p/test && ./test_p2p_banned_peers.exe)
+[17:21:43.692] [SUCCESS] (1/3) tezos-p2p: p2p.banned (empty)
+[17:21:43.694] [SUCCESS] (2/3) tezos-p2p: p2p.banned (ban)
+[17:21:43.695] [SUCCESS] (3/3) tezos-p2p: p2p.banned (clear)
+(cd _build/default/src/lib_p2p/test && ./test_p2p_connect_handler.exe)
+[17:21:44.696] [SUCCESS] (1/3) tezos-p2p: p2p.connect_handler (Connect then destroy)
+[17:21:44.700] [SUCCESS] (2/3) tezos-p2p: p2p.connect_handler (Don't remove incoming connections too early)
+[17:21:44.703] [SUCCESS] (3/3) tezos-p2p: p2p.connect_handler (on_new_connection hook is triggered on new connection)
+(cd _build/default/src/lib_p2p/test && ./test_p2p_maintenance.exe)
+[17:21:56.049] [SUCCESS] (1/2) tezos-p2p: p2p-maintenance (triggers.too-few-connections)
+[17:21:56.203] [SUCCESS] (2/2) tezos-p2p: p2p-maintenance (triggers.too-many-connections)
+Oct 13 17:21:46.001: too few connections (conn.: 0, min. target: 30, conf: [18;36])
+Oct 13 17:21:46.021: too few connections (conn.: 17, min. target: 30, conf: [18;36])
+Oct 13 17:21:46.062: received requests for peers addresses from private peer
+Oct 13 17:21:46.062:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:46.062: received requests for peers addresses from private peer
+Oct 13 17:21:46.062:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:46.062: received requests for peers addresses from private peer
+Oct 13 17:21:46.062:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:46.062: received swap requests from private peer idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:46.062: received requests for peers addresses from private peer
+Oct 13 17:21:46.062:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:46.062: received requests for peers addresses from private peer
+Oct 13 17:21:46.062:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:46.062: received requests for peers addresses from private peer
+Oct 13 17:21:46.062:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:46.062: received requests for peers addresses from private peer
+Oct 13 17:21:46.062:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:46.062: received requests for peers addresses from private peer
+Oct 13 17:21:46.062:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:46.062: received requests for peers addresses from private peer
+Oct 13 17:21:46.062:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:46.062: received requests for peers addresses from private peer
+Oct 13 17:21:46.062:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:46.063: received requests for peers addresses from private peer
+Oct 13 17:21:46.063:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:46.062: received requests for peers addresses from private peer
+Oct 13 17:21:46.062:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:46.062: received requests for peers addresses from private peer
+Oct 13 17:21:46.062:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:46.063: received requests for peers addresses from private peer
+Oct 13 17:21:46.063:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:46.062: received requests for peers addresses from private peer
+Oct 13 17:21:46.062:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:46.062: received requests for peers addresses from private peer
+Oct 13 17:21:46.062:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:46.063: received requests for peers addresses from private peer
+Oct 13 17:21:46.063:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:46.065: received requests for peers addresses from private peer
+Oct 13 17:21:46.065:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:46.065: received requests for peers addresses from private peer
+Oct 13 17:21:46.065:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.027: too few connections (conn.: 19, min. target: 30, conf: [18;36])
+Oct 13 17:21:56.028: received requests for peers addresses from private peer
+Oct 13 17:21:56.028:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.028: received requests for peers addresses from private peer
+Oct 13 17:21:56.028:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.028: received requests for peers addresses from private peer
+Oct 13 17:21:56.028:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.028: received requests for peers addresses from private peer
+Oct 13 17:21:56.028:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.028: received requests for peers addresses from private peer
+Oct 13 17:21:56.028:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.028: received requests for peers addresses from private peer
+Oct 13 17:21:56.028:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.028: received requests for peers addresses from private peer
+Oct 13 17:21:56.028:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.028: received requests for peers addresses from private peer
+Oct 13 17:21:56.028:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.028: received requests for peers addresses from private peer
+Oct 13 17:21:56.028:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.029: received requests for peers addresses from private peer
+Oct 13 17:21:56.029:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.029: received requests for peers addresses from private peer
+Oct 13 17:21:56.029:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.029: received requests for peers addresses from private peer
+Oct 13 17:21:56.029:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.028: received requests for peers addresses from private peer
+Oct 13 17:21:56.028:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.029: received requests for peers addresses from private peer
+Oct 13 17:21:56.029:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.029: received requests for peers addresses from private peer
+Oct 13 17:21:56.029:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.029: received requests for peers addresses from private peer
+Oct 13 17:21:56.029:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.029: received requests for peers addresses from private peer
+Oct 13 17:21:56.029:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.029: received requests for peers addresses from private peer
+Oct 13 17:21:56.029:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.030: received requests for peers addresses from private peer
+Oct 13 17:21:56.030:   idtjHzarsP5BRoh7wBvUM79AQv2fz6
+Oct 13 17:21:56.169: too few connections (conn.: 0, min. target: 16, conf: [0;24])
+Oct 13 17:21:56.189: received swap requests from private peer idqTigwp6wiY6akib8PeFhL83kpup7
+File "src/bin_snoop/snoop-command-workload-dump-json.t", line 1, characters 0-0:
+/usr/bin/git --no-pager diff --no-index --color=always -u _build/default/src/bin_snoop/snoop-command-workload-dump-json.t _build/default/src/bin_snoop/snoop-command-workload-dump-json.t.corrected
+diff --git a/_build/default/src/bin_snoop/snoop-command-workload-dump-json.t b/_build/default/src/bin_snoop/snoop-command-workload-dump-json.t.corrected
+index ff939820..39d37d49 100644
+--- a/_build/default/src/bin_snoop/snoop-command-workload-dump-json.t
++++ b/_build/default/src/bin_snoop/snoop-command-workload-dump-json.t.corrected
+@@ -3,6 +3,7 @@ Run benchmark to dump json data later
+ 
+ Dump workload json to file
+   $ ./main_snoop.exe workload dump data.workload -o data.json 2>&1 |grep -v "already registered for code"
++  [11:57:21.089] [warn] Leftover temporary file from previous run: /work/tmp/build_a876c2_dune/tezt-675881
+   Measure.load: loaded data.workload
+   Measure.packed_measurement_save_json: saved to data.json
+ 
+File "src/bin_snoop/snoop-command.t", line 1, characters 0-0:
+/usr/bin/git --no-pager diff --no-index --color=always -u _build/default/src/bin_snoop/snoop-command.t _build/default/src/bin_snoop/snoop-command.t.corrected
+diff --git a/_build/default/src/bin_snoop/snoop-command.t b/_build/default/src/bin_snoop/snoop-command.t.corrected
+index 2d18a3f1..cedfae0c 100644
+--- a/_build/default/src/bin_snoop/snoop-command.t
++++ b/_build/default/src/bin_snoop/snoop-command.t.corrected
+@@ -1,5 +1,6 @@
+ Missing config file prints
+   $ ./main_snoop.exe benchmark interpreter/N_IBlake2b and save to output.json -c __nosuchdir --bench-num 1 2>&1 | sed -E "s/seed=[0-9]+;/seed=SEED;/g" | sed s'/stats over all benchmarks:.*/stats <hidden>/'
++  [11:57:19.024] [warn] Leftover temporary file from previous run: /work/tmp/build_a876c2_dune/tezt-675881
+   Benchmarking interpreter/N_IBlake2b with the following options:
+     { options = { seed=SEED;
+                   bench #=1;
+@@ -28,6 +29,7 @@ benchmarking 1/1
+ 
+ Generate empty config
+   $ ./main_snoop.exe config generate empty in empty.json; jq . empty.json
++  [11:57:19.506] [warn] Leftover temporary file from previous run: /work/tmp/build_a876c2_dune/tezt-675881
+   {
+     "namespace": ".",
+     "config": null,
+@@ -36,6 +38,7 @@ Generate empty config
+ 
+ Generate default config
+   $ ./main_snoop.exe config generate default in dft.json for interpreter/N_IBlake2b; jq . dft.json
++  [11:57:19.767] [warn] Leftover temporary file from previous run: /work/tmp/build_a876c2_dune/tezt-675881
+   {
+     "namespace": ".",
+     "config": null,
+@@ -187,6 +190,7 @@ Generate default config
+ 
+ Modify empty config
+   $ ./main_snoop.exe config edit dft.json for interpreter -j '{"a":123}'; jq . dft.json
++  [11:57:20.014] [warn] Leftover temporary file from previous run: /work/tmp/build_a876c2_dune/tezt-675881
+   {
+     "namespace": ".",
+     "config": null,
+@@ -340,6 +344,7 @@ Modify empty config
+ 
+ Check config edition
+   $ ./main_snoop.exe config check dft.json for interpreter/N_IBlake2b
++  [11:57:20.267] [warn] Leftover temporary file from previous run: /work/tmp/build_a876c2_dune/tezt-675881
+   Looking for custom configuration for benchmark interpreter/N_IBlake2b
+   Config file successfully parsed
+   Loaded configuration from dft.json for benchmark interpreter/N_IBlake2b
+@@ -356,6 +361,7 @@ Check config edition
+ 
+ Test merge
+   $ ./main_snoop.exe config merge dft.json in empty.json; jq . empty.json
++  [11:57:20.504] [warn] Leftover temporary file from previous run: /work/tmp/build_a876c2_dune/tezt-675881
+   {
+     "namespace": ".",
+     "config": null,
+File "src/lib_benchmark/pyinit.ml", line 1, characters 0-0:
+/usr/bin/git --no-pager diff --no-index --color=always -u _build/default/src/lib_benchmark/pyinit.ml _build/.sandbox/d4fc919cb89c82c58e9874d0ef34a1b7/default/src/lib_benchmark/pyinit.ml.corrected
+diff --git a/_build/default/src/lib_benchmark/pyinit.ml b/_build/.sandbox/d4fc919cb89c82c58e9874d0ef34a1b7/default/src/lib_benchmark/pyinit.ml.corrected
+index 8e567067..50aff6e3 100644
+--- a/_build/default/src/lib_benchmark/pyinit.ml
++++ b/_build/.sandbox/d4fc919cb89c82c58e9874d0ef34a1b7/default/src/lib_benchmark/pyinit.ml.corrected
+@@ -76,10 +76,28 @@ let%expect_test "pyinit can be called twice without failing" =
+   in
+   pyinit () ;
+   [%expect.output] |> discard_python_path |> print_endline ;
+-  [%expect
+-    {|
+-      Initializing python...
+-      Python library used:REPLACED_FOR_TEST|}] ;
++  [%expect.unreachable] ;
+   (* Second run is empty, but no failure *)
+   pyinit () ;
+-  [%expect {| |}]
++  [%expect.unreachable]
++[@@expect.uncaught_exn {|
++  (* CR expect_test_collector: This test expectation appears to contain a backtrace.
++     This is strongly discouraged as backtraces are fragile.
++     Please change this test to not include a backtrace. *)
++
++  (Failure
++    "Py.find_library: unable to find the Python library [libpython3.11m.so returned libpython3.11m.so: cannot open shared object file: No such file or directory] [/usr/bin/../lib/libpython3.11m.so returned /usr/bin/../lib/libpython3.11m.so: cannot open shared object file: No such file or directory] [libpython3.11.so returned libpython3.11.so: cannot open shared object file: No such file or directory] [/usr/bin/../lib/libpython3.11.so returned /usr/bin/../lib/libpython3.11.so: cannot open shared object file: No such file or directory] [libpython3.11m.so returned libpython3.11m.so: cannot open shared object file: No such file or directory] [/usr/lib/libpython3.11m.so returned /usr/lib/libpython3.11m.so: cannot open shared object file: No such file or directory] [libpython3.11.so returned libpython3.11.so: cannot open shared object file: No such file or directory] [/usr/lib/libpython3.11.so returned /usr/lib/libpython3.11.so: cannot open shared object file: No such file or directory]")
++  Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
++  Called from Py.initialize_library in file "py.ml", lines 594-595, characters 2-20
++  Called from Py.initialize.do_initialize in file "py.ml", lines 760-761, characters 10-28
++  Re-raised at Py.initialize.do_initialize in file "py.ml", line 765, characters 10-17
++  Called from Stdlib__Fun.protect in file "fun.ml", line 34, characters 8-15
++  Re-raised at Stdlib__Fun.protect in file "fun.ml", line 39, characters 6-52
++  Called from Py.initialize in file "py.ml", line 769, characters 4-29
++  Called from Tezos_benchmark__Pyinit.pyinit in file "src/lib_benchmark/pyinit.ml", line 35, characters 4-31
++  Called from Tezos_benchmark__Pyinit.(fun) in file "src/lib_benchmark/pyinit.ml", line 77, characters 2-11
++  Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 234, characters 12-19
++
++  Trailing output
++  ---------------
++  Initializing python... |}]
+Total runtime: 00:07:8.1997
+Error: exited with exitcode 1. See full logs in test_results/test-nonproto-unit.log
+make: *** [Makefile:307: test-nonproto-unit] Error 1
+
+GATE EXIT: 2

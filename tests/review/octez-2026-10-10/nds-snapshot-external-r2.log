@@ -1,0 +1,6 @@
+capture 1
+capture 2
+Fatal error: exception Failure("CheckpointCreationFailed { error: Error { message: \"IO error: No such file or directory: while link file to /work/tmp/nds-repro/repo-external-r2/databases/temporary/db_pr7GeZ/checkpoint.tmp/000013.sst: /work/tmp/nds-repro/repo-external-r2/databases/temporary/db_9fnPT1/checkpoint/000013.sst: No such file or directory\" } }")
+Raised by primitive operation at Octez_riscv_nds_disk.Normal.Registry.to_imm in file "src/lib_riscv_nds/disk/octez_riscv_nds_disk.ml", line 81, characters 6-62
+Called from Nds_snapshot_repro.capture in file "nds_snapshot_repro.ml", line 14, characters 5-15
+Called from Nds_snapshot_repro in file "nds_snapshot_repro.ml", line 25, characters 10-19

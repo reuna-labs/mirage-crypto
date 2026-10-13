@@ -1,0 +1,15 @@
+Mon Oct 12 04:27:56 UTC 2026
+NAME       BACK-FILE
+/dev/loop0 /work/linux-test-tmp.ext4
+TARGET    SOURCE     FSTYPE OPTIONS
+/work/tmp /dev/loop0 ext4   rw,noatime
+TARGET SOURCE                                                                               FSTYPE   OPTIONS
+/tmp   mac[/Volumes/Seagate Expansion Drive/reuna/builds/octez-native-signers-20261010/tmp] virtiofs rw,relatime
+/tmp   /dev/loop0                                                                           ext4     rw,noatime
+TARGET   SOURCE                                                                                   FSTYPE   OPTIONS
+/var/tmp mac[/Volumes/Seagate Expansion Drive/reuna/builds/octez-native-signers-20261010/var-tmp] virtiofs rw,relatime
+/var/tmp /dev/loop0[/var-tmp]                                                                     ext4     rw,noatime
+Filesystem      Size  Used Avail Use% Mounted on
+mac             1.9T  1.3T  555G  71% /work
+/dev/loop0      7.8G   52K  7.8G   1% /work/tmp
+overlay          98G   80G   19G  82% /

@@ -1,0 +1,36 @@
+External workspace: /work/src
+Command: ['opam', 'exec', '--switch=octez-5.3', '--', 'dune', 'build', '-j', '4', '--profile=dev', '@runtest_out_of_opam']
+Storage reserves: external 20 GiB; internal metadata 2 GiB; root read-only
+(cd _build/default/src/lib_protocol_compiler/test && /usr/bin/bash rejections.sh ../../../../install/default/bin/octez-protocol-compiler ../../../../install/default/lib/tezos-protocol-demo-noops/protocol/raw/TEZOS_PROTOCOL)
+Success: ProtoDemoNoopsDemoNoopsDemoNoopsDemoNoopsDemo6XBoYp as PsVqdRxvEt9ctaqQjqP1Pn362isRempxrGCPFnMtHXuyeW7B9XM.
+Success: ProtoDemoNoopsDemoNoopsDemoNoopsDemoNoopsDemo6XBoYp as PsVqdRxvEt9ctaqQjqP1Pn362isRempxrGCPFnMtHXuyeW7B9XM.
+Success: ProtoDemoNoopsDemoNoopsDemoNoopsDemoNoopsDemo6XBoYp as PsVqdRxvEt9ctaqQjqP1Pn362isRempxrGCPFnMtHXuyeW7B9XM.
+[[compiler-rejections]]: Trying ../../../../install/default/lib/tezos-protocol-demo-noops/protocol/raw
+[[compiler-rejections]]: Trying /tmp/proto_007_gXqr/
+[[compiler-rejections]]: Trying /tmp/proto_007_gXqr/
+Fatal error: exception Failure("protocol-compiler: File \"/tmp/proto_007_gXqr/main.ml\", line 216, characters 4-43: use of `external` is forbidden")
+Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
+Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+Called from Ast_iterator.E.iter in file "parsing/ast_iterator.ml", line 437, characters 24-46
+Called from Ast_iterator.default_iterator.(fun) in file "parsing/ast_iterator.ml", line 672, characters 9-32
+Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+Called from Ast_iterator.default_iterator.(fun) in file "parsing/ast_iterator.ml" (inlined), line 568, characters 31-69
+Called from Octez_protocol_compiler__Packer.check_syntax in file "src/lib_protocol_compiler/packer.ml", line 90, characters 6-38
+Called from Octez_protocol_compiler__Packer.include_ml in file "src/lib_protocol_compiler/packer.ml", line 122, characters 2-35
+Called from Octez_protocol_compiler__Packer.dump in file "src/lib_protocol_compiler/packer.ml", line 143, characters 4-27
+Called from Octez_protocol_compiler__Compiler.main in file "src/lib_protocol_compiler/compiler.ml", lines 266-274, characters 2-43
+Called from Dune__exe__Main_native in file "src/lib_protocol_compiler/bin/main_native.ml", lines 58-60, characters 4-58
+Re-raised at Location.report_exception.loop in file "parsing/location.ml", line 999, characters 14-25
+Called from Stdlib__Format.output_acc in file "format.ml", line 1395, characters 32-48
+Called from Stdlib__Format.output_acc in file "format.ml", line 1397, characters 32-48
+Called from Dune__exe__Main_native in file "src/lib_protocol_compiler/bin/main_native.ml", line 63, characters 4-54
+[[compiler-rejections]]: With external: 👍
+[[compiler-rejections]]: Trying /tmp/proto_008_MNPs/
+[[compiler-rejections]]: Trying /tmp/proto_008_MNPs/
+File "/tmp/proto_008_MNPs/weird.ml", line 1, characters 0-3:
+Error: Syntax error
+
+[[compiler-rejections]]: With weird ends: 👍
+
+GATE EXIT: 0

@@ -1,0 +1,6 @@
+External workspace: /work/src
+Command: ['opam', 'exec', '--switch=octez-5.3', '--', './_build/default/src/lib_riscv_nds/test/main.exe', '--verbose', '--file', 'src/lib_riscv_nds/test/test_nds_pbt.ml', '--title', 'disk: interleaved snapshots each recover their capture', '--seed', '481264812']
+[04:29:14.355] Starting test: disk: interleaved snapshots each recover their capture
+[04:48:10.773] [SUCCESS] (1/1) disk: interleaved snapshots each recover their capture
+
+GATE EXIT: 0

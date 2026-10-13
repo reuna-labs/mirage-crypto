@@ -1,0 +1,84 @@
+External workspace: /work/src
+Command: ['opam', 'exec', '--switch=octez-5.3', '--', 'make', '-C', 'manifest', 'check']
+make: Entering directory '/work/src/manifest'
+echo "# 1 \"JSON_AST.ml\"" > _build/JSON_AST.ml
+cat JSON_AST.ml >> _build/JSON_AST.ml
+echo "# 1 \"JSON_parser.mly\"" > _build/JSON_parser.mly
+cat JSON_parser.mly >> _build/JSON_parser.mly
+ocamlyacc _build/JSON_parser.mly
+echo "# 1 \"JSON_lexer.mll\"" > _build/JSON_lexer.mll
+cat JSON_lexer.mll >> _build/JSON_lexer.mll
+ocamllex _build/JSON_lexer.mll
+16 states, 361 transitions, table size 1540 bytes
+echo "# 1 \"dgraph.mli\"" > _build/dgraph.mli
+cat dgraph.mli >> _build/dgraph.mli
+echo "# 1 \"dgraph.ml\"" > _build/dgraph.ml
+cat dgraph.ml >> _build/dgraph.ml
+echo "# 1 \"tezos_protocol.ml\"" > _build/tezos_protocol.ml
+cat tezos_protocol.ml >> _build/tezos_protocol.ml
+echo "# 1 \"manifest_link_deps.mli\"" > _build/manifest_link_deps.mli
+cat manifest_link_deps.mli >> _build/manifest_link_deps.mli
+echo "# 1 \"manifest_link_deps.ml\"" > _build/manifest_link_deps.ml
+cat manifest_link_deps.ml >> _build/manifest_link_deps.ml
+echo "# 1 \"manifest.mli\"" > _build/manifest.mli
+cat manifest.mli >> _build/manifest.mli
+echo "# 1 \"manifest.ml\"" > _build/manifest.ml
+cat manifest.ml >> _build/manifest.ml
+echo "# 1 \"externals.ml\"" > _build/externals.ml
+cat externals.ml >> _build/externals.ml
+echo "# 1 \"internals.ml\"" > _build/internals.ml
+cat internals.ml >> _build/internals.ml
+echo "# 1 \"product_data_encoding.mli\"" > _build/product_data_encoding.mli
+cat product_data_encoding.mli >> _build/product_data_encoding.mli
+echo "# 1 \"product_data_encoding.ml\"" > _build/product_data_encoding.ml
+cat product_data_encoding.ml >> _build/product_data_encoding.ml
+echo "# 1 \"product_websocket.mli\"" > _build/product_websocket.mli
+cat product_websocket.mli >> _build/product_websocket.mli
+echo "# 1 \"product_websocket.ml\"" > _build/product_websocket.ml
+cat product_websocket.ml >> _build/product_websocket.ml
+echo "# 1 \"product_lwt_domain.ml\"" > _build/product_lwt_domain.ml
+cat product_lwt_domain.ml >> _build/product_lwt_domain.ml
+echo "# 1 \"product_prometheus.mli\"" > _build/product_prometheus.mli
+cat product_prometheus.mli >> _build/product_prometheus.mli
+echo "# 1 \"product_prometheus.ml\"" > _build/product_prometheus.ml
+cat product_prometheus.ml >> _build/product_prometheus.ml
+echo "# 1 \"product_resto.mli\"" > _build/product_resto.mli
+cat product_resto.mli >> _build/product_resto.mli
+echo "# 1 \"product_resto.ml\"" > _build/product_resto.ml
+cat product_resto.ml >> _build/product_resto.ml
+echo "# 1 \"product_efunc_core.mli\"" > _build/product_efunc_core.mli
+cat product_efunc_core.mli >> _build/product_efunc_core.mli
+echo "# 1 \"product_efunc_core.ml\"" > _build/product_efunc_core.ml
+cat product_efunc_core.ml >> _build/product_efunc_core.ml
+echo "# 1 \"product_octez.mli\"" > _build/product_octez.mli
+cat product_octez.mli >> _build/product_octez.mli
+echo "# 1 \"product_octez.ml\"" > _build/product_octez.ml
+cat product_octez.ml >> _build/product_octez.ml
+echo "# 1 \"product_tooling.mli\"" > _build/product_tooling.mli
+cat product_tooling.mli >> _build/product_tooling.mli
+echo "# 1 \"product_tooling.ml\"" > _build/product_tooling.ml
+cat product_tooling.ml >> _build/product_tooling.ml
+echo "# 1 \"product_etherlink.mli\"" > _build/product_etherlink.mli
+cat product_etherlink.mli >> _build/product_etherlink.mli
+echo "# 1 \"product_etherlink.ml\"" > _build/product_etherlink.ml
+cat product_etherlink.ml >> _build/product_etherlink.ml
+echo "# 1 \"product_teztale.ml\"" > _build/product_teztale.ml
+cat product_teztale.ml >> _build/product_teztale.ml
+echo "# 1 \"product_tezt_cloud_tests.ml\"" > _build/product_tezt_cloud_tests.ml
+cat product_tezt_cloud_tests.ml >> _build/product_tezt_cloud_tests.ml
+echo "# 1 \"product_ciao.ml\"" > _build/product_ciao.ml
+cat product_ciao.ml >> _build/product_ciao.ml
+echo "# 1 \"product_release_site.ml\"" > _build/product_release_site.ml
+cat product_release_site.ml >> _build/product_release_site.ml
+echo "# 1 \"product_tobi.ml\"" > _build/product_tobi.ml
+cat product_tobi.ml >> _build/product_tobi.ml
+echo "# 1 \"main.mli\"" > _build/main.mli
+cat main.mli >> _build/main.mli
+echo "# 1 \"main.ml\"" > _build/main.ml
+cat main.ml >> _build/main.ml
+ocamlc -bin-annot -g -w @1..3@5..28@30..39@43@46..47@49..57@61..62 \
+	-I _build -I +str str.cma _build/JSON_AST.ml _build/JSON_parser.mli _build/JSON_parser.ml _build/JSON_lexer.ml _build/dgraph.mli _build/dgraph.ml _build/tezos_protocol.ml _build/manifest_link_deps.mli _build/manifest_link_deps.ml _build/manifest.mli _build/manifest.ml _build/externals.ml _build/internals.ml _build/product_data_encoding.mli _build/product_data_encoding.ml _build/product_websocket.mli _build/product_websocket.ml _build/product_lwt_domain.ml _build/product_prometheus.mli _build/product_prometheus.ml _build/product_resto.mli _build/product_resto.ml _build/product_efunc_core.mli _build/product_efunc_core.ml _build/product_octez.mli _build/product_octez.ml _build/product_tooling.mli _build/product_tooling.ml _build/product_etherlink.mli _build/product_etherlink.ml _build/product_teztale.ml _build/product_tezt_cloud_tests.ml _build/product_ciao.ml _build/product_release_site.ml _build/product_tobi.ml _build/main.mli _build/main.ml -o manifest
+(cd .. && manifest/manifest)
+make: Leaving directory '/work/src/manifest'
+
+GATE EXIT: 0

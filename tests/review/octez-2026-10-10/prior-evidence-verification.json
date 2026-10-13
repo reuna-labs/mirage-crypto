@@ -1,0 +1,6 @@
+{
+  "archive": "tests/review/octez-2026-10-04/evidence.tar.gz",
+  "archive_sha256": "61683ac761fd5d535257057fd553e828522b3c1b4cdc2887063886d067692a80",
+  "verified_files": 922,
+  "result": "All indexed lengths and SHA256 values match; this archive predates the final secp heap-layout correction."
+}

@@ -1,0 +1,50 @@
+{
+  "filesystem_counterexample": "Exact shrunk ten-operation sequence from unit seed 481264812; diagnostic does not replace the full property/unit gate.",
+  "shared_external_filesystem_exits": [
+    2,
+    2
+  ],
+  "linux_tmpfs_exits": [
+    0,
+    0
+  ],
+  "external_ext4_exit": 0,
+  "ext4_image_bytes": 8589934592,
+  "netbase_version": "6.4",
+  "netbase_sha256": "29b23c48c0fe6f878e56c5ddc9f65d1c05d729360f3690a593a8c795031cd867",
+  "driver_sha256": "5aa15fa263c1534aa20c370d992694a4dc0ac0e01656aabf6ce1d8ce09a1aabd",
+  "link_argv": [
+    "ocamlfind",
+    "ocamlopt",
+    "-thread",
+    "-ccopt",
+    "-Wl,--start-group",
+    "-package",
+    "octez-riscv-nds.disk,bls12-381.archive,octez-rollup-node-rust-deps",
+    "-linkpkg",
+    "nds_snapshot_repro.ml",
+    "-cclib",
+    "-Wl,--end-group",
+    "-o",
+    "nds_snapshot_repro"
+  ],
+  "logs": {
+    "nds-snapshot-external-r1.log": "31c2373437dd0cce61c1a46f65f33e41cf494da10c2335ec55eda3740034327d",
+    "nds-snapshot-external-r2.log": "758d0a1de2ec91177133eecef213a0a3f648bee56d3435ea5f15c365bf85d79f",
+    "nds-snapshot-tmpfs.log": "6bcc11f5996a6b6bdf1b0ef15dad420f7bff4f6973636e6a89d035840c3ec2f8",
+    "nds-snapshot-tmpfs-r2.log": "6bcc11f5996a6b6bdf1b0ef15dad420f7bff4f6973636e6a89d035840c3ec2f8",
+    "nds-snapshot-ext4.log": "6bcc11f5996a6b6bdf1b0ef15dad420f7bff4f6973636e6a89d035840c3ec2f8",
+    "connpool-netbase-recheck.log": "57d36170d2548e46311482a59521a51d13afdcc766b078e911af7652a0896122",
+    "native-tmp-mount.log": "b9f13f90f70ee1a0210066826ae2fcbbb14a303092594bb568b362d23a3aefb8",
+    "test-tmp-ext4-format.log": "4f18310cfc41d6fc6567eb3d77e054ff2097b47bd82f77f06e860363f978db0c",
+    "nds-repro-build-group.log": "3facb3523ee5e16198e80465d3fa72b2be5c5a4b830181a8d90db8be87f28d3d",
+    "nds-snapshot-property-ext4.log": "5bbcba00b877a4d10f9e15e8bb9fe9c52295fb1b8fc0012e129d7ab22af02c82"
+  },
+  "original_property_recheck": {
+    "seed": 481264812,
+    "exit": 0,
+    "finished_utc": "2026-10-12T04:48:10Z",
+    "samples": "unchanged QCheck default (100)",
+    "full_unit_gate": "pending"
+  }
+}

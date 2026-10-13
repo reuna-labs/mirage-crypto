@@ -1,0 +1,65 @@
+[04:50:39.764] [warn] Unknown tag: ci_disabled
+[04:50:39.769] [warn] Unknown tag: flaky
+[04:50:39.806] [SUCCESS] (1/139) memory: fresh registry has size 0
+[04:50:39.844] [SUCCESS] (2/139) memory: resize by 1 succeeds
+[04:50:39.844] [SUCCESS] (3/139) memory: resize by more than 1 fails
+[04:50:39.844] [SUCCESS] (4/139) memory: key too long errors
+[04:50:39.844] [SUCCESS] (5/139) memory: database index out of bounds
+[04:50:39.844] [SUCCESS] (6/139) memory: registry ops with OOB index error
+[04:50:39.844] [SUCCESS] (7/139) memory: shrink makes removed index out of bounds
+[04:50:39.845] [SUCCESS] (8/139) memory: delete non-existent key preserves hash
+[04:50:39.845] [SUCCESS] (9/139) memory: write after copy_database returns wrong error
+[04:50:39.861] [SUCCESS] (10/139) memory: hash determinism
+[04:50:39.869] [SUCCESS] (11/139) memory: hash changes when value changes
+[04:50:39.875] [SUCCESS] (12/139) memory: isolation between databases
+[04:50:39.885] [SUCCESS] (13/139) memory: registry hash determinism
+[04:50:39.893] [SUCCESS] (14/139) memory: hash reverts when value is restored
+[04:50:39.965] [SUCCESS] (15/139) memory: same ops produce same hash
+[04:50:40.053] [SUCCESS] (16/139) memory: ops on different databases commute
+[04:50:40.068] [SUCCESS] (17/139) memory_prove: fresh registry has size 0
+[04:50:40.068] [SUCCESS] (18/139) memory_prove: resize by 1 succeeds
+[04:50:40.069] [SUCCESS] (19/139) memory_prove: resize by more than 1 fails
+[04:50:40.069] [SUCCESS] (20/139) memory_prove: key too long errors
+[04:50:40.069] [SUCCESS] (21/139) memory_prove: database index out of bounds
+[04:50:40.069] [SUCCESS] (22/139) memory_prove: registry ops with OOB index error
+[04:50:40.069] [SUCCESS] (23/139) memory_prove: shrink makes removed index out of bounds
+[04:50:40.069] [SUCCESS] (24/139) memory_prove: delete non-existent key preserves hash
+[04:50:40.070] [SUCCESS] (25/139) memory_prove: write after copy_database returns wrong error
+[04:50:40.100] [SUCCESS] (26/139) memory_prove: hash determinism
+[04:50:40.118] [SUCCESS] (27/139) memory_prove: hash changes when value changes
+[04:50:40.138] [SUCCESS] (28/139) memory_prove: isolation between databases
+[04:50:40.177] [SUCCESS] (29/139) memory_prove: registry hash determinism
+[04:50:40.201] [SUCCESS] (30/139) memory_prove: hash reverts when value is restored
+[04:50:40.421] [SUCCESS] (31/139) memory_prove: same ops produce same hash
+[04:50:40.602] [SUCCESS] (32/139) memory_prove: ops on different databases commute
+[04:50:40.643] [SUCCESS] (33/139) disk: fresh registry has size 0
+[04:50:55.088] [SUCCESS] (34/139) disk: resize by 1 succeeds
+[04:50:55.090] [SUCCESS] (35/139) disk: resize by more than 1 fails
+[04:50:59.914] [SUCCESS] (36/139) disk: key too long errors
+[04:51:04.607] [SUCCESS] (37/139) disk: database index out of bounds
+[04:51:08.863] [SUCCESS] (38/139) disk: registry ops with OOB index error
+[04:51:17.841] [SUCCESS] (39/139) disk: shrink makes removed index out of bounds
+[04:51:22.331] [SUCCESS] (40/139) disk: delete non-existent key preserves hash
+[04:51:33.944] [SUCCESS] (41/139) disk: write after copy_database returns wrong error
+[04:59:09.635] [SUCCESS] (42/139) disk: hash determinism
+[05:02:58.789] [SUCCESS] (43/139) disk: hash changes when value changes
+[05:10:22.262] [SUCCESS] (44/139) disk: isolation between databases
+[05:17:58.794] [SUCCESS] (45/139) disk: registry hash determinism
+[05:21:41.327] [SUCCESS] (46/139) disk: hash reverts when value is restored
+[06:45:01.633] [SUCCESS] (47/139) disk: same ops produce same hash
+[08:00:16.158] [SUCCESS] (48/139) disk: ops on different databases commute
+[08:00:16.259] [SUCCESS] (49/139) disk_prove: fresh registry has size 0
+[08:00:23.280] [SUCCESS] (50/139) disk_prove: resize by 1 succeeds
+[08:00:23.281] [SUCCESS] (51/139) disk_prove: resize by more than 1 fails
+[08:00:27.684] [SUCCESS] (52/139) disk_prove: key too long errors
+[08:00:31.700] [SUCCESS] (53/139) disk_prove: database index out of bounds
+[08:00:35.770] [SUCCESS] (54/139) disk_prove: registry ops with OOB index error
+[08:00:44.405] [SUCCESS] (55/139) disk_prove: shrink makes removed index out of bounds
+[08:00:48.008] [SUCCESS] (56/139) disk_prove: delete non-existent key preserves hash
+[08:00:56.714] [SUCCESS] (57/139) disk_prove: write after copy_database returns wrong error
+[08:14:36.292] [SUCCESS] (58/139) disk_prove: hash determinism
+[08:21:18.370] [SUCCESS] (59/139) disk_prove: hash changes when value changes
+[08:34:38.304] [SUCCESS] (60/139) disk_prove: isolation between databases
+[08:47:49.381] [SUCCESS] (61/139) disk_prove: registry hash determinism
+[08:54:33.949] [SUCCESS] (62/139) disk_prove: hash reverts when value is restored
+[10:33:20.839] [SUCCESS] (63/139) disk_prove: same ops produce same hash

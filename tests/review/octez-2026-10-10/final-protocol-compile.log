@@ -1,0 +1,71 @@
+External workspace: /work/src
+Command: ['opam', 'exec', '--switch=octez-5.3', '--', 'dune', 'build', '-j', '4', '--profile=dev', '@runtest_compile_protocol']
+Storage reserves: external 20 GiB; internal metadata 2 GiB; root read-only
+(cd _build/default/src/bin_client && ../../../install/default/bin/octez-protocol-compiler -no-hash-check -warn-error +a test/proto_test_injection/)
+Success: PsWRA6bc1migF6ctDbXJXiAbkWA36aqZuGqd6GBVFqB6couENx4.
+(cd _build/default/src/proto_000_Ps9mPmXa/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -6-7-9-16-29-32-34-51-68 -warn-error +a .)
+Success: Ps9mPmXaRzmzk35gbAYNCAw6UXdE2qoABTHbN2oEEc1qM7CwT9P.
+(cd _build/default/src/proto_002_PsYLVpVv/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -6-7-9-16-29-32-34-51-68 -warn-error +a .)
+Success: PsYLVpVvgbLhAhoqAkMFUo6gudkJ9weNXhUYCiLDzcUpFpkk8Wt.
+(cd _build/default/src/proto_001_PtCJ7pwo/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -6-7-9-16-29-32-34-51-68 -warn-error +a .)
+Success: PtCJ7pwoxe8JasnHY8YonnLYjcVHmhiARPJvqcC6VfHT5s8k8sY.
+(cd _build/default/src/proto_003_PsddFKi3/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -6-7-9-16-29-32-34-51-68 -warn-error +a .)
+Success: PsddFKi32cMJ2qPjf43Qv5GDWLDPZb3T3bF6fLKiF5HtvHNU7aP.
+(cd _build/default/src/proto_004_Pt24m4xi/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -6-7-9-16-29-32-34-51-68 -warn-error +a .)
+Success: Pt24m4xiPbLDhVgVfABUjirbmda3yohdN82Sp9FeuAXJ4eV9otd.
+(cd _build/default/src/proto_005_PsBABY5H/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -6-7-9-16-29-32-34-51-68 -warn-error +a .)
+Success: PsBABY5HQTSkA4297zNHfsZNKtxULfL18y95qb3m53QJiXGmrbU.
+(cd _build/default/src/proto_005_PsBabyM1/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -6-7-9-16-29-32-34-51-68 -warn-error +a .)
+Success: PsBabyM1eUXZseaJdmXFApDSBqj8YBfwELoxZHHW77EMcAbbwAS.
+(cd _build/default/src/proto_007_PsDELPH1/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -6-7-9-16-29-32-34-51-68 -warn-error +a .)
+Success: PsDELPH1Kxsxt8f9eWbxQeRxkjfbxoqM52jvs5Y5fBxWWh4ifpo.
+(cd _build/default/src/proto_006_PsCARTHA/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -6-7-9-16-29-32-34-51-68 -warn-error +a .)
+Success: PsCARTHAGazKbHtnKfLzQg3kms52kSRpgnDY982a9oYsSXRLQEb.
+(cd _build/default/src/proto_008_PtEdoTez/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -6-7-9-16-29-32-34-51-68 -warn-error +a .)
+Success: PtEdoTezd3RHSC31mpxxo1npxFjoWWcFgQtxapi51Z8TLu6v6Uq.
+(cd _build/default/src/proto_008_PtEdo2Zk/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -6-7-9-16-29-32-34-51-68 -warn-error +a .)
+Success: PtEdo2ZkT9oKpimTah6x2embF25oss54njMuPzkJTEi5RqfdZFA.
+(cd _build/default/src/proto_alpha/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -no-hash-check -warn-error +a .)
+Success: ProtoALphaALphaALphaALphaALphaALphaALphaALphaDdp3zK as PsRuRosfSYgDYYF5TaKjgT2wYGrJM1p7VYpoYXR3VFEyHxQaeaR.
+(cd _build/default/src/proto_025_PsUshuai/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warn-error +a .)
+Success: PsUshuai9QapM5TGj1JpuVGkdxz5GykdnEvS6Rh8SUVrARvZLCY.
+(cd _build/default/src/proto_009_PsFLoren/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -6-7-9-16-29-32-34-51-68 -warn-error +a .)
+Success: PsFLorenaUUuikDWvMDr6fGBRG8kt3e3D3fHoXK1j1BFRxeSH4i.
+(cd _build/default/src/proto_010_PtGRANAD/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -6-7-9-16-29-32-34-51-68 -warn-error +a .)
+Success: PtGRANADsDU8R9daYKAgWnQYAJ64omN1o3KMGVCykShA97vQbvV as PsERsg9nX1wo2X5jqVCzKJvoczwtbF9NtJ1XkvR8cnvhokv1EJc.
+(cd _build/default/src/proto_011_PtHangz2/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -32-34-51 -warn-error +a .)
+Success: PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx as PtMph9rT4iQxKFDvxYAcKqcQ8j45oY6uCpzedB98LfWMARxQQSW.
+(cd _build/default/src/proto_012_Psithaca/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -32-34-51 -warn-error +a .)
+Success: Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A as PsgP5GoLQ57n2yBXG1uu6oKQf1YGYmW7w498E7S81MqheYRc5Wo.
+(cd _build/default/src/proto_013_PtJakart/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -32-34-51 -warn-error +a .)
+Success: PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY as PssV7reTFUwrtfhfKSzAQ5MwVpfg35QNBiBBNeH4AvoAStqBBfH.
+(cd _build/default/src/proto_014_PtKathma/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -32-34 -warn-error +a .)
+Success: PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg as PrqoTUFUrorf5LAt7F28SXDScpmS5CR2KuVJvzmrQtUJJZVuUaK.
+(cd _build/default/src/proto_015_PtLimaPt/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -32-34 -warn-error +a .)
+Success: PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW as Psad9fKoPh8bNtaB4vhwsnYBAeKhf5EXrQbmo7q1ozkQgGNQ3qb.
+(cd _build/default/src/proto_016_PtMumbai/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -32-34 -warn-error +a .)
+Success: PtMumbai2TmsJHNGRkD8v8YDbtao7BLUC3wjASn1inAKLFCjaH1 as PsE988pGzcDaLWsDYXKj8tZTYryfns8xQzFF58T6MHfw1HwJhbZ.
+(cd _build/default/src/proto_017_PtNairob/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -32-34 -warn-error +a .)
+Success: PtNairobiyssHuh87hEhfVBGCVrK3WnS8Z2FT4ymB5tAa4r1nQf as PsMmVdraV63nbGuMG1FGM2WCragcWRsb85T3duL7LEL87PH7RFU.
+(cd _build/default/src/proto_018_Proxford/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -32-34 -warn-error +a .)
+Success: ProxfordYmVfjWnRcgjWH36fW6PArwqykTFzotUxRs6gmTcZDuH as Pse1yoTfQcn7CAnVpRpAQmKy88otrsdj1FJZb5RbqNbQHAbU94h.
+(cd _build/default/src/proto_019_PtParisB/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -32-34 -warn-error +a .)
+Success: PtParisBxoLz5gzMmn3d9WBQNoPSZakgnkMC2VNuQ3KXfUtUQeZ as PsvYZTuJyMerq4EF2yT8SETMR1D7fAqzwERDkh9B8T2cjQh5zph.
+(cd _build/default/src/proto_020_PsParisC/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -32-34 -warn-error +a .)
+Success: PsParisCZo7KAh1Z1smVd9ZMZ1HHn5gkzbM94V3PLCpknFWhUAi as PtJdFR5xNLSufXi5LmHKwstm7Dd8SDj7PEmfKmvz5B9hHs6oEtB.
+(cd _build/default/src/proto_021_PsQuebec/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -32-34 -warn-error +a .)
+Success: PsQuebecnLByd3JwTiGadoG4nGWi3HYiLXUjkibeFV8dCFeVMUg as PtSAFF8wPqJcqwFoJfQoKgQBef7b7YNAgW1LjKMdhmigC7BumiX.
+(cd _build/default/src/proto_demo_counter/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -no-hash-check -warn-error +a .)
+Success: ProtoDemoCounterDemoCounterDemoCounterDemoCou4LSpdT as Ps48AX1F5fXAoWWEsaHRU9tJCLaV79JJseJQnUaNay9Bpfcg3TR.
+(cd _build/default/src/proto_demo_noops/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -no-hash-check -warn-error +a .)
+Success: ProtoDemoNoopsDemoNoopsDemoNoopsDemoNoopsDemo6XBoYp as PsVqdRxvEt9ctaqQjqP1Pn362isRempxrGCPFnMtHXuyeW7B9XM.
+(cd _build/default/src/proto_genesis/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -no-hash-check -warn-error +a .)
+Success: ProtoGenesisGenesisGenesisGenesisGenesisGenesk612im as PrrUA9dCzbqBzugjQyw65HLHKjhH3HMFSLLHLZjj5rkmkG13Fej.
+(cd _build/default/src/proto_022_PsRiotum/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -32-34 -warn-error +a .)
+Success: PsRiotumaAMotcRoDWW1bysEhQy2n1M5fy8JgRp8jjRfHGmfeA7.
+(cd _build/default/src/proto_023_PtSeouLo/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warning -32-34 -warn-error +a .)
+Success: PtSeouLouXkxhg39oWzjxDWaCydNfR3RxCUrNe4Q9Ro8BTehcbh.
+(cd _build/default/src/proto_024_PtTALLiN/lib_protocol && ../../../../install/default/bin/octez-protocol-compiler -warn-error +a .)
+Success: PtTALLiNtPec7mE7yY4m3k26J8Qukef3E3ehzhfXgFZKGtDdAXu.
+
+GATE EXIT: 0

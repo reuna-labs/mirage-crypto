@@ -1,0 +1,14 @@
+External workspace: /work/src
+Command: ['opam', 'exec', '--switch=octez-5.3', '--', 'sh', 'scripts/crypto/check-signer-timing.sh', '50000']
+Storage reserves: external 20 GiB; internal metadata 2 GiB; root read-only
+Timing artifacts: /work/tmp/tmp.phVKNlV8Kp
+ed25519/public	n=50000/class	fixed_ns=20208.95	random_ns=20240.50	t=-1.1397
+ed25519/sign	n=50000/class	fixed_ns=42736.89	random_ns=42671.18	t=0.8380
+p256/public	n=50000/class	fixed_ns=108031.79	random_ns=108140.41	t=-0.1326
+p256/sign	n=50000/class	fixed_ns=116701.28	random_ns=117154.74	t=-1.9575
+p256/sign-nonce	n=50000/class	fixed_ns=128803.75	random_ns=128070.86	t=0.6503
+secp256k1/public	n=50000/class	fixed_ns=38996.86	random_ns=38951.89	t=0.3275
+secp256k1/sign	n=50000/class	fixed_ns=41264.84	random_ns=41031.05	t=0.8820
+secp256k1/recoverable	n=50000/class	fixed_ns=41902.73	random_ns=41836.86	t=1.4031
+
+GATE EXIT: 0

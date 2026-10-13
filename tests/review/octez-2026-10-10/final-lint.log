@@ -1,0 +1,9 @@
+External workspace: /work/src
+Command: ['opam', 'exec', '--switch=octez-5.3', '--', 'make', 'check-linting']
+check-scripts: 234 passed, 7 skipped, 0 failed
+Repository clean :thumbsup:
+rm 'src/lib_time_measurement/.ocamlformat'
+Files that differ but that shouldn't:
+(none, everything looks good)
+
+GATE EXIT: 0

@@ -1,0 +1,7 @@
+2026-10-11T01:36:12Z Waiting for the already-running final-format.log gate
+2026-10-11T01:37:32Z Formatting passed
+2026-10-11T01:38:02Z START final-lint.log ['make', 'check-linting']
+2026-10-11T01:38:48Z END final-lint.log exit=0
+2026-10-11T01:38:48Z START final-manifest.log ['make', '-C', 'manifest', 'check']
+2026-10-11T01:38:53Z END final-manifest.log exit=0
+2026-10-11T01:38:53Z START final-unit.log ['make', 'test-unit']

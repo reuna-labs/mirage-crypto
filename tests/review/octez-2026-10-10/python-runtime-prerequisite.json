@@ -1,0 +1,16 @@
+{
+  "source": "Debian bookworm-security arm64; apt-get download",
+  "version": "3.11.2-6+deb12u9",
+  "prefix": "/work/system-prereqs",
+  "LD_LIBRARY_PATH": "/work/system-prereqs/usr/lib/aarch64-linux-gnu",
+  "packages": [
+    {
+      "file": "libpython3.11_3.11.2-6+deb12u9_arm64.deb",
+      "sha256": "afdd9cc70e2ffe43551b79288d351920cb495d1190b600d5ceee4c11677fde4e"
+    },
+    {
+      "file": "libpython3.11-dev_3.11.2-6+deb12u9_arm64.deb",
+      "sha256": "fb34da3be5eb345a6a34c5a7ef760a33ff22054d46b8906b81b2fa8e80c26a7f"
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "image": "reuna/octez-native-validation:20261010",
+  "image_id": "sha256:685c4c413e8f540fc6593c7966153984f745db136ee023d154688dd92543db41",
+  "entrypoint": [
+    "/work/bin/native-tmp-entrypoint.sh"
+  ],
+  "command": null,
+  "working_directory": "/work",
+  "read_only_root": true,
+  "privileged": false,
+  "cap_add": [
+    "CAP_SYS_ADMIN"
+  ],
+  "devices": [
+    {
+      "PathOnHost": "/dev/loop-control",
+      "PathInContainer": "/dev/loop-control",
+      "CgroupPermissions": "rwm"
+    }
+  ],
+  "device_cgroup_rules": [
+    "b 7:* rwm"
+  ],
+  "tmpfs": {
+    "/run": "rw,size=16777216"
+  },
+  "binds": null,
+  "mounts": [
+    {
+      "Type": "bind",
+      "Source": "/Volumes/Seagate Expansion Drive/reuna/builds/octez-native-signers-20261010",
+      "Destination": "/work",
+      "Mode": "",
+      "RW": true,
+      "Propagation": "rprivate"
+    },
+    {
+      "Type": "bind",
+      "Source": "/Volumes/Seagate Expansion Drive/reuna/builds/octez-native-signers-20261010/tmp",
+      "Destination": "/tmp",
+      "Mode": "",
+      "RW": true,
+      "Propagation": "rprivate"
+    },
+    {
+      "Type": "bind",
+      "Source": "/Volumes/Seagate Expansion Drive/reuna/builds/octez-native-signers-20261010/var-tmp",
+      "Destination": "/var/tmp",
+      "Mode": "",
+      "RW": true,
+      "Propagation": "rprivate"
+    },
+    {
+      "Type": "bind",
+      "Source": "/Users/gilbahat/reuna/web3/tezos",
+      "Destination": "/source",
+      "Mode": "",
+      "RW": false,
+      "Propagation": "rprivate"
+    },
+    {
+      "Type": "bind",
+      "Source": "/Volumes/Seagate Expansion Drive/reuna/builds/octez-native-signers-20261010/system-prereqs/etc/services",
+      "Destination": "/etc/services",
+      "Mode": "",
+      "RW": false,
+      "Propagation": "rprivate"
+    },
+    {
+      "Type": "bind",
+      "Source": "/Volumes/Seagate Expansion Drive/reuna/builds/octez-native-signers-20261010/system-prereqs/etc/protocols",
+      "Destination": "/etc/protocols",
+      "Mode": "",
+      "RW": false,
+      "Propagation": "rprivate"
+    }
+  ],
+  "note": "Docker inspect records declared mounts; Linux loop and bind mounts made by the entrypoint are recorded separately in native-tmp-mount.log."
+}

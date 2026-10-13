@@ -1,0 +1,291 @@
+{
+  "archive_sha256": "f38232bd70e7c19c7b1cdea4245bf0c6fb4e263e4efca86a9b6f5cbd715d7bf5",
+  "excluded_redundant_or_setup_traces": [
+    "git-setup-trace.log",
+    "opam-setup-trace.log",
+    "prior-evidence.tar.gz",
+    "validation-snapshot.log"
+  ],
+  "files": [
+    {
+      "path": "logs/connpool-netbase-recheck.log",
+      "bytes": 477,
+      "sha256": "57d36170d2548e46311482a59521a51d13afdcc766b078e911af7652a0896122"
+    },
+    {
+      "path": "logs/dal-setup.log",
+      "bytes": 752,
+      "sha256": "76d754c51c4d1ff536ddafee7052967a66708f71e40b275dd443071ca326070a"
+    },
+    {
+      "path": "logs/final-format.log",
+      "bytes": 405,
+      "sha256": "d11fb56732d7c633aac152b5991f62355824e7abf918f11871a715d1c230a416"
+    },
+    {
+      "path": "logs/final-lint.log",
+      "bytes": 309,
+      "sha256": "bc03cbfec10c3974b6dc3694e7fd30f6da5e477697a09a82fe778c2ace04a7b6"
+    },
+    {
+      "path": "logs/final-manifest.log",
+      "bytes": 5396,
+      "sha256": "2198fce0b75e007e0da802cf75d4afb5a670c842c984497d6502775a4d30f13a"
+    },
+    {
+      "path": "logs/final-protocol-compile.log",
+      "bytes": 8250,
+      "sha256": "95ea0b1b3d7feb8c38357e79df77b1755ffe66214cd77499d053114a6872bb50"
+    },
+    {
+      "path": "logs/final-protocol-out-of-opam.log",
+      "bytes": 3101,
+      "sha256": "7a04ecc1378c00fd049a8689e5c90b963952ccdd7528d8ddab870693009342f7"
+    },
+    {
+      "path": "logs/final-sequence-ext4.log",
+      "bytes": 260,
+      "sha256": "a15296ff40566ec1c6adfdd4cf29ba76891800a87b5795f7c5acf4358ad08692"
+    },
+    {
+      "path": "logs/final-sequence-resume.log",
+      "bytes": 672,
+      "sha256": "104e845cee849712e8d36c4b49f7cd0bbeaab1bbe3d557b304513a224516ad0b"
+    },
+    {
+      "path": "logs/final-sequence.log",
+      "bytes": 474,
+      "sha256": "58549bdfdfbf2737d98da2e4c28fa3a244149163f8b6043883ffd85cfe15d306"
+    },
+    {
+      "path": "logs/final-signer-timing.log",
+      "bytes": 881,
+      "sha256": "c16e12651e18e6ecff72d1a5cac8da9e42efab0c43954532ad474ed17791d0b1"
+    },
+    {
+      "path": "logs/final-unit-ext4-r2.log",
+      "bytes": 7285,
+      "sha256": "167426a2cacf987c902eb3a27e0c96da44e5225cd8bbb2c995a9a322bb5a8662"
+    },
+    {
+      "path": "logs/final-unit-ext4-r2.nds.stderr.partial.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/final-unit-ext4-r2.nds.stdout.partial.log",
+      "bytes": 4754,
+      "sha256": "bc40717b92988625c52c64ff7f6fdf1aa4eeef002906a2c4cbeb215ee09fb282"
+    },
+    {
+      "path": "logs/final-unit-ext4.log",
+      "bytes": 7268,
+      "sha256": "45afa212c609e2cbd1326e7221da1b43edb32ce53310a5b1956bc7bfa2fc2e78"
+    },
+    {
+      "path": "logs/final-unit-ram-r2.log",
+      "bytes": 917992,
+      "sha256": "0fb73ab96e1cd3db401d29cb417aa00d830c10637c086a44086889f3845baea4"
+    },
+    {
+      "path": "logs/final-unit-ram.log",
+      "bytes": 96502,
+      "sha256": "1f60ceb2a89b217487ebf5a3352855ab93fce9c94a55b877f440a122fec0fb07"
+    },
+    {
+      "path": "logs/final-unit-ram.nds.stderr.partial.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/final-unit-ram.nds.stdout.partial.log",
+      "bytes": 10888,
+      "sha256": "7e1a0582d28c6d00006a8215fcb8b9f699296dd79a0122406362beed0e7032e2"
+    },
+    {
+      "path": "logs/final-unit.log",
+      "bytes": 453534,
+      "sha256": "b600f9600d75369593c3998f48507401799463c98d8f4d0c8cdb3406db54c8cc"
+    },
+    {
+      "path": "logs/installed-packages.txt",
+      "bytes": 10920,
+      "sha256": "fa2f8d223fbe078a82cf40694e481ff6a6a203495844b37069d7470ea1f20103"
+    },
+    {
+      "path": "logs/locked-dependencies-readonly.log",
+      "bytes": 44628,
+      "sha256": "dd75ab9e0d6b14ffc1815357df9d0e353f4d8ba20fa0dbf9f75389f9d467eceb"
+    },
+    {
+      "path": "logs/locked-dependencies-retry.log",
+      "bytes": 34261,
+      "sha256": "6332ac1ba44511555f62770208466226cac0ca1de202199b97d4874e1248cbf4"
+    },
+    {
+      "path": "logs/locked-dependencies.log",
+      "bytes": 29877,
+      "sha256": "cc192dc3378a7aa984504c02e4d19e94b2cc34ecaf8009fdb7df6451a608c187"
+    },
+    {
+      "path": "logs/mpc-nonce-race-20261011.log",
+      "bytes": 66,
+      "sha256": "f52678ab7c27f84af3e3a721714092d1b1cd00ace9b3188d341e58f483ff1f59"
+    },
+    {
+      "path": "logs/native-tmp-mount.log",
+      "bytes": 1029,
+      "sha256": "8f46bfc639f602c6aa88543f9a0eb74010ab24ebb64354d25399342ceb74987a"
+    },
+    {
+      "path": "logs/nds-ram-probe.log",
+      "bytes": 11288,
+      "sha256": "0cd05d17e3503b3d6e74fa2764229ac8b5c714a57a97f4c7e53d8be81a466b0f"
+    },
+    {
+      "path": "logs/nds-repro-build-group.log",
+      "bytes": 357,
+      "sha256": "3facb3523ee5e16198e80465d3fa72b2be5c5a4b830181a8d90db8be87f28d3d"
+    },
+    {
+      "path": "logs/nds-repro-build.log",
+      "bytes": 35734,
+      "sha256": "4e2675e33b77b0077d62d67b1bce3c7eca566e46b74df000f81dd731df302ff4"
+    },
+    {
+      "path": "logs/nds-snapshot-ext4.log",
+      "bytes": 81,
+      "sha256": "6bcc11f5996a6b6bdf1b0ef15dad420f7bff4f6973636e6a89d035840c3ec2f8"
+    },
+    {
+      "path": "logs/nds-snapshot-external-r1.log",
+      "bytes": 726,
+      "sha256": "31c2373437dd0cce61c1a46f65f33e41cf494da10c2335ec55eda3740034327d"
+    },
+    {
+      "path": "logs/nds-snapshot-external-r2.log",
+      "bytes": 726,
+      "sha256": "758d0a1de2ec91177133eecef213a0a3f648bee56d3435ea5f15c365bf85d79f"
+    },
+    {
+      "path": "logs/nds-snapshot-external.log",
+      "bytes": 39,
+      "sha256": "7fd16bae4939db4277c039f3528622c587e2e7a83fec857ef0fafb31855516fb"
+    },
+    {
+      "path": "logs/nds-snapshot-property-ext4.log",
+      "bytes": 478,
+      "sha256": "5bbcba00b877a4d10f9e15e8bb9fe9c52295fb1b8fc0012e129d7ab22af02c82"
+    },
+    {
+      "path": "logs/nds-snapshot-tmpfs-r2.log",
+      "bytes": 81,
+      "sha256": "6bcc11f5996a6b6bdf1b0ef15dad420f7bff4f6973636e6a89d035840c3ec2f8"
+    },
+    {
+      "path": "logs/nds-snapshot-tmpfs.log",
+      "bytes": 81,
+      "sha256": "6bcc11f5996a6b6bdf1b0ef15dad420f7bff4f6973636e6a89d035840c3ec2f8"
+    },
+    {
+      "path": "logs/ocaml-toolchain.log",
+      "bytes": 966,
+      "sha256": "1ce47b1788cefd55f23474bfd1ec277c0a2fd031ff17146d652c48e4751fa4c2"
+    },
+    {
+      "path": "logs/opam-init.log",
+      "bytes": 1307,
+      "sha256": "88fd2b231498ae479c02657f92b635a17bc0b2ccb5c86a605020272476cbb209"
+    },
+    {
+      "path": "logs/postgresql-system-deps.log",
+      "bytes": 1831,
+      "sha256": "0395d89467373bef1e3e1cae238762c82c315b4a418e212393b1cd730a11a8d1"
+    },
+    {
+      "path": "logs/python-formatter.log",
+      "bytes": 1076,
+      "sha256": "948f70ab129044bd956d9accdf1ef8497404a83f9a17270ed54eade25f9b62b1"
+    },
+    {
+      "path": "logs/python-runtime-prerequisite.json",
+      "bytes": 539,
+      "sha256": "97d9e92e03ed23c390d2c0f948aa87382fe84e13efdd543760a27c1b221a3ca3"
+    },
+    {
+      "path": "logs/repository-build.log",
+      "bytes": 213896,
+      "sha256": "d29a01f5b7507ffa349d84f3823f24da086eb3e1fc7647719486615c6d644368"
+    },
+    {
+      "path": "logs/riscv-nds.partial.log",
+      "bytes": 9042,
+      "sha256": "314244fddd50f07b7a49ae3275daeb20e1e7e77ef3bc3e1411cc270b0dfa9206"
+    },
+    {
+      "path": "logs/rust-opam-registration.log",
+      "bytes": 595,
+      "sha256": "82a38737b4b792db3afdb750a52f00d6f1048e8fdca9cb9c0403470562e350be"
+    },
+    {
+      "path": "logs/rust-riscv-target.log",
+      "bytes": 37,
+      "sha256": "831ad8906cd548d1be0b512110752469e0a5b4f23e8ea459eb4bf438761bef31"
+    },
+    {
+      "path": "logs/rust-toolchain.log",
+      "bytes": 1683,
+      "sha256": "b48c2a0d5599f584aaca6cbb3ab8d63435343d66f72eb4bd5e60342719e6b8e9"
+    },
+    {
+      "path": "logs/snoop-command-workload-dump-json.t.stale-cram.out",
+      "bytes": 2879,
+      "sha256": "9f71f1a40b2dd00cd1b8c3d9091f0be29edbfede74b9f0f754430f255048e2f4"
+    },
+    {
+      "path": "logs/snoop-command.t.stale-cram.out",
+      "bytes": 16743,
+      "sha256": "7af7d1ab7bef5819863978c9adfeccd80f4fe69fc2d4fb2a95758bc80fa7e04b"
+    },
+    {
+      "path": "logs/source-snapshot.log",
+      "bytes": 53,
+      "sha256": "8e2aad682ae4c0ed4f1cc1c5e87a8a82463deb28191549e8a855bddd52ccb9eb"
+    },
+    {
+      "path": "logs/storage-preflight-20261013.log",
+      "bytes": 137,
+      "sha256": "e8520ea66e1150481ca1f65fb3a3200e8fd79ee8a99cd1b0cf1d45c0ed013d63"
+    },
+    {
+      "path": "logs/strace-install.log",
+      "bytes": 1280,
+      "sha256": "f61b031dc1d7ce49e3234b2ae7115b466244ef45465995cb59a060233dae2efd"
+    },
+    {
+      "path": "logs/system-deps-install.log",
+      "bytes": 64438,
+      "sha256": "92a13a348bb605d3e74233fe5900ae4802d2d728ad50d238a62e7419d7c49555"
+    },
+    {
+      "path": "logs/system-deps.log",
+      "bytes": 522,
+      "sha256": "60198643882195335ff6b5e82fb530d235d745d91f472cbba57161c51be9a8dd"
+    },
+    {
+      "path": "logs/test-tmp-ext4-format.log",
+      "bytes": 520,
+      "sha256": "4f18310cfc41d6fc6567eb3d77e054ff2097b47bd82f77f06e860363f978db0c"
+    },
+    {
+      "path": "logs/validation-tools.log",
+      "bytes": 778,
+      "sha256": "1a600f875ba143841804c4a169e8ea54d8f920e57c47336b3fbf9a76d6e2555c"
+    },
+    {
+      "path": "source-manifest.json",
+      "bytes": 4594012,
+      "sha256": "2b0d25aca28dcc3f504e33fbef4f5656eb60f7d308571605d093108bcc8583af"
+    }
+  ]
+}
