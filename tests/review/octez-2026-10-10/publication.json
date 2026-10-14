@@ -1,0 +1,24 @@
+{
+  "verified_utc": "2026-10-14T14:13:20.705Z",
+  "authorization": "User requested creation of Reuna repositories matching other web3 repositories and publication there.",
+  "repositories": [
+    {
+      "url": "https://github.com/reuna-labs/tezos",
+      "visibility": "public",
+      "default_branch": "reuna@native-crypto-signers",
+      "remote": "reuna",
+      "remote_head": "d6601b2f79039d46cf493da5fd9ba9eb8fcad4b9",
+      "verification": "git ls-remote plus GitHub repository API",
+      "upstream_remote_preserved": "https://gitlab.com/tezos/tezos.git"
+    },
+    {
+      "url": "https://github.com/reuna-labs/ocaml-tezos",
+      "visibility": "public",
+      "default_branch": "main",
+      "remote": "origin",
+      "remote_head": "8a0768d4506f2cadb571ed06742902cb5a15915a",
+      "verification": "git ls-remote plus GitHub repository API"
+    }
+  ],
+  "history_rewritten": false
+}

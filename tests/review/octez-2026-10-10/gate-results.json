@@ -68,5 +68,5 @@
     "build_and_logs": "external drive",
     "temporary_storage": "4 GiB tmpfs, noswap"
   },
-  "publication": "pending intended fork URL"
+  "publication": "https://github.com/reuna-labs/tezos; reuna@native-crypto-signers; remote head verified"
 }

@@ -119,10 +119,10 @@ preserves that existing hash/framing choice; its 68-test result is not proof
 of full RFC8009 string-to-key compliance. Correcting that protocol path needs
 published RFC8009 vectors and a separately identified compatibility change.
 
-## Outstanding work
+## Completion
 
-Publish the completed Octez feature branch and Tezos SDK commit once their
-intended remote URLs are provided. Task-owned build cleanup is complete.
+The requested implementation, review, approved Octez phases, publication and
+task-owned build cleanup are complete.
 All required Octez build, formatting, lint, manifest, protocol and full unit
 gates passed. MPC findings remain review output, not fixed production code.
 The unrelated AGENTS.md change remains excluded.
@@ -131,7 +131,8 @@ Publication on 2026-10-02 succeeded for Digestif and Mirage Crypto (`reuna/main`
 EVM (`reuna/main`), Tron and Cosmos (`origin/main`, Reuna URLs), Bitcoin
 (`reuna/rewrite/4.0`) and TON (`reuna/main`). The initial default-account push
 was denied; the existing Reuna GitHub account succeeded without changing the
-active account. The Tezos SDK commit remains local because it has no remote.
+active account. The Tezos SDK initially remained local pending a remote;
+its publication is recorded below.
 
 Protocol-review publication on 2026-10-12: commit
 `b9ef4ad20cb4793951251d61cbec4abe12f0af61` is published to the configured
@@ -139,9 +140,8 @@ Reuna remote (`https://github.com/reuna-labs/mirage-crypto.git`, `main`), and
 the remote head was verified. The review includes exact baseline revisions,
 the nonce-race reproducer, its ISC notice and fresh retained OCaml 5.3 evidence
 (11,536 duplicated consumptions in 100,000 trials). This remains review output;
-no MPC production fix is claimed. Octez validation is complete; its publication
-destination remains pending. The feature commit is local and the checkout has
-only the upstream GitLab remote, which has not been pushed to.
+no MPC production fix is claimed. Octez validation is complete. The upstream
+GitLab repository has not been pushed to.
 
 The completed assurance evidence was published in Mirage Crypto commit
 `9acc54f89a3fbbc6767f98b216b9fa276b1a2c94`. Cleanup removed the 67.6 GiB
@@ -149,3 +149,15 @@ external build workspace, both task-owned containers and their validation
 image after verifying loop detachment. Source checkouts and evidence remain;
 unrelated Docker volumes and shared caches were not pruned. See
 `tests/review/octez-2026-10-10/cleanup.json`.
+
+Following the user's authorization to create matching Reuna repositories,
+both final publications succeeded and their remote heads were verified:
+
+- Octez: https://github.com/reuna-labs/tezos,
+  `reuna@native-crypto-signers`, commit
+  `d6601b2f79039d46cf493da5fd9ba9eb8fcad4b9`.
+- Tezos SDK: https://github.com/reuna-labs/ocaml-tezos,
+  `main`, commit `8a0768d4506f2cadb571ed06742902cb5a15915a`.
+
+Both repositories are public, matching the neighboring Reuna web3 repositories.
+See `tests/review/octez-2026-10-10/publication.json` for the verification record.

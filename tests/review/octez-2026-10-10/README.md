@@ -15,7 +15,10 @@ three stages successful and `GATE EXIT: 0`. The 56-member
 and the original source manifest; every member is checked against the
 accompanying SHA-256 index. Historical checkpoints below document failed,
 interrupted and successful attempts rather than replacing this final result.
-The intended fork URL is still required for Octez publication.
+Published at https://github.com/reuna-labs/tezos on
+`reuna@native-crypto-signers`; the remote head matches the implementation
+commit above. The SDK is also published at https://github.com/reuna-labs/ocaml-tezos.
+See `publication.json` for the verified remote commit IDs.
 
 The previous validation container was absent when work resumed on 2026-10-10.
 The old evidence archive remains in `../octez-2026-10-04/evidence.tar.gz`.

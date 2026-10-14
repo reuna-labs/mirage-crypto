@@ -317,3 +317,14 @@ in Mirage Crypto `9acc54f89a3fbbc6767f98b216b9fa276b1a2c94`. The task loop
 device was verified detached. Source checkouts and retained evidence are
 preserved; shared caches and unrelated volumes were not pruned. The exact
 cleanup receipt is `tests/review/octez-2026-10-10/cleanup.json`.
+
+## Publication complete
+
+The user authorized creating Reuna repositories matching the other web3
+repositories. Octez is published at https://github.com/reuna-labs/tezos on
+`reuna@native-crypto-signers`; its remote head is exactly
+`d6601b2f79039d46cf493da5fd9ba9eb8fcad4b9`. The Tezos SDK is published at
+https://github.com/reuna-labs/ocaml-tezos on `main`, with remote head
+`8a0768d4506f2cadb571ed06742902cb5a15915a`. Both are public. Commit history
+was preserved and the upstream Octez GitLab remote was left unchanged.
+The publication blocker is resolved; all approved phases and cleanup are done.
