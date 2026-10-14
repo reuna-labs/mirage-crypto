@@ -1,0 +1,29 @@
+{
+  "recorded_utc": "2026-10-14T03:24:28.411Z",
+  "workspace_removed": "/Volumes/Seagate Expansion Drive/reuna/builds/octez-native-signers-20261010",
+  "allocated_kib_before": 70831480,
+  "allocated_gib_before": 67.55016326904297,
+  "workspace_absence_verified": true,
+  "containers_removed": [
+    "octez-native-external",
+    "octez-native-external-before-ext4"
+  ],
+  "container_absence_verified": true,
+  "image_removed": "reuna/octez-native-validation:20261010",
+  "image_absence_verified": true,
+  "loop_device": "/dev/loop0",
+  "loop_verification": "After container stop, independent loop query reported back-file null and autoclear false.",
+  "evidence_published_commit": "9acc54f89a3fbbc6767f98b216b9fa276b1a2c94",
+  "octez_implementation_commit": "d6601b2f79039d46cf493da5fd9ba9eb8fcad4b9",
+  "host_generated_files_removed": [
+    "octez-hacl-signer.install",
+    "octez-secp-signer.install"
+  ],
+  "install_metadata_backup": "/tmp/octez-install-metadata-backup-20261014",
+  "shared_docker_cache_pruned": false,
+  "unrelated_volumes_removed": false,
+  "publication_pending": [
+    "Octez fork URL",
+    "ocaml-tezos remote URL"
+  ]
+}

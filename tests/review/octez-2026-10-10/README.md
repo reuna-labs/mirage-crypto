@@ -215,7 +215,12 @@ The complete retry in `final-unit-ram-r2.log` passed all three unit stages.
 
 ## Cleanup
 
-Keep this workspace until final gates, commit and evidence export finish.
-The user authorized cleanup afterward. Remove only task-owned artifacts;
-the other contents of the external drive and unrelated Docker resources
-are outside this task.
+Cleanup completed after all gates, implementation commit and evidence
+publication (`9acc54f89a3fbbc6767f98b216b9fa276b1a2c94`). The external
+workspace occupied 70,831,480 KiB (67.6 GiB) before deletion. Its absence,
+removal of both task containers and the validation image, and loop detachment
+were verified. The source checkout is clean; its two generated install files
+were backed up under `/tmp` before removal. See `cleanup.json` for exact paths.
+Shared Docker caches, unrelated volumes and other external-drive content
+were not pruned. Paths in the historical instructions above no longer exist;
+the committed source, runners and evidence retain the validation record.

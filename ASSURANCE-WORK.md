@@ -121,8 +121,8 @@ published RFC8009 vectors and a separately identified compatibility change.
 
 ## Outstanding work
 
-Publish the completed Octez feature branch once its intended fork URL is
-provided, and complete task-owned build cleanup after evidence export.
+Publish the completed Octez feature branch and Tezos SDK commit once their
+intended remote URLs are provided. Task-owned build cleanup is complete.
 All required Octez build, formatting, lint, manifest, protocol and full unit
 gates passed. MPC findings remain review output, not fixed production code.
 The unrelated AGENTS.md change remains excluded.
@@ -142,3 +142,10 @@ the nonce-race reproducer, its ISC notice and fresh retained OCaml 5.3 evidence
 no MPC production fix is claimed. Octez validation is complete; its publication
 destination remains pending. The feature commit is local and the checkout has
 only the upstream GitLab remote, which has not been pushed to.
+
+The completed assurance evidence was published in Mirage Crypto commit
+`9acc54f89a3fbbc6767f98b216b9fa276b1a2c94`. Cleanup removed the 67.6 GiB
+external build workspace, both task-owned containers and their validation
+image after verifying loop detachment. Source checkouts and evidence remain;
+unrelated Docker volumes and shared caches were not pruned. See
+`tests/review/octez-2026-10-10/cleanup.json`.

@@ -310,3 +310,10 @@ archive. Timing and prior Solo5 artifact limitations remain as recorded.
 Publication needs the intended Octez fork URL; only upstream GitLab is
 configured. Task-owned cleanup follows evidence export. The separate later
 crypto proposals remain outside this completed implementation scope.
+
+Task-owned cleanup is complete: the 67.6 GiB external build workspace, both
+validation containers and their image were removed after evidence publication
+in Mirage Crypto `9acc54f89a3fbbc6767f98b216b9fa276b1a2c94`. The task loop
+device was verified detached. Source checkouts and retained evidence are
+preserved; shared caches and unrelated volumes were not pruned. The exact
+cleanup receipt is `tests/review/octez-2026-10-10/cleanup.json`.
